@@ -9,10 +9,12 @@ import { OTHERS_INDEX, OTHERS_GLSL_VALUE, OTHERS_LABEL } from './constants';
 const MAX_TOP_BUCKETS = 16;
 
 /**
- * Get the top `n` properties, aggregating the rest into an "others" bucket category.
+ * Get the top `n` properties, aggregating the rest into an "others" bucket category. The "others" label is by default CARTO_VL_OTHERS.
+ * This can be overwriten by setting the "others" label as the third parameter.
  *
  * @param {Category} property - Column of the table
  * @param {number} n - Number of top properties to be returned, the maximum value is 16, values higher than that will result in an error
+ * @param {string} othersLabel - Custom label for "others"
  * @return {Category}
  *
  * @example <caption>Use top 3 categories to define a color ramp.</caption>
@@ -24,6 +26,18 @@ const MAX_TOP_BUCKETS = 16;
  * @example <caption>Use top 3 categories to define a color ramp. (String)</caption>
  * const viz = new carto.Viz(`
  *   color: ramp(top($category, 3), VIVID)
+ * `);
+ *
+ * @example <caption>Set custom "others" label.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.ramp(s.top(s.prop('category'), 3, 'Others'), s.palettes.VIVID)
+ * });
+ *
+ * @example <caption>Set custom "others" label. (String)</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz(`
+ *   color: ramp(top($category, 3, 'Others'), VIVID)
  * `);
  *
  * @memberof carto.expressions

@@ -5,10 +5,12 @@ import { OTHERS_INDEX, OTHERS_LABEL, OTHERS_GLSL_VALUE } from './constants';
 /**
  * Given a property create "sub-groups" based on the given breakpoints.
  *
- * This returns a number or category expression depending on the input values.
+ * This returns a number or category expression depending on the input values. The "others" label is by default CARTO_VL_OTHERS.
+ * This can be overwriten by setting the "others" label as the third parameter.
  *
  * @param {Number|Category} property - The property to be evaluated and interpolated
  * @param {Number[]|Category[]} breakpoints - Expression containing the different breakpoints.
+ * @param {string} othersLabel - Custom label for "others"
  * @return {Number|Category}
  *
  * @example <caption>Display a traffic dataset in 4 colors depending on the numeric speed.</caption>
@@ -49,6 +51,21 @@ import { OTHERS_INDEX, OTHERS_LABEL, OTHERS_GLSL_VALUE } from './constants';
  * @example <caption>Display a traffic dataset is 3 colors depending on the category procesedSpeed. (String)</caption>
  * const viz = new carto.Viz(`
  *    color: ramp(buckets($procesedSpeed, ['slow', 'medium', 'high']), PRISM)
+ * `);
+ *
+ * @example <caption>Set custom "others" label.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.ramp(
+ *     s.buckets(s.prop('procesedSpeed'), ['slow', 'medium', 'high'], 'Others'),
+ *     s.palettes.PRISM)
+ *   )
+ * });
+ *
+ * @example <caption>Set custom "others" label. (String)</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz(`
+ *    color: ramp(buckets($procesedSpeed, ['slow', 'medium', 'high'], 'Others'), PRISM)
  * `);
  *
  * @memberof carto.expressions
