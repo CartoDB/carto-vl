@@ -26,13 +26,13 @@ import { implicitCast, checkType, checkExpression } from './utils';
  * @api
  */
 export default class Zoomrange extends BaseExpression {
-    constructor (_zoomBreakpointList) {
-        _zoomBreakpointList = implicitCast(_zoomBreakpointList);
+    constructor (zoomBreakpointList) {
+        zoomBreakpointList = implicitCast(zoomBreakpointList);
 
         super({});
-        checkExpression('zoomrange', '_zoomBreakpointList', 0, _zoomBreakpointList);
+        checkExpression('zoomrange', 'zoomBreakpointList', 0, zoomBreakpointList);
         this.type = 'number';
-        this._zoomBreakpointList = _zoomBreakpointList;
+        this._zoomBreakpointList = zoomBreakpointList;
         this.inlineMaker = inline => inline._impostor;
     }
 
