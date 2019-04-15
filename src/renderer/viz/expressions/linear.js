@@ -12,6 +12,8 @@ import { DEFAULT_SAMPLES } from './constants';
 * @param {Number|Date} input - The input to be evaluated and interpolated, can be a numeric property or a date property
 * @param {Number|Date} [min=globalMin(input)] - Numeric or date expression pointing to the lower limit
 * @param {Number|Date} [max=globalMax(input)] - Numeric or date expression pointing to the higher limit
+* @param {Number|Date} [max=globalMax(input)] - Numeric or date expression to set a timerange
+* @param {Number} samples - Number of samples, which is 10 by default
 * @return {Number|Date}
 *
 * @example <caption> Color by $speed using the CARTOColor Prism by assigning the first color in Prism to features with speeds of 10 or less, the last color in Prism to features with speeds of 100 or more and a interpolated value for the speeds in between.</caption>
@@ -25,6 +27,18 @@ import { DEFAULT_SAMPLES } from './constants';
 *   color: ramp(linear($speed, 10, 100), PRISM)
 * `);
 *
+* @example <caption> Set custom number of samples.</caption>
+* const s = carto.expressions;
+* const viz = new carto.Viz({
+*   color: s.ramp(s.linear(s.prop('speed'), 10, 100, null, 10), s.palettes.PRISM)
+* });
+*
+* @example <caption> Set custom number of samples. (String)</caption>
+* const s = carto.expressions;
+* const viz = new carto.Viz(`
+*   color: ramp(linear($speed, 10, 100, null, 10), PRISM)
+* `);
+*
 * @memberof carto.expressions
 * @name linear
 * @function
@@ -32,7 +46,7 @@ import { DEFAULT_SAMPLES } from './constants';
 */
 export default class Linear extends BaseExpression {
     constructor (input, min, max, range, samples = DEFAULT_SAMPLES) {
-        checkMaxArguments(arguments, 4, 'linear');
+        checkMaxArguments(arguments, 5, 'linear');
 
         input = implicitCast(input);
 
