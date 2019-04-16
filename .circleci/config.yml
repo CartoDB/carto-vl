@@ -8,10 +8,26 @@ orbs:
   sauce-connect: saucelabs/sauce-connect@1.0.1
 
 jobs:
-  test-e2e:
+  test-e2e-pg10:
     docker:
-      - image: circleci/node:8-browsers
-      - image: carto/windshaft-cartovl-testing
+      - image: circleci/node:10.15.1-jessie-browsers
+      - image: carto/windshaft-cartovl-testing-pg10
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - restore_cache: # special step to restore the dependency cache
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run: yarn install
+      - save_cache: # special step to save the dependency cache
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - ./node_modules
+      - run: yarn build:clean && yarn build:min && yarn wait-on http://127.0.0.1:8181 && MIN=1 yarn mocha test/acceptance/e2e.test.js --timeout 25000
+
+  test-e2e-pg11:
+    docker:
+      - image: circleci/node:10.15.1-jessie-browsers
+      - image: carto/windshaft-cartovl-testing-pg11
     working_directory: ~/repo
     steps:
       - checkout
@@ -27,7 +43,7 @@ jobs:
   test-unit-lint-docs:
     docker:
       # specify the version you desire here
-      - image: circleci/node:8-browsers
+      - image: circleci/node:10.15.1-jessie-browsers
     working_directory: ~/repo
     steps:
       - checkout
@@ -45,7 +61,7 @@ jobs:
   test-user:
     docker:
       # specify the version you desire here
-      - image: circleci/node:8-browsers
+      - image: circleci/node:10.15.1-jessie-browsers
     working_directory: ~/repo
     steps:
       - checkout
@@ -64,7 +80,7 @@ jobs:
   test-render:
     docker:
       # specify the version you desire here
-      - image: circleci/node:8-browsers
+      - image: circleci/node:10.15.1-jessie-browsers
     working_directory: ~/repo
     steps:
       - checkout
@@ -82,10 +98,11 @@ jobs:
       - run: xvfb-run -a yarn test:render:min
 
 workflows:
-  version: 2
+  version: 2.1
   build_and_test:
     jobs:
-      - test-e2e
+      - test-e2e-pg10
+      - test-e2e-pg11
       - test-unit-lint-docs
       - test-render
       - test-user
