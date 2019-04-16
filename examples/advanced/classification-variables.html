@@ -64,10 +64,10 @@
             <li>
               <label>1. Select the input field</label>
               <select id="valueSelector">
-                <option value="trump" selected>Trump</option>
-                <option value="clinton">Clinton</option>
-                <option value="pct_dem">Percent Democr.</option>
-                <option value="pct_higher_ed">Percent Higher Education</option>
+                <option value="pct_trump" selected>Percent Trump</option>
+                <option value="pct_clinton">Percent Clinton</option>
+                <option value="pct_dem_r">Percent Democrat</option>
+                <option value="pct_higher_edu">Percent Higher Education</option>
               </select>
             </li>
             <li>
@@ -241,7 +241,7 @@
     // Define layer
     const source = new carto.source.Dataset('higher_edu_by_county');
     let initialSettings = {
-      input: 'trump',
+      input: 'pct_trump',
       buckets: 3,
       palette: 'Burg',
       opacity: 0.8
