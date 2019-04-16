@@ -139,7 +139,13 @@ export default class Linear extends BaseExpression {
     }
 
     get value () {
-        return this.eval();
+        return {
+            min: this.min,
+            max: this.max,
+            input: this.input.value,
+            range: this._rangeMode,
+            samples: this.samples
+        };
     }
 
     eval (feature) {

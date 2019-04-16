@@ -29,52 +29,26 @@ import timeZoneDate from './TimeZoneDate';
  * */
 export default class TimeRange {
     constructor (timeZone, iso, startValue, endValue) {
-        // The timezone of a TimeRange is merely informative.
-        // No time zone conversion is ever performed, e.g. when
-        // several ranges are used in the same linear expression.
-        // In same cases (e.g. defining a time range from a text constant)
-        // it may not be available.
-        this._timeZone = timeZone;
+        this._startValue = startValue;
+        this._endValue = endValue;
 
         if (startValue && endValue) {
             this._iso = periodISO(startValue, endValue);
-            this._startValue = startValue;
-            this._endValue = endValue;
-        } else {
+        } else if (!startValue && !endValue && iso) {
             const startEndValues = _startEndTimeValues(iso);
 
             this._iso = iso;
             this._startValue = startEndValues[0];
             this._endValue = startEndValues[1];
         }
+
+        // The timezone of a TimeRange is merely informative.
+        // No time zone conversion is ever performed, e.g. when
+        // several ranges are used in the same linear expression.
+        // In same cases (e.g. defining a time range from a text constant)
+        // it may not be available.
+        this._timeZone = timeZone;
     }
-
-    // /**
-    //  * Construct a TimeRange from a time range string
-    //  *
-    //  * @param {String} iso - Abbreviated ISO-formatted string (e.g. `'2018-03'`)
-    //  * @param {String} timeZone - Optional time zone identification
-    //  * @return {TimeRange}
-    //  * @api
-    //  */
-    // static fromText (iso, timeZone = null) {
-    //     return new TimeRange(timeZone, iso, ..._startEndTimeValues(iso));
-    // }
-
-    // /**
-    //  * Construct a TimeRange from start and end epoch values in milliseconds
-    //  * interpreted as in the specified time zone (UTC by default).
-    //  *
-    //  * @param {Number} startValue - start of the range as elapsed milliseconds since a timezone-specific epoch
-    //  * @param {Number} endValue - end of the range as elapsed milliseconds since a timezone-specific epoch
-    //  * @param {String} timeZone - Optional time zone identification
-    //  * @return {TimeRange}
-    //  * @api
-    //  */
-    // static fromStartEndValues (startValue, endValue, timeZone = null) {
-    //     const iso = periodISO(startValue, endValue);
-    //     return new TimeRange(timeZone, iso, startValue, endValue);
-    // }
 
     get timeZone () {
         return this._timeZone;
