@@ -8,7 +8,7 @@ cd ./Windshaft-cartodb/
 git checkout master
 git pull origin master
 
-yarn
+npm ci
 
 cd /srv
 echo "port 6335" | redis-server - > ./redis.log &
