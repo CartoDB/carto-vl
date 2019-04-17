@@ -79,7 +79,7 @@ export default class Windshaft {
             const aggregatedUsage = usages.some(x => x.type === aggregationTypes.AGGREGATED);
             const unAggregatedUsage = usages.some(x => x.type === aggregationTypes.UNAGGREGATED);
             if (aggregatedUsage && unAggregatedUsage) {
-                throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Incompatible combination of cluster aggregation usages (${
+                throw new CartoValidationError(cvt.INCORRECT_VALUE, `Incompatible combination of cluster aggregation usages (${
                     JSON.stringify(usages.filter(x => x.type !== 'aggregated'))
                 }) with unaggregated usage for property '${propertyName}'`);
             }
@@ -205,7 +205,7 @@ export default class Windshaft {
     _checkLayerMeta (MNS) {
         if (!this._isAggregated()) {
             if (this._requiresAggregation(MNS)) {
-                throw new CartoMapsAPIError(`${cmt.NOT_SUPPORTED} Aggregation not supported for this dataset`);
+                throw new CartoMapsAPIError(cmt.NOT_SUPPORTED, `Aggregation not supported for this dataset`);
             }
         }
     }
@@ -324,11 +324,11 @@ export default class Windshaft {
         if (!response.ok) {
             if (response.status === 401) {
                 throw new CartoMapsAPIError(
-                    `${cmt.SECURITY} Unauthorized access to Maps API: invalid combination of user('${this._source._username}') and apiKey('${this._source._apiKey}')`
+                    cmt.SECURITY, `Unauthorized access to Maps API: invalid combination of user('${this._source._username}') and apiKey('${this._source._apiKey}')`
                 );
             } else if (response.status === 403) {
                 throw new CartoMapsAPIError(
-                    `${cmt.SECURITY} Unauthorized access to dataset: the provided apiKey('${this._source._apiKey}') doesn't provide access to the requested data`
+                    cmt.SECURITY, `Unauthorized access to dataset: the provided apiKey('${this._source._apiKey}') doesn't provide access to the requested data`
                 );
             }
             throw new CartoMapsAPIError(`SQL errors: ${JSON.stringify(layergroup.errors)}`);
@@ -369,7 +369,7 @@ export default class Windshaft {
                 const dimType = adaptColumnType(dimensionStats.type);
                 const { column, ...params } = dimension;
                 if (properties[column].dimension) {
-                    throw new CartoMapsAPIError(`${cmt.NOT_SUPPORTED} Multiple dimensions based on same column '${column}'.`);
+                    throw new CartoMapsAPIError(cmt.NOT_SUPPORTED, `Multiple dimensions based on same column '${column}'.`);
                 }
                 properties[column].dimension = {
                     propertyName: dimName,
@@ -423,7 +423,7 @@ function adaptGeometryType (type) {
         case 'ST_LineString':
             return GEOMETRY_TYPE.LINE;
         default:
-            throw new CartoMapsAPIError(`${cmt.NOT_SUPPORTED} Unimplemented geometry type '${type}'.`);
+            throw new CartoMapsAPIError(cmt.NOT_SUPPORTED, `Unimplemented geometry type '${type}'.`);
     }
 }
 

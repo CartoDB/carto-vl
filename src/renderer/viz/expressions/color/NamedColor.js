@@ -32,7 +32,7 @@ export default class NamedColor extends BaseExpression {
 
         if (!CSS_COLOR_NAMES.includes(colorName.toLowerCase())) {
             const preface = getStringErrorPreface('namedColor', 'colorName', 0);
-            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} ${preface}\nInvalid color name:  '${colorName}'`);
+            throw new CartoValidationError(cvt.INCORRECT_VALUE, `${preface}\nInvalid color name:  '${colorName}'`);
         }
         super({});
         this.type = 'color';

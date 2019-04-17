@@ -390,7 +390,7 @@ export default class Viz {
         if (util.isString(definition)) {
             return this._setDefaults(parseVizDefinition(definition));
         }
-        throw new CartoValidationError(`${cvt.INCORRECT_VALUE} viz 'definition' should be a vizSpec object or a valid viz string.`);
+        throw new CartoValidationError(cvt.INCORRECT_VALUE, `viz 'definition' should be a vizSpec object or a valid viz string.`);
     }
 
     /**
@@ -441,13 +441,13 @@ export default class Viz {
 
         if (util.isNumber(resolutionValue)) {
             if (resolution <= MIN_RESOLUTION) {
-                throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'resolution' is ${resolution}, must be greater than ${MIN_RESOLUTION}.`);
+                throw new CartoValidationError(cvt.INCORRECT_VALUE, `'resolution' is ${resolution}, must be greater than ${MIN_RESOLUTION}.`);
             }
             if (resolution >= MAX_RESOLUTION) {
-                throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'resolution' is ${resolution}, must be lower than ${MAX_RESOLUTION}.`);
+                throw new CartoValidationError(cvt.INCORRECT_VALUE, `'resolution' is ${resolution}, must be lower than ${MAX_RESOLUTION}.`);
             }
         } else {
-            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'resolution' property must be a number.`);
+            throw new CartoValidationError(cvt.INCORRECT_TYPE, `'resolution' property must be a number.`);
         }
     }
 
@@ -467,7 +467,7 @@ export default class Viz {
 
         SUPPORTED_VIZ_PROPERTIES.forEach((parameter) => {
             if (!(vizSpec[parameter] instanceof BaseExpression)) {
-                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} '${parameter}' parameter is not a valid viz Expresion.`);
+                throw new CartoValidationError(cvt.INCORRECT_TYPE, `'${parameter}' parameter is not a valid viz Expresion.`);
             }
         });
 
@@ -516,7 +516,7 @@ function checkVizPropertyTypes (viz) {
         const expected = expectedTypePerProperty[property];
         if (currentType !== expected) {
             throw new CartoValidationError(
-                `${cvt.INCORRECT_TYPE} Viz property '${property}': must be of type '${expected}' but it was of type '${currentType}'`
+                cvt.INCORRECT_TYPE, `Viz property '${property}': must be of type '${expected}' but it was of type '${currentType}'`
             );
         }
     });

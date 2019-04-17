@@ -6,13 +6,15 @@ import CartoError from './carto-error';
  * @return {CartoError} A well formed object representing the error.
  */
 export default class CartoValidationError extends CartoError {
-    constructor (message) {
-        super({ message: message });
+    constructor (type=CartoValidationTypes.DEFAULT, message) {
+        super({ message });
         this.name = 'CartoValidationError';
+        this.type = type;
     }
 }
 
 export const CartoValidationTypes = {
+    DEFAULT: '[Error:]',
     MISSING_REQUIRED: '[Missing required property]:',
     INCORRECT_TYPE: '[Property with an incorrect type]:',
     INCORRECT_VALUE: '[Incorrect value]:',

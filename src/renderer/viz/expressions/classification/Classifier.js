@@ -55,7 +55,7 @@ export default class Classifier extends BaseExpression {
         const buckets = this.buckets.value;
         checkNumber(this.expressionName, 'buckets', 1, buckets);
         if (buckets <= 1) {
-            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} The number of 'buckets' must be >=2, but ${buckets} was used`);
+            throw new CartoValidationError(cvt.INCORRECT_VALUE, `The number of 'buckets' must be >=2, but ${buckets} was used`);
         }
     }
 

@@ -80,7 +80,7 @@ export default class ViewportStandardDev extends Classifier {
         const classSize = this._classSize.value;
         checkNumber(this.expressionName, 'classSize', 2, classSize);
         if (classSize <= 0) {
-            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} The 'classSize' must be > 0.0, but ${classSize} was used.`);
+            throw new CartoValidationError(cvt.INCORRECT_VALUE, `The 'classSize' must be > 0.0, but ${classSize} was used.`);
         }
     }
 
@@ -88,7 +88,7 @@ export default class ViewportStandardDev extends Classifier {
         const histogramSize = this._histogramSize.value;
         checkNumber(this.expressionName, 'histogramSize', 3, histogramSize);
         if (histogramSize <= 0) {
-            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} The 'histogramSize' must be > 0, but ${histogramSize} was used`);
+            throw new CartoValidationError(cvt.INCORRECT_VALUE, `The 'histogramSize' must be > 0, but ${histogramSize} was used`);
         }
     }
 

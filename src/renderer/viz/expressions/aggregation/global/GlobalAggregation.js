@@ -99,14 +99,14 @@ export default class GlobalAggregation extends BaseExpression {
             }
         } else {
             if (propertyName === CLUSTER_FEATURE_COUNT) {
-                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'clusterCount' can not be used in ${this.expressionName}.`);
+                throw new CartoValidationError(cvt.INCORRECT_TYPE, `'clusterCount' can not be used in ${this.expressionName}.`);
             }
             const stats = metadata.stats(propertyName);
             value = stats && stats[this._name];
         }
 
         if (value === undefined) {
-            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} Metadata ${this._name} for property ${propertyName} is not defined`);
+            throw new CartoValidationError(cvt.MISSING_REQUIRED, `Metadata ${this._name} for property ${propertyName} is not defined`);
         }
 
         return value;

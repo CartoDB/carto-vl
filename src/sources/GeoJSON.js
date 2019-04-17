@@ -2,7 +2,7 @@ import * as rsys from '../client/rsys';
 import Dataframe from '../renderer/Dataframe';
 import Metadata from './GeoJSONMetadata';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../src/errors/carto-validation-error';
-import CartoRuntimeError, { CartoRuntimeTypes as runtimeErrors } from '../../src/errors/carto-runtime-error';
+import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../../src/errors/carto-runtime-error';
 import util from '../utils/util';
 import Base from './Base';
 import schema from '../renderer/schema';
@@ -58,7 +58,7 @@ export default class GeoJSON extends Base {
         } else if (data.type === 'Feature') {
             this._features = [data];
         } else {
-            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'data' property must be a GeoJSON object.`);
+            throw new CartoValidationError(cvt.INCORRECT_VALUE, `'data' property must be a GeoJSON object.`);
         }
 
         this._features = this._initializeFeatureProperties(this._features);
@@ -109,10 +109,10 @@ export default class GeoJSON extends Base {
 
     _checkData (data) {
         if (util.isUndefined(data)) {
-            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} 'data'`);
+            throw new CartoValidationError(cvt.MISSING_REQUIRED, `'data'`);
         }
         if (!util.isObject(data)) {
-            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'data' property must be an object.`);
+            throw new CartoValidationError(cvt.INCORRECT_TYPE, `'data' property must be an object.`);
         }
     }
 
@@ -173,7 +173,7 @@ export default class GeoJSON extends Base {
 
     _addNumericPropertyToMetadata (propertyName, value) {
         if (this._catFields.has(propertyName) || this._dateFields.has(propertyName)) {
-            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
+            throw new CartoValidationError(cvt.INCORRECT_TYPE, `Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
         }
         this._addNumericColumnField(propertyName);
         const property = this._properties[propertyName];
@@ -199,7 +199,7 @@ export default class GeoJSON extends Base {
     _addDatePropertyToMetadata (propertyName, value) {
         if (this._catFields.has(propertyName) || this._numFields.has(propertyName)) {
             throw new CartoRuntimeError(
-                `${runtimeErrors.NOT_SUPPORTED} Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`
+                crt.NOT_SUPPORTED, `Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`
             );
         }
         this._addDateColumnField(propertyName);
@@ -241,7 +241,7 @@ export default class GeoJSON extends Base {
     _addCategoryPropertyToMetadata (propertyName, value) {
         if (this._numFields.has(propertyName) || this._dateFields.has(propertyName)) {
             throw new CartoRuntimeError(
-                `${runtimeErrors.NOT_SUPPORTED} Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`
+                crt.NOT_SUPPORTED, `Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`
             );
         }
         if (!this._catFields.has(propertyName)) {
@@ -332,7 +332,7 @@ export default class GeoJSON extends Base {
             const type = geometry.type;
             const coordinates = geometry.coordinates;
             if (this._type !== type) {
-                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} multiple geometry types not supported: found '${type}' instead of '${this._type}'.`);
+                throw new CartoValidationError(cvt.INCORRECT_TYPE, `multiple geometry types not supported: found '${type}' instead of '${this._type}'.`);
             }
             if (type === 'Point') {
                 const point = this._computePointGeometry(coordinates);

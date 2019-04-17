@@ -107,7 +107,7 @@ export default class Buckets extends BaseExpression {
 
         if (this.input.type !== 'number' && this.input.type !== 'category') {
             throw new CartoValidationError(
-                `${cvt.INCORRECT_TYPE} buckets(): invalid first parameter type\n\t'input' type was ${this.input.type}`
+                cvt.INCORRECT_TYPE, `buckets(): invalid first parameter type\n\t'input' type was ${this.input.type}`
             );
         }
 
@@ -116,12 +116,12 @@ export default class Buckets extends BaseExpression {
         this.list.elems.map((item, index) => {
             if (this.input.type !== item.type) {
                 throw new CartoValidationError(
-                    `${cvt.INCORRECT_TYPE} buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type` +
+                    cvt.INCORRECT_TYPE, `buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type` +
                     `\n\texpected type was ${this.input.type}\n\tactual type was ${item.type}`
                 );
             } else if (item.type !== 'number' && item.type !== 'category') {
                 throw new CartoValidationError(
-                    `${cvt.INCORRECT_TYPE} buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type\n\ttype was ${item.type}`
+                    cvt.INCORRECT_TYPE, `buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type\n\ttype was ${item.type}`
                 );
             }
         });

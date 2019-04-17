@@ -114,7 +114,7 @@ function _defineRootBlendToMethod (targetObject) {
             const blendTo = (newVizProperties, duration = 500) => {
                 Object.keys(newVizProperties).forEach((property) => {
                     if (!(SUPPORTED_VIZ_PROPERTIES.includes(property))) {
-                        throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Property '${property}' is not a valid viz property`);
+                        throw new CartoValidationError(cvt.INCORRECT_VALUE, `Property '${property}' is not a valid viz property`);
                     }
                     const newValue = newVizProperties[property];
                     this[property].blendTo(newValue, duration);

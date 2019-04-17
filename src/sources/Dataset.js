@@ -57,13 +57,13 @@ export default class Dataset extends BaseWindshaft {
 
     _checkTableName (tableName) {
         if (util.isUndefined(tableName)) {
-            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} 'tableName'`);
+            throw new CartoValidationError(cvt.MISSING_REQUIRED, `'tableName'`);
         }
         if (!util.isString(tableName)) {
-            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'tableName' property must be a string.`);
+            throw new CartoValidationError(cvt.INCORRECT_TYPE, `'tableName' property must be a string.`);
         }
         if (tableName === '') {
-            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'tableName' property must be not empty.`);
+            throw new CartoValidationError(cvt.INCORRECT_VALUE, `'tableName' property must be not empty.`);
         }
     }
 }
