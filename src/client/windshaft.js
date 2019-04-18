@@ -132,7 +132,6 @@ export default class Windshaft {
 
         const schemaChanged = (schema.notEquals(this._MNS, MNS));
         const resolutionChanged = this.resolution !== resolution;
-
         const filteringChanged = JSON.stringify(this.filtering) !== JSON.stringify(filtering);
         const shouldBeServerFiltered = this.metadata && (this.metadata.featureCount > MIN_FILTERING);
 
@@ -364,33 +363,9 @@ export default class Windshaft {
     }
 
     async _makeWindshaftRequest (conf, mapConfigAgg) {
-        let response;
-        try {
-            const requestHelper = new WindshaftRequestHelper(conf, mapConfigAgg);
-            response = await fetch(requestHelper.getMapRequest());
-        } catch (error) {
-            throw new CartoMapsAPIError(`Failed to connect to Maps API with your user('${this._source._username}')`);
-        }
-
-        const layergroup = await response.json();
-        if (!response.ok) {
-            this._dealWithWindshaftErrors(response);
-        }
-
+        const requestHelper = new WindshaftRequestHelper(conf, mapConfigAgg);
+        const layergroup = await requestHelper.getMapRequest();
         return layergroup;
-    }
-
-    _dealWithWindshaftErrors (response, layergroup) {
-        if (response.status === 401) {
-            throw new CartoMapsAPIError(
-                `${cmt.SECURITY} Unauthorized access to Maps API: invalid combination of user('${this._source._username}') and apiKey('${this._source._apiKey}')`
-            );
-        } else if (response.status === 403) {
-            throw new CartoMapsAPIError(
-                `${cmt.SECURITY} Unauthorized access to dataset: the provided apiKey('${this._source._apiKey}') doesn't provide access to the requested data`
-            );
-        }
-        throw new CartoMapsAPIError(`SQL errors: ${JSON.stringify(layergroup.errors)}`);
     }
 
     _adaptMetadata (meta, agg, MNS) {
