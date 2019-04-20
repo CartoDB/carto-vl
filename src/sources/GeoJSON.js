@@ -92,7 +92,7 @@ export default class GeoJSON extends Base {
             throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'data' property must be a GeoJSON object.`);
         }
 
-        features = this._initializeFeaturePropertiesIn(features);
+        this._initializePropertiesIn(features);
         return features;
     }
 
@@ -189,11 +189,10 @@ export default class GeoJSON extends Base {
         return new GeoJSON(this._data, { dateColumns: Array.from(this._providedDateColumns) });
     }
 
-    _initializeFeaturePropertiesIn (features) {
+    _initializePropertiesIn (features) {
         for (let i = 0; i < features.length; i++) {
             features[i].properties = features[i].properties || {};
         }
-        return features;
     }
 
     _computeMetadata (viz) {
