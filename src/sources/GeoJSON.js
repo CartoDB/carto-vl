@@ -149,7 +149,7 @@ export default class GeoJSON extends Base {
     requestData () {
         if (this._dataframe) {
             const newProperties = this._decodeUnboundProperties();
-            this._dataframe.addProperties(newProperties);
+            this._dataframe.addProperties();
 
             const newPropertyNames = Object.keys(newProperties);
             newPropertyNames.forEach(propertyName => {
