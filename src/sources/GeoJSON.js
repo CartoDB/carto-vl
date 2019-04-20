@@ -8,7 +8,12 @@ import Base from './Base';
 import schema from '../renderer/schema';
 import { GEOMETRY_TYPE } from '../utils/geometry';
 
+import GeoJSONGeometryTransformer from './geojson/GeoJSONGeometryTransformer';
+import GeoJSONGeometryType from './geojson/GeoJSONGeometryType';
+
 const SAMPLE_TARGET_SIZE = 1000;
+const DATAFRAME_PADDING = 1024;
+const ID_PROPERTY = 'cartodb_id';
 
 export default class GeoJSON extends Base {
     /**
@@ -40,9 +45,9 @@ export default class GeoJSON extends Base {
      */
     constructor (data, options = {}) {
         super();
-        this._checkData(data);
 
-        this._type = ''; // Point, LineString, MultiLineString, Polygon, MultiPolygon
+        this._initializeData(data);
+
         this._categoryStringToIDMap = {};
         this._numCategories = 0;
         this._numFields = new Set();
@@ -51,19 +56,86 @@ export default class GeoJSON extends Base {
         this._providedDateColumns = new Set(options.dateColumns);
         this._properties = {};
         this._boundColumns = new Set();
+    }
+
+    _initializeData (data) {
+        this._checkData(data);
 
         this._data = data;
-        if (data.type === 'FeatureCollection') {
-            this._features = data.features;
-        } else if (data.type === 'Feature') {
-            this._features = [data];
+        this._features = this._featuresFromData();
+        this._type = this._getType();
+        this._webMercatorCenter = this._getWebMercatorCoordsCenter();
+        this._geometryTransformer = new GeoJSONGeometryTransformer(this._webMercatorCenter);
+    }
+
+    _checkData (data) {
+        if (util.isUndefined(data)) {
+            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} 'data'`);
+        }
+        if (!util.isObject(data)) {
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'data' property must be an object.`);
+        }
+    }
+
+    /**
+     * Get initialized Features from data
+     */
+    _featuresFromData () {
+        let features;
+
+        const dataType = this._data.type;
+        if (dataType === 'FeatureCollection') {
+            features = this._data.features;
+        } else if (dataType === 'Feature') {
+            features = [this._data];
         } else {
             throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'data' property must be a GeoJSON object.`);
         }
 
-        this._features = this._initializeFeatureProperties(this._features);
+        features = this._initializeFeaturePropertiesIn(features);
+        return features;
+    }
 
-        this._setCoordinatesCenter();
+    /**
+     * Get the GeoJSONGeometryType from the first Feature
+     */
+    _getType () {
+        return this._features[0].geometry.type;
+    }
+
+    /**
+     * Get an estimated center in WebMercator coordinates, based on a sample of the Features
+     */
+    _getWebMercatorCoordsCenter () {
+        let x = 0;
+        let y = 0;
+        let nPoints = 0;
+        this._fetchFeatureGeometry({ sample: 10 }, (_, geometry) => {
+            const samplePoint = this._samplePoint(geometry);
+            const sampleXY = util.projectToWebMercator({ lng: samplePoint[0], lat: samplePoint[1] });
+            x += sampleXY.x;
+            y += sampleXY.y;
+            nPoints += 1;
+        });
+
+        if (nPoints > 1) {
+            x /= nPoints;
+            y /= nPoints;
+        }
+
+        return { x, y };
+    }
+
+    /**
+     * Get the dataframe center in a local RSys.
+     */
+    _getDataframeCenter () {
+        const targetReferenceSystem = {
+            scale: util.WM_R,
+            center: { x: 0, y: 0 }
+        };
+        const { x: worldX, y: worldY } = this._webMercatorCenter;
+        return rsys.wToR(worldX, worldY, targetReferenceSystem);
     }
 
     bindLayer (addDataframe) {
@@ -78,14 +150,23 @@ export default class GeoJSON extends Base {
         if (this._dataframe) {
             const newProperties = this._decodeUnboundProperties();
             this._dataframe.addProperties(newProperties);
-            Object.keys(newProperties).forEach(propertyName => {
+
+            const newPropertyNames = Object.keys(newProperties);
+            newPropertyNames.forEach(propertyName => {
                 this._boundColumns.add(propertyName);
             });
-            return Promise.resolve(Object.keys(newProperties).length > 0);
+
+            return Promise.resolve(newPropertyNames.length > 0);
         }
+
+        this._dataframe = this._createNewDataframe();
+        return Promise.resolve(true);
+    }
+
+    _createNewDataframe () {
         const dataframe = new Dataframe({
             active: true,
-            center: this._dataframeCenter,
+            center: this._getDataframeCenter(),
             geom: this._decodeGeometry(),
             properties: this._decodeUnboundProperties(),
             scale: 1,
@@ -93,10 +174,11 @@ export default class GeoJSON extends Base {
             type: this._getDataframeType(this._type),
             metadata: this._metadata
         });
+
         this._boundColumns = new Set(Object.keys(dataframe.properties));
-        this._dataframe = dataframe;
         this._addDataframe(dataframe);
-        return Promise.resolve(true);
+
+        return dataframe;
     }
 
     requiresNewMetadata () {
@@ -107,26 +189,16 @@ export default class GeoJSON extends Base {
         return new GeoJSON(this._data, { dateColumns: Array.from(this._providedDateColumns) });
     }
 
-    _checkData (data) {
-        if (util.isUndefined(data)) {
-            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} 'data'`);
-        }
-        if (!util.isObject(data)) {
-            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'data' property must be an object.`);
-        }
-    }
-
-    _initializeFeatureProperties (features) {
+    _initializeFeaturePropertiesIn (features) {
         for (let i = 0; i < features.length; i++) {
             features[i].properties = features[i].properties || {};
         }
-
         return features;
     }
 
     _computeMetadata (viz) {
         const sample = [];
-        this._addNumericColumnField('cartodb_id');
+        this._addNumericColumnField(ID_PROPERTY);
 
         const featureCount = this._features.length;
         const requiredColumns = new Set(Object.keys(schema.simplify(viz.getMinimumNeededSchema())));
@@ -154,9 +226,15 @@ export default class GeoJSON extends Base {
             // Set the geomType of the first feature to the metadata
             geomType = this._getDataframeType(this._features[0].geometry.type);
         }
-        const idProperty = 'cartodb_id';
 
-        this._metadata = new Metadata({ properties: this._properties, featureCount, sample, geomType, idProperty });
+        this._metadata = new Metadata({
+            properties: this._properties,
+            featureCount,
+            sample,
+            geomType,
+            idProperty: ID_PROPERTY
+        });
+
         this._metadata.setCodecs();
         return this._metadata;
     }
@@ -261,55 +339,63 @@ export default class GeoJSON extends Base {
     }
 
     _decodeUnboundProperties () {
-        const properties = {};
-        [...this._numFields].concat([...this._catFields]).concat([...this._dateFields]).map(name => {
-            if (this._boundColumns.has(name)) {
-                return;
-            }
-            // The dataframe expects to have a padding of 1024, adding 1024 empty values assures this condition is met
-            properties[name] = new Float32Array(this._features.length + 1024);
-        });
-
-        const catFields = [...this._catFields].filter(name => !this._boundColumns.has(name));
-        const numFields = [...this._numFields].filter(name => !this._boundColumns.has(name));
-        const dateFields = [...this._dateFields].filter(name => !this._boundColumns.has(name));
-        const fields = [...catFields, ...numFields, ...dateFields];
+        const unboundProperties = this._getUnboundProperties();
+        const unboundFieldNames = Object.keys(unboundProperties);
 
         for (let i = 0; i < this._features.length; i++) {
             const f = this._features[i];
-            fields.forEach(name => {
-                if (name === 'cartodb_id' && !Number.isFinite(f.properties.cartodb_id)) {
-                    // Using negative ids for GeoJSON features
-                    f.properties.cartodb_id = -i;
+            unboundFieldNames.forEach(name => {
+                if (name === ID_PROPERTY && !Number.isFinite(f.properties[ID_PROPERTY])) {
+                    f.properties[ID_PROPERTY] = -i; // using negative ids for GeoJSON features
                 }
                 // note that GeoJSON does not support multi-value properties
-                properties[name][i] = this._metadata.codec(name).sourceToInternal(this._metadata, f.properties[name]);
+                unboundProperties[name][i] = this._metadata.codec(name).sourceToInternal(this._metadata, f.properties[name]);
             });
         }
+
+        return unboundProperties;
+    }
+
+    _getUnboundProperties () {
+        const properties = {};
+        const allFields = [...this._numFields].concat([...this._catFields]).concat([...this._dateFields]);
+        allFields.map(name => {
+            if (this._boundColumns.has(name)) {
+                return;
+            }
+            // The dataframe expects to have a padding, adding DATAFRAME_PADDING empty values assures this condition is met
+            properties[name] = new Float32Array(this._features.length + DATAFRAME_PADDING);
+        });
+
         return properties;
     }
 
     _getDataframeType (type) {
         switch (type) {
-            case 'Point':
+            case GeoJSONGeometryType.POINT:
                 return GEOMETRY_TYPE.POINT;
-            case 'LineString':
-            case 'MultiLineString':
+            case GeoJSONGeometryType.LINE_STRING:
+            case GeoJSONGeometryType.MULTI_LINE_STRING:
                 return GEOMETRY_TYPE.LINE;
-            case 'Polygon':
-            case 'MultiPolygon':
+            case GeoJSONGeometryType.POLYGON:
+            case GeoJSONGeometryType.MULTI_POLYGON:
                 return GEOMETRY_TYPE.POLYGON;
             default:
                 return '';
         }
     }
 
+    /**
+     * Take the geometry from every feature and invoke the callback with it.
+     * If custom options are specified, a 'sample' can be used to skip every 'X' features
+     */
     _fetchFeatureGeometry (options = {}, callback) {
         let geometry = null;
+        const DEFAULT_SAMPLE = 1; // every feature
         const numFeatures = this._features.length;
-        const incr = options.sample ? Math.max(1, Math.floor(numFeatures / options.sample)) : 1;
+        const increment = options.sample ? Math.max(1, Math.floor(numFeatures / options.sample)) : DEFAULT_SAMPLE;
 
-        for (let i = 0; i < numFeatures; i += incr) {
+        for (let i = 0; i < numFeatures; i += increment) {
             const feature = this._features[i];
             if (feature.type === 'Feature') {
                 callback(i, feature.geometry);
@@ -334,25 +420,25 @@ export default class GeoJSON extends Base {
             if (this._type !== type) {
                 throw new CartoValidationError(`${cvt.INCORRECT_TYPE} multiple geometry types not supported: found '${type}' instead of '${this._type}'.`);
             }
-            if (type === 'Point') {
-                const point = this._computePointGeometry(coordinates);
+            if (type === GeoJSONGeometryType.POINT) {
+                const point = this._geometryTransformer.computePoint(coordinates);
                 geometries[6 * i + 0] = point.x;
                 geometries[6 * i + 1] = point.y;
                 geometries[6 * i + 2] = point.x;
                 geometries[6 * i + 3] = point.y;
                 geometries[6 * i + 4] = point.x;
                 geometries[6 * i + 5] = point.y;
-            } else if (type === 'LineString') {
-                const line = this._computeLineStringGeometry(coordinates);
+            } else if (type === GeoJSONGeometryType.LINE_STRING) {
+                const line = this._geometryTransformer.computeLineString(coordinates);
                 geometries.push([line]);
-            } else if (type === 'MultiLineString') {
-                const multiline = this._computeMultiLineStringGeometry(coordinates);
+            } else if (type === GeoJSONGeometryType.MULTI_LINE_STRING) {
+                const multiline = this._geometryTransformer.computeMultiLineString(coordinates);
                 geometries.push(multiline);
-            } else if (type === 'Polygon') {
-                const polygon = this._computePolygonGeometry(coordinates);
+            } else if (type === GeoJSONGeometryType.POLYGON) {
+                const polygon = this._geometryTransformer.computePolygon(coordinates);
                 geometries.push([polygon]);
-            } else if (type === 'MultiPolygon') {
-                const multipolygon = this._computeMultiPolygonGeometry(coordinates);
+            } else if (type === GeoJSONGeometryType.MULTI_POLYGON) {
+                const multipolygon = this._geometryTransformer.computeMultiPolygon(coordinates);
                 geometries.push(multipolygon);
             }
         });
@@ -360,122 +446,19 @@ export default class GeoJSON extends Base {
         return geometries;
     }
 
-    _computePointGeometry (data) {
-        const lat = data[1];
-        const lng = data[0];
-        const wm = util.projectToWebMercator({ lat, lng });
-        return rsys.wToR(wm.x, wm.y, { scale: util.WM_R, center: this._center });
-    }
-
-    _computeLineStringGeometry (data, reverse) {
-        let line = [];
-        for (let i = 0; i < data.length; i++) {
-            const point = this._computePointGeometry(
-                data[reverse ? (data.length - i - 1) : i]
-            );
-            line.push(point.x, point.y);
-        }
-        return line;
-    }
-
-    _computeMultiLineStringGeometry (data) {
-        let multiline = [];
-        for (let i = 0; i < data.length; i++) {
-            let line = this._computeLineStringGeometry(data[i]);
-            if (line.length > 0) {
-                multiline.push(line);
-            }
-        }
-        return multiline;
-    }
-
-    _computePolygonGeometry (data) {
-        let polygon = {
-            flat: [],
-            holes: [],
-            clipped: []
-        };
-        let holeIndex = 0;
-        let firstReverse = false;
-
-        if (data.length) {
-            firstReverse = this._isReversed(data[0]);
-            const flat = this._computeLineStringGeometry(data[0], firstReverse);
-            polygon.flat = polygon.flat.concat(flat);
-        }
-        for (let i = 1; i < data.length; i++) {
-            if (firstReverse !== this._isReversed(data[i])) {
-                holeIndex += data[i - 1].length;
-                polygon.holes.push(holeIndex);
-            }
-            const flat = this._computeLineStringGeometry(data[i], firstReverse);
-            polygon.flat = polygon.flat.concat(flat);
-        }
-        return polygon;
-    }
-
-    _computeMultiPolygonGeometry (data) {
-        let multipolygon = [];
-        for (let i = 0; i < data.length; i++) {
-            let polygon = this._computePolygonGeometry(data[i]);
-            if (polygon.flat.length > 0) {
-                multipolygon.push(polygon);
-            }
-        }
-        return multipolygon;
-    }
-
-    _isReversed (vertices) {
-        let total = 0;
-        let pt1 = vertices[0];
-        let pt2;
-        for (let i = 0; i < vertices.length - 1; i++) {
-            pt2 = vertices[i + 1];
-            total += (pt2[1] - pt1[1]) * (pt2[0] + pt1[0]);
-            pt1 = pt2;
-        }
-        // When total is positive it means that vertices are oriented clock wise
-        // and, since positive orientation is counter-clock wise, it is reversed.
-        return total >= 0;
-    }
-
     _samplePoint (geometry) {
         const type = geometry.type;
 
         const coordinates = geometry.coordinates;
-        if (type === 'Point') {
+        if (type === GeoJSONGeometryType.POINT) {
             return coordinates;
-        } else if (type === 'LineString') {
+        } else if (type === GeoJSONGeometryType.LINE_STRING) {
             return coordinates[0];
-        } else if (type === 'MultiLineString' || type === 'Polygon') {
+        } else if (type === GeoJSONGeometryType.MULTI_LINE_STRING || type === GeoJSONGeometryType.POLYGON) {
             return coordinates[0][0];
-        } else if (type === 'MultiPolygon') {
+        } else if (type === GeoJSONGeometryType.MULTI_POLYGON) {
             return coordinates[0][0][0];
         }
-    }
-
-    // sets this._type, this._center, this._dataframeCenter
-    _setCoordinatesCenter () {
-        let x = 0;
-        let y = 0;
-        let nPoints = 0;
-        this._fetchFeatureGeometry({ sample: 10 }, (_, geometry) => {
-            if (!this._type) {
-                this._type = geometry.type;
-            }
-            const samplePoint = this._samplePoint(geometry);
-            const sampleXY = util.projectToWebMercator({ lng: samplePoint[0], lat: samplePoint[1] });
-            x += sampleXY.x;
-            y += sampleXY.y;
-            nPoints += 1;
-        });
-        if (nPoints > 1) {
-            x /= nPoints;
-            y /= nPoints;
-        }
-
-        this._center = { x, y };
-        this._dataframeCenter = rsys.wToR(this._center.x, this._center.y, { scale: util.WM_R, center: { x: 0, y: 0 } });
     }
 
     free () {
