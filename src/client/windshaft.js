@@ -14,6 +14,7 @@ const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
 const MAX_CATEGORIES = 32768;
 const TILE_EXTENT = 2048;
+const ID_PROPERTY = 'cartodb_id';
 
 export default class Windshaft {
     constructor (source) {
@@ -72,7 +73,7 @@ export default class Windshaft {
     }
 
     /**
-     * Get the minimum schema from the viz, validated and with cartodb_id
+     * Get the minimum schema from the viz, validated and with ID_PROPERTY
     */
     _getMinNeededSchemaFrom (viz) {
         const MNS = viz.getMinimumNeededSchema();
@@ -83,10 +84,10 @@ export default class Windshaft {
     }
 
     _forceIncludeCartodbId (MNS) {
-        // Force to include `cartodb_id` in the MNS columns.
+        // Force to include ID_PROPERTY in the MNS columns.
         // TODO: revisit this request to Maps API
-        if (!MNS['cartodb_id']) {
-            MNS['cartodb_id'] = [{ type: aggregationTypes.UNAGGREGATED }];
+        if (!MNS[ID_PROPERTY]) {
+            MNS[ID_PROPERTY] = [{ type: aggregationTypes.UNAGGREGATED }];
         }
     }
 
@@ -256,7 +257,7 @@ export default class Windshaft {
 
         Object.keys(MNS)
             .forEach(propertyName => {
-                if (propertyName !== 'cartodb_id') {
+                if (propertyName !== ID_PROPERTY) {
                     const propertyUsages = MNS[propertyName];
                     propertyUsages.forEach(usage => {
                         if (usage.type === 'aggregated') {
@@ -286,7 +287,7 @@ export default class Windshaft {
     }
 
     _buildSelectClause (MNS) {
-        const columns = Object.keys(MNS).concat(['the_geom_webmercator', 'cartodb_id']);
+        const columns = Object.keys(MNS).concat(['the_geom_webmercator', ID_PROPERTY]);
         return columns.filter((item, pos) => columns.indexOf(item) === pos); // get unique values
     }
 
@@ -316,7 +317,7 @@ export default class Windshaft {
             this._completeMapConfigWithColumns(mapConfigAgg, columns);
         }
 
-        const layergroup = await this._makeWindshaftRequest(conf, mapConfigAgg);
+        const layergroup = await this._getLayerGroupFromWindshaft(conf, mapConfigAgg);
 
         return {
             urlTemplates: layergroup.metadata.tilejson.vector.tiles,
@@ -362,7 +363,7 @@ export default class Windshaft {
         };
     }
 
-    async _makeWindshaftRequest (conf, mapConfigAgg) {
+    async _getLayerGroupFromWindshaft (conf, mapConfigAgg) {
         const requestHelper = new WindshaftRequestHelper(conf, mapConfigAgg);
         const layergroup = await requestHelper.getMapRequest();
         return layergroup;
@@ -436,15 +437,13 @@ export default class Windshaft {
             properties[CLUSTER_FEATURE_COUNT] = { type: 'number' };
         }
 
-        const idProperty = 'cartodb_id';
-
         return new Metadata({
             properties,
             featureCount,
             sample: stats.sample,
             geomType,
             isAggregated: aggregation.mvt,
-            idProperty
+            idProperty: ID_PROPERTY
         });
     }
 }
