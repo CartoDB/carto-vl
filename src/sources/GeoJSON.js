@@ -1,19 +1,18 @@
 import * as rsys from '../client/rsys';
 import Dataframe from '../renderer/Dataframe';
-import Metadata from './GeoJSONMetadata';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../../src/errors/carto-validation-error';
-import CartoRuntimeError, { CartoRuntimeTypes as runtimeErrors } from '../../src/errors/carto-runtime-error';
+import { DEFAULT_ID_PROPERTY } from '../renderer/Metadata';
+
+import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
+
 import util from '../utils/util';
 import Base from './Base';
-import schema from '../renderer/schema';
-import { GEOMETRY_TYPE } from '../utils/geometry';
 
 import GeoJSONGeometryTransformer from './geojson/GeoJSONGeometryTransformer';
-import GeoJSONGeometryType from './geojson/GeoJSONGeometryType';
+import { GeoJSONGeometryType, dataframeGeometryType } from './geojson/GeoJSONGeometryType';
+import { GeoJSONMetadataBuilder } from './geojson/GeoJSOMetadataBuilder';
 
-const SAMPLE_TARGET_SIZE = 1000;
 const DATAFRAME_PADDING = 1024;
-const ID_PROPERTY = 'cartodb_id';
+const SAMPLE_SIZE_FOR_CENTER = 10;
 
 export default class GeoJSON extends Base {
     /**
@@ -47,13 +46,7 @@ export default class GeoJSON extends Base {
         super();
 
         this._initializeData(data);
-
-        this._numFields = new Set();
-        this._catFields = new Set();
-        this._dateFields = new Set();
-        this._providedDateColumns = new Set(options.dateColumns);
-        this._properties = {};
-        this._boundColumns = new Set();
+        this._initializeMetadataHelpers(options);
     }
 
     _initializeData (data) {
@@ -61,11 +54,21 @@ export default class GeoJSON extends Base {
 
         this._data = data;
         this._features = this._featuresFromData();
-        this._type = this._getType();
+        this._geomType = this._getGeomType();
         this._webMercatorCenter = this._getWebMercatorCoordsCenter();
         this._geometryTransformer = new GeoJSONGeometryTransformer(this._webMercatorCenter);
     }
 
+    _initializeMetadataHelpers (options) {
+        this._providedDateColumns = new Set(options.dateColumns);
+        this._boundColumns = new Set();
+
+        this._metadataBuilder = new GeoJSONMetadataBuilder(this._providedDateColumns, this._boundColumns);
+    }
+
+    /**
+     * Check geojson data is a proper object
+     */
     _checkData (data) {
         if (util.isUndefined(data)) {
             throw new CartoValidationError(`${cvt.MISSING_REQUIRED} 'data'`);
@@ -97,18 +100,19 @@ export default class GeoJSON extends Base {
     /**
      * Get the GeoJSONGeometryType from the first Feature
      */
-    _getType () {
+    _getGeomType () {
         return this._features[0].geometry.type;
     }
 
     /**
      * Get an estimated center in WebMercator coordinates, based on a sample of the Features
+     * with SAMPLE_SIZE_FOR_CENTER
      */
     _getWebMercatorCoordsCenter () {
         let x = 0;
         let y = 0;
         let nPoints = 0;
-        this._fetchFeatureGeometry({ sample: 10 }, (_, geometry) => {
+        this._fetchFeatureGeometry({ sample: SAMPLE_SIZE_FOR_CENTER }, (_, geometry) => {
             const samplePoint = this._samplePoint(geometry);
             const sampleXY = util.projectToWebMercator({ lng: samplePoint[0], lat: samplePoint[1] });
             x += sampleXY.x;
@@ -169,7 +173,7 @@ export default class GeoJSON extends Base {
             properties: this._decodeUnboundProperties(),
             scale: 1,
             size: this._features.length,
-            type: this._getDataframeType(this._type),
+            type: dataframeGeometryType(this._geomType),
             metadata: this._metadata
         });
 
@@ -194,145 +198,8 @@ export default class GeoJSON extends Base {
     }
 
     _computeMetadata (viz) {
-        const sample = [];
-        this._addNumericColumnField(ID_PROPERTY);
-
-        const featureCount = this._features.length;
-        const requiredColumns = new Set(Object.keys(schema.simplify(viz.getMinimumNeededSchema())));
-        for (let i = 0; i < this._features.length; i++) {
-            const properties = this._features[i].properties;
-            const keys = Object.keys(properties);
-            for (let j = 0, len = keys.length; j < len; j++) {
-                const name = keys[j];
-                if (!requiredColumns.has(name) || this._boundColumns.has(name)) {
-                    continue;
-                }
-                const value = properties[name];
-                this._addPropertyToMetadata(name, value);
-            }
-            this._sampleFeatureOnMetadata(properties, sample, this._features.length);
-        }
-
-        this._numFields.forEach(name => {
-            const property = this._properties[name];
-            property.avg = property.sum / property.count;
-        });
-
-        let geomType = '';
-        if (featureCount > 0) {
-            // Set the geomType of the first feature to the metadata
-            geomType = this._getDataframeType(this._features[0].geometry.type);
-        }
-
-        this._metadata = new Metadata({
-            properties: this._properties,
-            featureCount,
-            sample,
-            geomType,
-            idProperty: ID_PROPERTY
-        });
-
-        this._metadata.setCodecs();
+        this._metadata = this._metadataBuilder.buildFrom(viz, this._features);
         return this._metadata;
-    }
-
-    _sampleFeatureOnMetadata (properties, sample, featureCount) {
-        if (featureCount > SAMPLE_TARGET_SIZE) {
-            const sampling = SAMPLE_TARGET_SIZE / featureCount;
-            if (Math.random() > sampling) {
-                return;
-            }
-        }
-        sample.push(properties);
-    }
-
-    _addNumericPropertyToMetadata (propertyName, value) {
-        if (this._catFields.has(propertyName) || this._dateFields.has(propertyName)) {
-            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
-        }
-        this._addNumericColumnField(propertyName);
-        const property = this._properties[propertyName];
-        property.min = Math.min(property.min, value);
-        property.max = Math.max(property.max, value);
-        property.sum += value;
-    }
-
-    _addNumericColumnField (propertyName) {
-        if (!this._numFields.has(propertyName)) {
-            this._numFields.add(propertyName);
-            this._properties[propertyName] = {
-                type: 'number',
-                min: Number.POSITIVE_INFINITY,
-                max: Number.NEGATIVE_INFINITY,
-                avg: Number.NaN,
-                sum: 0,
-                count: 0
-            };
-        }
-    }
-
-    _addDatePropertyToMetadata (propertyName, value) {
-        if (this._catFields.has(propertyName) || this._numFields.has(propertyName)) {
-            throw new CartoRuntimeError(
-                `${runtimeErrors.NOT_SUPPORTED} Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`
-            );
-        }
-        this._addDateColumnField(propertyName);
-        const column = this._properties[propertyName];
-        const dateValue = util.castDate(value);
-        column.min = column.min ? util.castDate(Math.min(column.min, dateValue)) : dateValue;
-        column.max = column.max ? util.castDate(Math.max(column.max, dateValue)) : dateValue;
-        column.sum += value;
-        column.count++;
-    }
-
-    _addDateColumnField (propertyName) {
-        if (!this._dateFields.has(propertyName)) {
-            this._dateFields.add(propertyName);
-            this._properties[propertyName] = {
-                type: 'date',
-                min: null,
-                max: null,
-                avg: null,
-                sum: 0,
-                count: 0
-            };
-        }
-    }
-
-    _addPropertyToMetadata (propertyName, value) {
-        if (this._providedDateColumns.has(propertyName)) {
-            return this._addDatePropertyToMetadata(propertyName, value);
-        }
-        if (Number.isFinite(value)) {
-            return this._addNumericPropertyToMetadata(propertyName, value);
-        }
-        if (value === null) {
-            return;
-        }
-        this._addCategoryPropertyToMetadata(propertyName, value);
-    }
-
-    _addCategoryPropertyToMetadata (propertyName, value) {
-        if (this._numFields.has(propertyName) || this._dateFields.has(propertyName)) {
-            throw new CartoRuntimeError(
-                `${runtimeErrors.NOT_SUPPORTED} Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`
-            );
-        }
-        if (!this._catFields.has(propertyName)) {
-            this._catFields.add(propertyName);
-            this._properties[propertyName] = {
-                type: 'category',
-                categories: []
-            };
-        }
-        const property = this._properties[propertyName];
-        const cat = property.categories.find(cat => cat.name === value);
-        if (cat) {
-            cat.frequency++;
-        } else {
-            property.categories.push({ name: value, frequency: 1 });
-        }
     }
 
     _decodeUnboundProperties () {
@@ -342,8 +209,8 @@ export default class GeoJSON extends Base {
         for (let i = 0; i < this._features.length; i++) {
             const f = this._features[i];
             unboundFieldNames.forEach(name => {
-                if (name === ID_PROPERTY && !Number.isFinite(f.properties[ID_PROPERTY])) {
-                    f.properties[ID_PROPERTY] = -i; // using negative ids for GeoJSON features
+                if (name === DEFAULT_ID_PROPERTY && !Number.isFinite(f.properties[DEFAULT_ID_PROPERTY])) {
+                    f.properties[DEFAULT_ID_PROPERTY] = -i; // using negative ids for GeoJSON features
                 }
                 // note that GeoJSON does not support multi-value properties
                 unboundProperties[name][i] = this._metadata.codec(name).sourceToInternal(this._metadata, f.properties[name]);
@@ -354,9 +221,10 @@ export default class GeoJSON extends Base {
     }
 
     _getUnboundProperties () {
+        const allFields = this._metadataBuilder.getCurrentFields();
+
         const properties = {};
-        const allFields = [...this._numFields].concat([...this._catFields]).concat([...this._dateFields]);
-        allFields.map(name => {
+        allFields.forEach(name => {
             if (this._boundColumns.has(name)) {
                 return;
             }
@@ -365,21 +233,6 @@ export default class GeoJSON extends Base {
         });
 
         return properties;
-    }
-
-    _getDataframeType (type) {
-        switch (type) {
-            case GeoJSONGeometryType.POINT:
-                return GEOMETRY_TYPE.POINT;
-            case GeoJSONGeometryType.LINE_STRING:
-            case GeoJSONGeometryType.MULTI_LINE_STRING:
-                return GEOMETRY_TYPE.LINE;
-            case GeoJSONGeometryType.POLYGON:
-            case GeoJSONGeometryType.MULTI_POLYGON:
-                return GEOMETRY_TYPE.POLYGON;
-            default:
-                return '';
-        }
     }
 
     /**
@@ -402,7 +255,7 @@ export default class GeoJSON extends Base {
     }
 
     _allocGeometry () {
-        if (this._type === 'Point') {
+        if (this._geomType === 'Point') {
             return new Float32Array(this._features.length * 6);
         }
         return ([]);
@@ -414,8 +267,8 @@ export default class GeoJSON extends Base {
         this._fetchFeatureGeometry({}, (i, geometry) => {
             const type = geometry.type;
             const coordinates = geometry.coordinates;
-            if (this._type !== type) {
-                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} multiple geometry types not supported: found '${type}' instead of '${this._type}'.`);
+            if (this._geomType !== type) {
+                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} multiple geometry types not supported: found '${type}' instead of '${this._geomType}'.`);
             }
             if (type === GeoJSONGeometryType.POINT) {
                 const point = this._geometryTransformer.computePoint(coordinates);
