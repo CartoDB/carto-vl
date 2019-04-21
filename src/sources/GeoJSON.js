@@ -48,8 +48,6 @@ export default class GeoJSON extends Base {
 
         this._initializeData(data);
 
-        this._categoryStringToIDMap = {};
-        this._numCategories = 0;
         this._numFields = new Set();
         this._catFields = new Set();
         this._dateFields = new Set();
