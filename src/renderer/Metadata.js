@@ -3,7 +3,7 @@ import IdentityCodec from '../codecs/Identity';
 import { FP32_DESIGNATED_NULL_VALUE } from './viz/expressions/constants';
 
 const DEFAULT_MVT_EXTENT = 4096;
-const DEFAULT_ID_PROPERTY = 'cartodb_id';
+export const DEFAULT_ID_PROPERTY = 'cartodb_id';
 
 // The IDENTITY metadata contains zero properties
 export const IDENTITY = {
