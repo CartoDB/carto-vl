@@ -40,10 +40,10 @@ function cleanDefaultAuth () {
  */
 function checkAuth (auth) {
     if (util.isUndefined(auth)) {
-        throw new CartoValidationError(cvt.MISSING_REQUIRED, `'auth'`);
+        throw new CartoValidationError(cvt.MISSING_REQUIRED, '\'auth\'');
     }
     if (!util.isObject(auth)) {
-        throw new CartoValidationError(cvt.INCORRECT_TYPE, `'auth' property must be an object.`);
+        throw new CartoValidationError(cvt.INCORRECT_TYPE, '\'auth\' property must be an object.');
     }
     auth.username = util.isUndefined(auth.username) ? auth.user : auth.username; // backwards compatibility
     checkApiKey(auth.apiKey);
@@ -52,25 +52,25 @@ function checkAuth (auth) {
 
 function checkApiKey (apiKey) {
     if (util.isUndefined(apiKey)) {
-        throw new CartoValidationError(cvt.MISSING_REQUIRED, `'apiKey'`);
+        throw new CartoValidationError(cvt.MISSING_REQUIRED, '\'apiKey\'');
     }
     if (!util.isString(apiKey)) {
-        throw new CartoValidationError(cvt.INCORRECT_TYPE, `'apiKey' property must be a string.`);
+        throw new CartoValidationError(cvt.INCORRECT_TYPE, '\'apiKey\' property must be a string.');
     }
     if (apiKey === '') {
-        throw new CartoValidationError(cvt.INCORRECT_VALUE, `'apiKey' property must be not empty.`);
+        throw new CartoValidationError(cvt.INCORRECT_VALUE, '\'apiKey\' property must be not empty.');
     }
 }
 
 function checkUsername (username) {
     if (util.isUndefined(username)) {
-        throw new CartoValidationError(cvt.MISSING_REQUIRED, `'username'`);
+        throw new CartoValidationError(cvt.MISSING_REQUIRED, '\'username\'');
     }
     if (!util.isString(username)) {
-        throw new CartoValidationError(cvt.INCORRECT_TYPE, `'username' property must be a string.`);
+        throw new CartoValidationError(cvt.INCORRECT_TYPE, '\'username\' property must be a string.');
     }
     if (username === '') {
-        throw new CartoValidationError(cvt.INCORRECT_VALUE, `'username' property must be not empty.`);
+        throw new CartoValidationError(cvt.INCORRECT_VALUE, '\'username\' property must be not empty.');
     }
 }
 

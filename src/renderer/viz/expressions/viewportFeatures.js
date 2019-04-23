@@ -87,7 +87,7 @@ export default class ViewportFeatures extends BaseExpression {
     _resetViewportAgg (metadata, renderLayer) {
         if (!this._FeatureProxy) {
             if (!this._requiredProperties.every(p => validProperty(p))) {
-                throw new CartoValidationError(cvt.INCORRECT_TYPE, `viewportFeatures arguments can only be properties`);
+                throw new CartoValidationError(cvt.INCORRECT_TYPE, 'viewportFeatures arguments can only be properties');
             }
 
             const propertyNames = this._requiredProperties.map((p) => {

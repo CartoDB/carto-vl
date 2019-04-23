@@ -301,19 +301,19 @@ export default class Interactivity {
 
 function preCheckLayerList (layerList) {
     if (!Array.isArray(layerList)) {
-        throw new CartoValidationError(cvt.INCORRECT_TYPE, `Invalid layer list, parameter must be an array of "carto.Layer" objects.`);
+        throw new CartoValidationError(cvt.INCORRECT_TYPE, 'Invalid layer list, parameter must be an array of "carto.Layer" objects.');
     }
     if (!layerList.length) {
-        throw new CartoValidationError(cvt.INCORRECT_VALUE, `Invalid argument, layer list must not be empty.`);
+        throw new CartoValidationError(cvt.INCORRECT_VALUE, 'Invalid argument, layer list must not be empty.');
     }
     if (!layerList.every(layer => layer instanceof Layer)) {
-        throw new CartoValidationError(cvt.INCORRECT_TYPE, `Invalid layer, layer must be an instance of "carto.Layer".`);
+        throw new CartoValidationError(cvt.INCORRECT_TYPE, 'Invalid layer, layer must be an instance of "carto.Layer".');
     }
 }
 
 function postCheckLayerList (layerList) {
     if (!layerList.every(layer => layer.map === layerList[0].map)) {
-        throw new CartoValidationError(cvt.INCORRECT_VALUE, `Invalid argument, all layers must belong to the same map.`);
+        throw new CartoValidationError(cvt.INCORRECT_VALUE, 'Invalid argument, all layers must belong to the same map.');
     }
 }
 

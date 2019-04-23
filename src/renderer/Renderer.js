@@ -437,13 +437,13 @@ export function unsupportedBrowserReasons (canvas, gl, early = false) {
         gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
     }
     if (!gl) {
-        reasons.push(new CartoRuntimeError(crt.WEB_GL, `WebGL 1 is unsupported`));
+        reasons.push(new CartoRuntimeError(crt.WEB_GL, 'WebGL 1 is unsupported'));
         return reasons;
     }
 
     const OESTextureFloat = gl.getExtension('OES_texture_float');
     if (!OESTextureFloat) {
-        reasons.push(new CartoRuntimeError(crt.WEB_GL, `WebGL extension 'OES_texture_float' is unsupported`));
+        reasons.push(new CartoRuntimeError(crt.WEB_GL, 'WebGL extension \'OES_texture_float\' is unsupported'));
         if (early) {
             return reasons;
         }

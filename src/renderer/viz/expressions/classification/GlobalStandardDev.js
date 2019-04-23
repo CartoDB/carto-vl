@@ -79,7 +79,7 @@ export default class GlobalStandardDev extends Classifier {
 
     _updateBreakpointsWith (metadata) {
         if (this.input.propertyName === CLUSTER_FEATURE_COUNT) {
-            throw new CartoValidationError(cvt.INCORRECT_TYPE, `'clusterCount' can not be used in GlobalStandardDev. Consider using ViewportStandardDev instead`);
+            throw new CartoValidationError(cvt.INCORRECT_TYPE, '\'clusterCount\' can not be used in GlobalStandardDev. Consider using ViewportStandardDev instead');
         }
         const name = this.input.name;
         const sample = metadata.sample.map(s => s[name]);

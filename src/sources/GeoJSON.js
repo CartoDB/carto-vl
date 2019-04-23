@@ -58,7 +58,7 @@ export default class GeoJSON extends Base {
         } else if (data.type === 'Feature') {
             this._features = [data];
         } else {
-            throw new CartoValidationError(cvt.INCORRECT_VALUE, `'data' property must be a GeoJSON object.`);
+            throw new CartoValidationError(cvt.INCORRECT_VALUE, '\'data\' property must be a GeoJSON object.');
         }
 
         this._features = this._initializeFeatureProperties(this._features);
@@ -109,10 +109,10 @@ export default class GeoJSON extends Base {
 
     _checkData (data) {
         if (util.isUndefined(data)) {
-            throw new CartoValidationError(cvt.MISSING_REQUIRED, `'data'`);
+            throw new CartoValidationError(cvt.MISSING_REQUIRED, '\'data\'');
         }
         if (!util.isObject(data)) {
-            throw new CartoValidationError(cvt.INCORRECT_TYPE, `'data' property must be an object.`);
+            throw new CartoValidationError(cvt.INCORRECT_TYPE, '\'data\' property must be an object.');
         }
     }
 

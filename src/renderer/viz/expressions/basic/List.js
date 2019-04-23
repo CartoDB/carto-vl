@@ -38,7 +38,7 @@ export default class List extends Base {
         checkMaxArguments(arguments, 1, 'list');
 
         if (!elems) {
-            throw new CartoValidationError(cvt.MISSING_REQUIRED, `list(): invalid parameters: must receive at least one argument.`);
+            throw new CartoValidationError(cvt.MISSING_REQUIRED, 'list(): invalid parameters: must receive at least one argument.');
         }
 
         if (!Array.isArray(elems)) {
@@ -48,7 +48,7 @@ export default class List extends Base {
         elems = elems.map(implicitCast);
 
         if (!elems.length) {
-            throw new CartoValidationError(cvt.MISSING_REQUIRED, `list(): invalid parameters: must receive at least one argument.`);
+            throw new CartoValidationError(cvt.MISSING_REQUIRED, 'list(): invalid parameters: must receive at least one argument.');
         }
 
         elems.map((item, index) => {

@@ -64,17 +64,17 @@ export default class SQL extends BaseWindshaft {
 
     _checkQuery (query) {
         if (util.isUndefined(query)) {
-            throw new CartoValidationError(cvt.MISSING_REQUIRED, `'query'`);
+            throw new CartoValidationError(cvt.MISSING_REQUIRED, '\'query\'');
         }
         if (!util.isString(query)) {
-            throw new CartoValidationError(cvt.INCORRECT_TYPE, `'query' property must be a string.`);
+            throw new CartoValidationError(cvt.INCORRECT_TYPE, '\'query\' property must be a string.');
         }
         if (query === '') {
-            throw new CartoValidationError(cvt.INCORRECT_VALUE, `'query' property must be not empty.`);
+            throw new CartoValidationError(cvt.INCORRECT_VALUE, '\'query\' property must be not empty.');
         }
         let sqlRegex = /\bSELECT\b/i;
         if (!query.match(sqlRegex)) {
-            throw new CartoValidationError(cvt.INCORRECT_VALUE, `'query' property must be a SQL query.`);
+            throw new CartoValidationError(cvt.INCORRECT_VALUE, '\'query\' property must be a SQL query.');
         }
     }
 }

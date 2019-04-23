@@ -390,7 +390,7 @@ export default class Viz {
         if (util.isString(definition)) {
             return this._setDefaults(parseVizDefinition(definition));
         }
-        throw new CartoValidationError(cvt.INCORRECT_VALUE, `viz 'definition' should be a vizSpec object or a valid viz string.`);
+        throw new CartoValidationError(cvt.INCORRECT_VALUE, 'viz \'definition\' should be a vizSpec object or a valid viz string.');
     }
 
     /**
@@ -447,7 +447,7 @@ export default class Viz {
                 throw new CartoValidationError(cvt.INCORRECT_VALUE, `'resolution' is ${resolution}, must be lower than ${MAX_RESOLUTION}.`);
             }
         } else {
-            throw new CartoValidationError(cvt.INCORRECT_TYPE, `'resolution' property must be a number.`);
+            throw new CartoValidationError(cvt.INCORRECT_TYPE, '\'resolution\' property must be a number.');
         }
     }
 

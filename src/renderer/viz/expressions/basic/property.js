@@ -38,7 +38,7 @@ export default class Property extends BaseExpression {
         checkString('property', 'name', 0, name);
 
         if (name === '') {
-            throw new CartoValidationError(cvt.INCORRECT_VALUE, `property(): invalid parameter, zero-length string`);
+            throw new CartoValidationError(cvt.INCORRECT_VALUE, 'property(): invalid parameter, zero-length string');
         }
         super({});
         this.name = name;
@@ -60,7 +60,7 @@ export default class Property extends BaseExpression {
 
     eval (feature) {
         if (!feature) {
-            throw new CartoValidationError(cvt.MISSING_REQUIRED, `A property needs to be evaluated in a 'feature'.`);
+            throw new CartoValidationError(cvt.MISSING_REQUIRED, 'A property needs to be evaluated in a \'feature\'.');
         }
 
         return feature[this.name] && feature[this.name] === FP32_DESIGNATED_NULL_VALUE

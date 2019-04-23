@@ -5,8 +5,8 @@ import { CartoValidationTypes as cvt } from '../../../../../../src/errors/carto-
 describe('src/renderer/viz/expressions/basic/list', () => {
     describe('error control', () => {
         validateMaxArgumentsError('list', ['number', 'number']);
-        validateTypeErrors('list', [], () => cvt.MISSING_REQUIRED, `list(): invalid parameters: must receive at least one argument.`);
-        validateTypeErrors('list', [[]], () => cvt.MISSING_REQUIRED, `list(): invalid parameters: must receive at least one argument.`);
+        validateTypeErrors('list', [], () => cvt.MISSING_REQUIRED, 'list(): invalid parameters: must receive at least one argument.');
+        validateTypeErrors('list', [[]], () => cvt.MISSING_REQUIRED, 'list(): invalid parameters: must receive at least one argument.');
         validateTypeErrors('list', [[1, 'a']]);
         validateTypeErrors('list', [[function () { }]]);
     });

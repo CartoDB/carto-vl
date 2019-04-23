@@ -6,7 +6,7 @@ import CartoError from './carto-error';
  * @return {CartoError} A well formed object representing the error.
  */
 export default class CartoRuntimeError extends CartoError {
-    constructor (types=CartoRuntimeTypes.DEFAULT, message) {
+    constructor (type = CartoRuntimeTypes.DEFAULT, message) {
         super({ message });
         this.name = 'CartoRuntimeError';
         this.type = type;

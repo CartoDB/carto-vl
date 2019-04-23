@@ -205,7 +205,7 @@ export default class Windshaft {
     _checkLayerMeta (MNS) {
         if (!this._isAggregated()) {
             if (this._requiresAggregation(MNS)) {
-                throw new CartoMapsAPIError(cmt.NOT_SUPPORTED, `Aggregation not supported for this dataset`);
+                throw new CartoMapsAPIError(cmt.NOT_SUPPORTED, 'Aggregation not supported for this dataset');
             }
         }
     }

@@ -45,7 +45,7 @@ export default class GlobalMax extends GlobalAggregation {
                 // but we allow for it
                 baseStats = 'max';
             } else {
-                throw new CartoValidationError(cvt.INCORRECT_TYPE, `Invalid globlalAvg input`);
+                throw new CartoValidationError(cvt.INCORRECT_TYPE, 'Invalid globlalAvg input');
             }
         }
 

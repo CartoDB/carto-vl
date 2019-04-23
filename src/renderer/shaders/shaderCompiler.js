@@ -4,6 +4,7 @@ class IDGenerator {
     constructor () {
         this._ids = new Map();
     }
+
     getID (expression) {
         if (this._ids.has(expression)) {
             return this._ids.get(expression);

@@ -42,7 +42,7 @@ export default class GlobalAvg extends GlobalAggregation {
                 // but we'll allow it
                 baseStats = 'avg';
             } else {
-                throw new CartoValidationError(cvt.INCORRECT_TYPE, `Invalid globlalAvg input`);
+                throw new CartoValidationError(cvt.INCORRECT_TYPE, 'Invalid globlalAvg input');
             }
         }
 

@@ -39,7 +39,7 @@ export default function variable (name) {
     checkString('variable', 'name', 0, name);
 
     if (name === '') {
-        throw new CartoValidationError(cvt.INCORRECT_VALUE, `variable(): invalid parameter, zero-length string`);
+        throw new CartoValidationError(cvt.INCORRECT_VALUE, 'variable(): invalid parameter, zero-length string');
     }
 
     let alias;

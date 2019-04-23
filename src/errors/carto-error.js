@@ -22,7 +22,7 @@ export default class CartoError extends Error {
         }
         super(error.message);
         this.name = 'CartoError';
-        this.type = '[Error]:'
+        this.type = '[Error]:';
         this.originalError = error;
     }
 }
