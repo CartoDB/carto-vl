@@ -25,7 +25,7 @@ describe('api/viz', () => {
                 expect(actual.color.eval()).toEqual(DEFAULT_COLOR_EXPRESSION.eval());
                 expect(actual.width.eval()).toEqual(DEFAULT_WIDTH_EXPRESSION.eval());
                 expect(actual.strokeColor.eval()).toEqual(DEFAULT_STROKE_COLOR_EXPRESSION.eval());
-                expect(actual.strokeWidthx.eval()).toEqual(DEFAULT_STROKE_WIDTH_EXPRESSION.eval());
+                expect(actual.strokeWidth.eval()).toEqual(DEFAULT_STROKE_WIDTH_EXPRESSION.eval());
                 expect(actual.filter.eval()).toEqual(DEFAULT_FILTER_EXPRESSION.eval());
                 expect(actual.order.expr).toEqual(DEFAULT_ORDER_EXPRESSION.expr);
                 expect(actual.resolution.eval()).toEqual(DEFAULT_RESOLUTION.eval());
