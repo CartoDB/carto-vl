@@ -55,7 +55,10 @@ export default class RenderLayer {
 
     _checkDataframeType (dataframe) {
         if (this.type !== dataframe.type) {
-            throw new CartoValidationError(cvt.INCORRECT_TYPE, 'Layer dataframes must always be of the same type');
+            throw new CartoValidationError(
+                'Layer dataframes must always be of the same type',
+                cvt.INCORRECT_TYPE
+            );
         }
     }
 

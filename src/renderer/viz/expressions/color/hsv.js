@@ -155,7 +155,10 @@ function genHSV (name, alpha) {
     function hsvCheckType (parameterName, parameterIndex, parameter) {
         checkExpression(name, parameterName, parameterIndex, parameter);
         if (parameter.type !== 'number' && parameter.type !== 'category' && parameter.type !== undefined) {
-            throw new CartoValidationError(cvt.INCORRECT_TYPE, `${name}(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`);
+            throw new CartoValidationError(
+                `${name}(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`,
+                cvt.INCORRECT_TYPE
+            );
         }
     }
 }

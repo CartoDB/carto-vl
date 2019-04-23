@@ -2,6 +2,7 @@ import { Viz, expressions as s } from '../../src/index';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../src/errors/carto-validation-error';
 import { regExpThatContains as thatContains } from '../../src/utils/util';
 import { SUPPORTED_VIZ_PROPERTIES } from '../../src/constants/viz';
+import CartoError from '../../src/errors/carto-error';
 
 // Generic Style defaults
 const DEFAULT_COLOR_EXPRESSION = s.rgb(0, 0, 0);
@@ -24,7 +25,7 @@ describe('api/viz', () => {
                 expect(actual.color.eval()).toEqual(DEFAULT_COLOR_EXPRESSION.eval());
                 expect(actual.width.eval()).toEqual(DEFAULT_WIDTH_EXPRESSION.eval());
                 expect(actual.strokeColor.eval()).toEqual(DEFAULT_STROKE_COLOR_EXPRESSION.eval());
-                expect(actual.strokeWidth.eval()).toEqual(DEFAULT_STROKE_WIDTH_EXPRESSION.eval());
+                expect(actual.strokeWidthx.eval()).toEqual(DEFAULT_STROKE_WIDTH_EXPRESSION.eval());
                 expect(actual.filter.eval()).toEqual(DEFAULT_FILTER_EXPRESSION.eval());
                 expect(actual.order.expr).toEqual(DEFAULT_ORDER_EXPRESSION.expr);
                 expect(actual.resolution.eval()).toEqual(DEFAULT_RESOLUTION.eval());
@@ -372,7 +373,7 @@ describe('api/viz', () => {
             expect(() => new Viz(`width: ramp(linear($numeric, 0, 10), [0.10,0.20,0.30]) * __cartovl_variable_ten
                 __cartovl_variable_oneHundred: __cartovl_variable_ten * __cartovl_variable_ten
                 __cartovl_variable_ten: __cartovl_variable_oneHundred / 10
-            `)).toThrowError('Viz contains a circular dependency');
+            `)).toThrowError(CartoError, thatContains('Viz contains a circular dependency'));
         });
     });
 

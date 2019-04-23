@@ -100,7 +100,8 @@ export default class Top extends BaseExpression {
             const prev = this.buckets.eval();
             setTimeout(() => {
                 throw new CartoValidationError(
-                    cvt.INCORRECT_VALUE, `top() function has a limit of ${MAX_TOP_BUCKETS} buckets but '${prev}' buckets were specified.`
+                    `top() function has a limit of ${MAX_TOP_BUCKETS} buckets but '${prev}' buckets were specified.`,
+                    cvt.INCORRECT_VALUE
                 );
             });
             buckets = 0;

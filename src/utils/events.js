@@ -45,7 +45,10 @@ export function on (eventName, layerList, callback) {
             internalCallbacks.push(internalCallback);
         });
     } else {
-        throw new CartoValidationError(cvt.INCORRECT_VALUE, `Event name '${eventName}' is not supported by "carto.on". Supported event names are: 'loaded' and 'updated'.`);
+        throw new CartoValidationError(
+            `Event name '${eventName}' is not supported by "carto.on". Supported event names are: 'loaded' and 'updated'.`,
+            cvt.INCORRECT_VALUE
+        );
     }
     registeredHandlers.push({
         eventName,

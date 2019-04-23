@@ -187,7 +187,10 @@ export function computeCentroids (decodedGeometry, type) {
         case GEOMETRY_TYPE.POLYGON:
             return _computeCentroidsForLinesOrPolygons(decodedGeometry, type);
         default:
-            throw new CartoValidationError(cvt.INCORRECT_VALUE, 'Invalid type argument, decoded geometry must have a point, line or polygon type.');
+            throw new CartoValidationError(
+                'Invalid type argument, decoded geometry must have a point, line or polygon type.',
+                cvt.INCORRECT_VALUE
+            );
     }
 }
 

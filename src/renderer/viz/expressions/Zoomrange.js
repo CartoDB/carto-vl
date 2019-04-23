@@ -40,7 +40,7 @@ export default class Zoomrange extends BaseExpression {
         this.zoomBreakpointList._bindMetadata(metadata);
         checkType('zoomrange', 'zoomBreakpointList', 0, 'number-list', this.zoomBreakpointList);
         if (this.zoomBreakpointList.elems.length < 2) {
-            throw new CartoValidationError(cvt.INCORRECT_VALUE, 'zoomrange() function must receive a list with at least two elements.');
+            throw new CartoValidationError('zoomrange() function must receive a list with at least two elements.', cvt.INCORRECT_VALUE);
         }
 
         const breakpointListCopy = [...this.zoomBreakpointList.elems];

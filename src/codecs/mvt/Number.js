@@ -5,7 +5,10 @@ export default class MVTNumberCodec extends NumberCodec {
     sourceToInternal (metadata, propertyValue) {
         const propertyValueType = typeof propertyValue;
         if (propertyValue !== null && propertyValueType !== 'undefined' && propertyValueType !== 'number') {
-            throw new CartoRuntimeError(crt.MVT, `MVT decoding error. Metadata property '${this._baseName}' is of type 'number' but the MVT tile contained a feature property of type '${propertyValueType}': '${propertyValue}'`);
+            throw new CartoRuntimeError(
+                `MVT decoding error. Metadata property '${this._baseName}' is of type 'number' but the MVT tile contained a feature property of type '${propertyValueType}': '${propertyValue}'`,
+                crt.MVT
+            );
         }
         return super.sourceToInternal(metadata, propertyValue);
     }

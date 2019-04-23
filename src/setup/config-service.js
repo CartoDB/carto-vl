@@ -40,7 +40,7 @@ function cleanDefaultConfig () {
 function checkConfig (config) {
     if (config) {
         if (!util.isObject(config)) {
-            throw new CartoValidationError(cvt.INCORRECT_TYPE, '\'config\' property must be an object.');
+            throw new CartoValidationError('\'config\' property must be an object.', cvt.INCORRECT_TYPE);
         }
         _checkServerURL(config.serverURL);
     }
@@ -48,7 +48,7 @@ function checkConfig (config) {
 
 function _checkServerURL (serverURL) {
     if (!util.isString(serverURL)) {
-        throw new CartoValidationError(cvt.INCORRECT_TYPE, '\'serverURL\' property must be a string.');
+        throw new CartoValidationError('\'serverURL\' property must be a string.', cvt.INCORRECT_TYPE);
     }
 }
 

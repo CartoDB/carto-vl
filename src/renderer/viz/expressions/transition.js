@@ -21,7 +21,10 @@ export default class Transition extends BaseExpression {
         checkNumber('transition', 'duration', 0, duration);
         if (duration < 0) {
             const preface = getStringErrorPreface('transition', 'duration', 0);
-            throw new CartoValidationError(cvt.INCORRECT_VALUE, `${preface} 'duration' must be greater than or equal to 0.`);
+            throw new CartoValidationError(
+                `${preface} 'duration' must be greater than or equal to 0.`,
+                cvt.INCORRECT_VALUE
+            );
         }
         super({});
         this.aTime = Date.now();

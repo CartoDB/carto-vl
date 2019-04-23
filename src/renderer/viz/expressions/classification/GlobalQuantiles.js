@@ -45,7 +45,10 @@ export default class GlobalQuantiles extends Classifier {
 
     _updateBreakpointsWith (metadata) {
         if (this.input.propertyName === CLUSTER_FEATURE_COUNT) {
-            throw new CartoValidationError(cvt.INCORRECT_TYPE, '\'clusterCount\' can not be used in GlobalQuantiles. Consider using ViewportQuantiles instead');
+            throw new CartoValidationError(
+                '\'clusterCount\' can not be used in GlobalQuantiles. Consider using ViewportQuantiles instead',
+                cvt.INCORRECT_TYPE
+            );
         }
 
         const name = this.input.name;

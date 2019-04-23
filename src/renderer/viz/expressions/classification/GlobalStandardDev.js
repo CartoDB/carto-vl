@@ -67,7 +67,10 @@ export default class GlobalStandardDev extends Classifier {
         const classSize = this._classSize.value;
         checkNumber(this.expressionName, 'classSize', 2, classSize);
         if (classSize <= 0) {
-            throw new CartoValidationError(cvt.INCORRECT_VALUE, `The 'classSize' must be > 0.0, but ${classSize} was used.`);
+            throw new CartoValidationError(
+                `The 'classSize' must be > 0.0, but ${classSize} was used.`,
+                cvt.INCORRECT_VALUE
+            );
         }
     }
 
@@ -79,7 +82,10 @@ export default class GlobalStandardDev extends Classifier {
 
     _updateBreakpointsWith (metadata) {
         if (this.input.propertyName === CLUSTER_FEATURE_COUNT) {
-            throw new CartoValidationError(cvt.INCORRECT_TYPE, '\'clusterCount\' can not be used in GlobalStandardDev. Consider using ViewportStandardDev instead');
+            throw new CartoValidationError(
+                '\'clusterCount\' can not be used in GlobalStandardDev. Consider using ViewportStandardDev instead',
+                cvt.INCORRECT_TYPE
+            );
         }
         const name = this.input.name;
         const sample = metadata.sample.map(s => s[name]);
@@ -106,7 +112,8 @@ export default class GlobalStandardDev extends Classifier {
 export function calculateBreakpoints (avg, stDev, buckets, classSize) {
     if (stDev === 0 || isNaN(stDev)) {
         throw new CartoRuntimeError(
-            crt.NOT_SUPPORTED, `There is no Standard Deviation, not possible to compute ${buckets} buckets (just one feature or maybe all share the same value...?)`
+            `There is no Standard Deviation, not possible to compute ${buckets} buckets (just one feature or maybe all share the same value...?)`,
+            crt.NOT_SUPPORTED
         );
     }
 

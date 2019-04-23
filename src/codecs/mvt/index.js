@@ -10,7 +10,8 @@ export default function MVTCodecFactory (metadata, type, propertyName) {
             return new CategoryCodec(metadata, propertyName);
         default:
             throw new CartoRuntimeError(
-                crt.MVT, `MVT decoding error. Feature property value of type '${type}' cannot be decoded.`
+                `MVT decoding error. Feature property value of type '${type}' cannot be decoded.`,
+                crt.MVT
             );
     }
 }

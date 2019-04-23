@@ -13,6 +13,9 @@ export function decodeGeom (geomType, geom) {
         case GEOMETRY_TYPE.POLYGON:
             return decodePolygon(geom);
         default:
-            throw new CartoRuntimeError(crt.NOT_SUPPORTED, `Unimplemented geometry type: '${geomType}'.`);
+            throw new CartoRuntimeError(
+                `Unimplemented geometry type: '${geomType}'.`,
+                crt.NOT_SUPPORTED
+            );
     }
 }

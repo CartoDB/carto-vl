@@ -471,7 +471,10 @@ function genBinaryOp (name, allowedSignature, jsFn, glsl) {
 
             const signature = getSignature(a, b);
             if (signature === UNSUPPORTED_SIGNATURE || !(signature & allowedSignature)) {
-                throw new CartoValidationError(cvt.INCORRECT_TYPE, `${name}(): invalid parameter types\n'x' type was ${a.type}, 'y' type was ${b.type}`);
+                throw new CartoValidationError(
+                    `${name}(): invalid parameter types\n'x' type was ${a.type}, 'y' type was ${b.type}`,
+                    cvt.INCORRECT_TYPE
+                );
             }
             this.type = getReturnTypeFromSignature(signature);
         }

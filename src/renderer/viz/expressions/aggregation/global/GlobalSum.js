@@ -44,7 +44,10 @@ export default class GlobalSum extends GlobalAggregation {
             } else if (property.isA(ClusterCount)) {
                 baseStats = '_count';
             } else {
-                throw new CartoValidationError(cvt.INCORRECT_TYPE, 'Invalid globlalAvg input');
+                throw new CartoValidationError(
+                    'Invalid globlalAvg input',
+                    cvt.INCORRECT_TYPE
+                );
             }
         }
 

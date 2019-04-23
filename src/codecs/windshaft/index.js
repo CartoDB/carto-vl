@@ -16,7 +16,7 @@ export default function windshaftCodecFactory (metadata, type, propertyName) {
             return new TimeRangeCodec(metadata, propertyName);
         default:
             throw new CartoMapsAPIError(
-                cmt.NOT_SUPPORTED, `Windshaft MVT decoding error. Feature property value of type '${type}' cannot be decoded.`
-            );
+                `Windshaft MVT decoding error. Feature property value of type '${type}' cannot be decoded.`,
+                cmt.NOT_SUPPORTED);
     }
 }

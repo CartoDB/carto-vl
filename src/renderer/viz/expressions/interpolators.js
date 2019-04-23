@@ -75,7 +75,9 @@ function genInterpolator (name, inlineMaker, preface, jsEval) {
         _bindMetadata (meta) {
             super._bindMetadata(meta);
             if (this.m.type !== 'number') {
-                throw new CartoValidationError(cvt.INCORRECT_TYPE, `Blending cannot be performed by '${this.m.type}'`);
+                throw new CartoValidationError(
+                    `Blending cannot be performed by '${this.m.type}'`,
+                    cvt.INCORRECT_TYPE);
             }
             this.type = 'number';
             this._setGenericGLSL(inline => inlineMaker(inline.m), preface);

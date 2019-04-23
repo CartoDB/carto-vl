@@ -106,7 +106,10 @@ export default class GlobalAggregation extends BaseExpression {
         }
 
         if (value === undefined) {
-            throw new CartoValidationError(cvt.MISSING_REQUIRED, `Metadata ${this._name} for property ${propertyName} is not defined`);
+            throw new CartoValidationError(
+                `Metadata ${this._name} for property ${propertyName} is not defined`,
+                cvt.MISSING_REQUIRED
+            );
         }
 
         return value;

@@ -89,6 +89,9 @@ function abTypeCheck (a, b) {
     const validTypes = ['number', 'color', 'image', 'placement'];
 
     if (a.type !== b.type || !(validTypes.includes(a.type))) {
-        throw new CartoValidationError(cvt.INCORRECT_TYPE, `blend(): invalid parameter types\n\t'a' type was '${a.type}'\n\t'b' type was '${b.type}'`);
+        throw new CartoValidationError(
+            `blend(): invalid parameter types\n\t'a' type was '${a.type}'\n\t'b' type was '${b.type}'`,
+            cvt.INCORRECT_TYPE
+        );
     }
 }

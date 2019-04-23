@@ -50,7 +50,10 @@ export function castDate (date) {
     if (isString(date)) {
         return new Date(date);
     } else {
-        throw new CartoValidationError(cvt.INCORRECT_TYPE, 'Invalid Date type');
+        throw new CartoValidationError(
+            'Invalid Date type',
+            cvt.INCORRECT_TYPE
+        );
     }
 }
 

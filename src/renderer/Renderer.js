@@ -437,13 +437,13 @@ export function unsupportedBrowserReasons (canvas, gl, early = false) {
         gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
     }
     if (!gl) {
-        reasons.push(new CartoRuntimeError(crt.WEB_GL, 'WebGL 1 is unsupported'));
+        reasons.push(new CartoRuntimeError('WebGL 1 is unsupported', crt.WEB_GL));
         return reasons;
     }
 
     const OESTextureFloat = gl.getExtension('OES_texture_float');
     if (!OESTextureFloat) {
-        reasons.push(new CartoRuntimeError(crt.WEB_GL, 'WebGL extension \'OES_texture_float\' is unsupported'));
+        reasons.push(new CartoRuntimeError('WebGL extension \'OES_texture_float\' is unsupported', crt.WEB_GL));
         if (early) {
             return reasons;
         }
@@ -451,7 +451,12 @@ export function unsupportedBrowserReasons (canvas, gl, early = false) {
 
     const supportedRTT = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
     if (supportedRTT < RTT_WIDTH) {
-        reasons.push(new CartoRuntimeError(crt.WEB_GL, `WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`));
+        reasons.push(
+            new CartoRuntimeError(
+                `WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`,
+                crt.WEB_GL
+            )
+        );
     }
 
     return reasons;

@@ -13,7 +13,8 @@ export default function codecFactory (metadata, type, propertyName) {
             return new DateCodec(metadata, propertyName);
         default:
             throw new CartoRuntimeError(
-                crt.NOT_SUPPORTED, `Feature property value of type '${type}' cannot be decoded.`
+                `Feature property value of type '${type}' cannot be decoded.`,
+                crt.NOT_SUPPORTED
             );
     }
 }

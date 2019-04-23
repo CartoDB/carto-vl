@@ -8,7 +8,7 @@ describe('errors/CartoValidationError', () => {
         expect(error instanceof CartoError);
         expect(error instanceof CartoValidationError);
         expect(error.name).toBe('CartoValidationError');
-        expect(error.message).toBe('my error');
+        expect(error.message).toBe('[Error]: my error');
     });
 
     it('shouldn\'t allow an error without a message', () => {
@@ -17,9 +17,9 @@ describe('errors/CartoValidationError', () => {
 
     it('should allow an error message using several predefined categories', () => {
         const errors = [];
-        errors.push(new CartoValidationError(cvt.MISSING_REQUIRED, '\'id\''));
-        errors.push(new CartoValidationError(cvt.INCORRECT_TYPE, '\'id\' property must be a string.'));
-        errors.push(new CartoValidationError(cvt.INCORRECT_VALUE, '\'resolution\' must be less than 100.'));
+        errors.push(new CartoValidationError('\'id\'', cvt.MISSING_REQUIRED));
+        errors.push(new CartoValidationError('\'id\' property must be a string.', cvt.INCORRECT_TYPE));
+        errors.push(new CartoValidationError('\'resolution\' must be less than 100.', cvt.INCORRECT_VALUE));
         errors.push(new CartoValidationError(cvt.TOO_MANY_ARGS));
         errors.push(new CartoValidationError(cvt.NOT_ENOUGH_ARGS));
         errors.push(new CartoValidationError(cvt.WRONG_NUMBER_ARGS));

@@ -48,7 +48,10 @@ export default class GlobalMin extends GlobalAggregation {
                 // but we allow for it
                 baseStats = 'min';
             } else {
-                throw new CartoValidationError(cvt.INCORRECT_TYPE, 'Invalid globlalAvg input');
+                throw new CartoValidationError(
+                    'Invalid globlalAvg input',
+                    cvt.INCORRECT_TYPE
+                );
             }
         }
 

@@ -58,7 +58,10 @@ export default class ViewportQuantiles extends Classifier {
         const histogramSize = this._histogramSize.value;
         checkNumber(this.expressionName, 'histogramSize', 2, histogramSize);
         if (histogramSize <= 0) {
-            throw new CartoValidationError(cvt.INCORRECT_VALUE, `The 'histogramSize' must be > 0, but ${histogramSize} was used`);
+            throw new CartoValidationError(
+                `The 'histogramSize' must be > 0, but ${histogramSize} was used`,
+                cvt.INCORRECT_VALUE
+            );
         }
     }
 

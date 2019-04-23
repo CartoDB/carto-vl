@@ -434,7 +434,7 @@ describe('Interactivity', () => {
 
             const int = new carto.Interactivity([layerA, layerB]);
             int._init([layerA, layerB]).catch((err) => {
-                expect(err).toEqual(new CartoValidationError(cvt.INCORRECT_VALUE, 'Invalid argument, all layers must belong to the same map.'));
+                expect(err).toEqual(new CartoValidationError('Invalid argument, all layers must belong to the same map.', cvt.INCORRECT_VALUE));
                 document.body.removeChild(setupA.div);
                 document.body.removeChild(setupB.div);
                 done();

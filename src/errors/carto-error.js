@@ -17,12 +17,21 @@ export default class CartoError extends Error {
      * @return {CartoError} A well formed object representing the error.
      */
     constructor (error) {
-        if (!(error && error.message)) {
+        if (!error) {
             throw Error('Invalid CartoError, a message is mandatory');
         }
-        super(error.message);
+
+        if (!error.message) {
+            throw Error('Invalid CartoError, a message is mandatory');
+        }
+
+        if (!error.type) {
+            throw Error('Invalid CartoError, a type is mandatory');
+        }
+
+        super(`${error.type} ${error.message}`);
         this.name = 'CartoError';
-        this.type = '[Error]:';
+        this.type = error.type;
         this.originalError = error;
     }
 }
