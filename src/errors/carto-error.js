@@ -4,6 +4,7 @@
  * @typedef {Object} CartoError
  * @property {String} message - A short error description
  * @property {String} name - The name of the error "CartoError"
+ * @property {String} type - The type of the error "CartoError"
  * @property {Object} originalError - An object containing the internal/original error
  *
  * @event CartoError
