@@ -114,7 +114,7 @@ describe('api/layer', () => {
             layer.metadata = { geomType: GEOMETRY_TYPE.POINT };
             layer._context = Promise.resolve(null);
             layer.map = { triggerRepaint: () => { } };
-            layer.updateLayer.then(() => {
+            layer._updateLayer.then(() => {
                 layer.blendToViz(viz2).then(done);
             });
         });

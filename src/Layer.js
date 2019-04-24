@@ -76,7 +76,7 @@ export default class Layer {
         this._renderWaiters = [];
         this._cameraMatrix = mat4.identity([]);
 
-        this.updateLayer = this.update(source, viz);
+        this._updateLayer = this.update(source, viz);
     }
 
     /**
@@ -368,7 +368,7 @@ export default class Layer {
      */
     async blendToViz (viz, ms = 400, interpolator = cubic) {
         this._checkViz(viz);
-        await this.updateLayer;
+        await this._updateLayer;
 
         // It doesn't make sense to blendTo if a new request is required
         if (this._viz && !this._source.requiresNewMetadata(viz)) {
