@@ -335,7 +335,7 @@ export default class Windshaft {
                     CartoMapsAPIErrorTypes.SECURITY
                 );
             }
-            throw new CartoMapsAPIError(`SQL errors: ${JSON.stringify(layergroup.errors)}`);
+            throw new CartoMapsAPIError(`${JSON.stringify(layergroup.errors)}`, CartoMapsAPIErrorTypes.SQL);
         }
         return {
             urlTemplates: layergroup.metadata.tilejson.vector.tiles,

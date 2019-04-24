@@ -26,6 +26,7 @@ export default class CartoMapsAPIError extends CartoError {
 
 export const CartoMapsAPIErrorTypes = {
     DEFAULT: '[Error]',
+    SQL: '[SQL]',
     NOT_SUPPORTED: '[Not supported]',
     SECURITY: '[Security]'
 };
