@@ -585,7 +585,7 @@ export default class Layer {
             throw new CartoValidationError(`${cvt.INCORRECT_TYPE} The given object is not a valid 'viz'. See "carto.Viz".`);
         }
         if (viz._boundLayer && viz._boundLayer !== this) {
-            // Not the required 1 on 1 relationship between layer & viz
+            // Note the required 1 on 1 relationship between layer & viz
             throw new CartoValidationError(`${cvt.INCORRECT_VALUE} The given Viz object is already bound to another layer. Vizs cannot be shared between different layers.`);
         }
     }
