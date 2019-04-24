@@ -71,7 +71,8 @@ export default class Layer {
         this._renderLayer = new RenderLayer();
 
         this.concurrencyHelper = new LayerConcurrencyHelper();
-        this._sourcePromise = this.update(source, viz);
+        this._initialSource = source;
+        this._initialViz = viz;
         this._renderWaiters = [];
         this._cameraMatrix = mat4.identity([]);
     }
@@ -94,6 +95,16 @@ export default class Layer {
         this._visible = visible;
         if (visible !== initial) {
             this._fire('updated', 'visibility change');
+        }
+    }
+
+    async init () {
+        if (this._initialSource && this._initialViz) {
+            try {
+                this._sourcePromise = await this.update(this._initialSource, this._initialViz);
+            } catch (err) {
+                throw err;
+            }
         }
     }
 
@@ -156,8 +167,14 @@ export default class Layer {
      * @instance
      * @api
      */
-    addTo (map, beforeLayerID) {
+    async addTo (map, beforeLayerID) {
         // Manage errors, whether they are an Evented Error or a common Error
+        try {
+            await this.init();
+        } catch (err) {
+            throw err;
+        }
+
         try {
             map.once('error', (data) => {
                 console.warn(data.error.message);
