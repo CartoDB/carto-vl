@@ -1,6 +1,6 @@
 import BaseExpression from './base';
 import { checkNumber, checkMaxArguments, getStringErrorPreface } from './utils';
-import CartoValidationError, { CartoValidationTypes } from '../../../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../../../errors/carto-validation-error';
 
 /**
  * Transition returns a number from zero to one based on the elapsed number of milliseconds since the viz was instantiated.
@@ -23,7 +23,7 @@ export default class Transition extends BaseExpression {
             const preface = getStringErrorPreface('transition', 'duration', 0);
             throw new CartoValidationError(
                 `${preface} 'duration' must be greater than or equal to 0.`,
-                CartoValidationTypes.INCORRECT_VALUE
+                CartoValidationErrorTypes.INCORRECT_VALUE
             );
         }
         super({});

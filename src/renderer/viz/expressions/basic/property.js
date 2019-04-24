@@ -1,6 +1,6 @@
 import BaseExpression from '../base';
 import { checkString, checkMaxArguments } from '../utils';
-import CartoValidationError, { CartoValidationTypes } from '../../../../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../../../../errors/carto-validation-error';
 import { FP32_DESIGNATED_NULL_VALUE } from '../constants';
 import { aggregationTypes } from '../../../../constants/metadata';
 /**
@@ -40,7 +40,7 @@ export default class Property extends BaseExpression {
         if (name === '') {
             throw new CartoValidationError(
                 'property(): invalid parameter, zero-length string',
-                CartoValidationTypes.INCORRECT_VALUE
+                CartoValidationErrorTypes.INCORRECT_VALUE
             );
         }
         super({});
@@ -65,7 +65,7 @@ export default class Property extends BaseExpression {
         if (!feature) {
             throw new CartoValidationError(
                 'A property needs to be evaluated in a \'feature\'.',
-                CartoValidationTypes.MISSING_REQUIRED
+                CartoValidationErrorTypes.MISSING_REQUIRED
             );
         }
 
@@ -90,7 +90,7 @@ export default class Property extends BaseExpression {
         if (!metaColumn) {
             throw new CartoValidationError(
                 `Property '${this.name}' does not exist`,
-                CartoValidationTypes.MISSING_REQUIRED
+                CartoValidationErrorTypes.MISSING_REQUIRED
             );
         }
 

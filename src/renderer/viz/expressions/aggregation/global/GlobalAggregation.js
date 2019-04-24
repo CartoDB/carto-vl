@@ -1,7 +1,7 @@
 import BaseExpression from '../../base';
 import { number } from '../../../expressions';
 import { implicitCast } from '../../utils';
-import CartoValidationError, { CartoValidationTypes } from '../../../../../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../../../../../errors/carto-validation-error';
 import { CLUSTER_FEATURE_COUNT } from '../../../../../constants/metadata';
 
 /**
@@ -99,7 +99,7 @@ export default class GlobalAggregation extends BaseExpression {
             }
         } else {
             if (propertyName === CLUSTER_FEATURE_COUNT) {
-                throw new CartoValidationError(CartoValidationTypes.INCORRECT_TYPE, `'clusterCount' can not be used in ${this.expressionName}.`);
+                throw new CartoValidationError(CartoValidationErrorTypes.INCORRECT_TYPE, `'clusterCount' can not be used in ${this.expressionName}.`);
             }
             const stats = metadata.stats(propertyName);
             value = stats && stats[this._name];
@@ -108,7 +108,7 @@ export default class GlobalAggregation extends BaseExpression {
         if (value === undefined) {
             throw new CartoValidationError(
                 `Metadata ${this._name} for property ${propertyName} is not defined`,
-                CartoValidationTypes.MISSING_REQUIRED
+                CartoValidationErrorTypes.MISSING_REQUIRED
             );
         }
 

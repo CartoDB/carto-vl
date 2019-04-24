@@ -1,6 +1,6 @@
 import mitt from 'mitt';
 import Layer from '../Layer';
-import CartoValidationError, { CartoValidationTypes } from '../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../errors/carto-validation-error';
 
 const EVENTS = [
     'featureClick',
@@ -303,21 +303,21 @@ function preCheckLayerList (layerList) {
     if (!Array.isArray(layerList)) {
         throw new CartoValidationError(
             'Invalid layer list, parameter must be an array of "carto.Layer" objects.',
-            CartoValidationTypes.INCORRECT_TYPE
+            CartoValidationErrorTypes.INCORRECT_TYPE
         );
     }
 
     if (!layerList.length) {
         throw new CartoValidationError(
             'Invalid argument, layer list must not be empty.',
-            CartoValidationTypes.INCORRECT_VALUE
+            CartoValidationErrorTypes.INCORRECT_VALUE
         );
     }
 
     if (!layerList.every(layer => layer instanceof Layer)) {
         throw new CartoValidationError(
             'Invalid layer, layer must be an instance of "carto.Layer".',
-            CartoValidationTypes.INCORRECT_TYPE
+            CartoValidationErrorTypes.INCORRECT_TYPE
         );
     }
 }
@@ -326,7 +326,7 @@ function postCheckLayerList (layerList) {
     if (!layerList.every(layer => layer.map === layerList[0].map)) {
         throw new CartoValidationError(
             'Invalid argument, all layers must belong to the same map.',
-            CartoValidationTypes.INCORRECT_VALUE
+            CartoValidationErrorTypes.INCORRECT_VALUE
         );
     }
 }
@@ -335,7 +335,7 @@ function checkEvent (eventName) {
     if (!EVENTS.includes(eventName)) {
         throw new CartoValidationError(
             `Unrecognized event: '${eventName}'. Available events: ${EVENTS.join(', ')}.`,
-            CartoValidationTypes.INCORRECT_VALUE
+            CartoValidationErrorTypes.INCORRECT_VALUE
         );
     }
 }

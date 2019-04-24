@@ -5,7 +5,7 @@ import ClusterAggregation from '../cluster/ClusterAggregation';
 import ClusterCount from '../cluster/ClusterCount';
 import ClusterSum from '../cluster/ClusterSum';
 
-import CartoValidationError, { CartoValidationTypes } from '../../../../../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../../../../../errors/carto-validation-error';
 
 /**
  * Return the sum of the feature property for the entire source data.
@@ -46,7 +46,7 @@ export default class GlobalSum extends GlobalAggregation {
             } else {
                 throw new CartoValidationError(
                     'Invalid globlalAvg input',
-                    CartoValidationTypes.INCORRECT_TYPE
+                    CartoValidationErrorTypes.INCORRECT_TYPE
                 );
             }
         }

@@ -1,6 +1,6 @@
 import BaseExpression from './base';
 import { implicitCast, getOrdinalFromIndex, checkMaxArguments, checkType } from './utils';
-import CartoValidationError, { CartoValidationTypes } from '../../../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../../../errors/carto-validation-error';
 import { OTHERS_INDEX, OTHERS_GLSL_VALUE } from './constants';
 
 /**
@@ -108,7 +108,7 @@ export default class Buckets extends BaseExpression {
         if (this.input.type !== 'number' && this.input.type !== 'category') {
             throw new CartoValidationError(
                 `buckets(): invalid first parameter type\n\t'input' type was ${this.input.type}`,
-                CartoValidationTypes.INCORRECT_TYPE
+                CartoValidationErrorTypes.INCORRECT_TYPE
             );
         }
 
@@ -119,12 +119,12 @@ export default class Buckets extends BaseExpression {
                 throw new CartoValidationError(
                     `buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type` +
                     `\n\texpected type was ${this.input.type}\n\tactual type was ${item.type}`,
-                    CartoValidationTypes.INCORRECT_TYPE
+                    CartoValidationErrorTypes.INCORRECT_TYPE
                 );
             } else if (item.type !== 'number' && item.type !== 'category') {
                 throw new CartoValidationError(
                     `buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type\n\ttype was ${item.type}`,
-                    CartoValidationTypes.INCORRECT_TYPE
+                    CartoValidationErrorTypes.INCORRECT_TYPE
                 );
             }
         });

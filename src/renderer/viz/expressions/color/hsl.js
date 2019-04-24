@@ -1,7 +1,7 @@
 
 import BaseExpression from '../base';
 import { implicitCast, checkExpression, checkType, checkMaxArguments, clamp } from '../utils';
-import CartoValidationError, { CartoValidationTypes } from '../../../../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../../../../errors/carto-validation-error';
 
 /**
  * Evaluates to a hsl color.
@@ -157,7 +157,7 @@ function genHSL (name, alpha) {
         if (parameter.type !== 'number' && parameter.type !== 'category' && parameter.type !== undefined) {
             throw new CartoValidationError(
                 `${name}(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`,
-                CartoValidationTypes.INCORRECT_TYPE
+                CartoValidationErrorTypes.INCORRECT_TYPE
             );
         }
     }

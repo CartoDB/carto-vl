@@ -1,6 +1,6 @@
 import { number, category, list, rgba } from '../expressions';
 import BaseExpression from './base';
-import CartoValidationError, { CartoValidationTypes } from '../../../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../../../errors/carto-validation-error';
 import CartoParsingError from '../../../errors/carto-parsing-error';
 import { interpolateRGBAinCieLAB } from '../colorspaces';
 
@@ -10,7 +10,7 @@ export function checkMaxArguments (constructorArguments, maxArguments, expressio
     if (constructorArguments.length > maxArguments) {
         throw new CartoValidationError(
             `Expression '${expressionName}' accepts just ${maxArguments} arguments, but ${constructorArguments.length} were passed.`,
-            CartoValidationTypes.TOO_MANY_ARGS
+            CartoValidationErrorTypes.TOO_MANY_ARGS
         );
     }
 }
@@ -19,7 +19,7 @@ export function checkMinArguments (constructorArguments, minArguments, expressio
     if (constructorArguments.length < minArguments) {
         throw new CartoValidationError(
             `Expression '${expressionName}' accepts at least ${minArguments} arguments, but ${constructorArguments.length} were passed.`,
-            CartoValidationTypes.NOT_ENOUGH_ARGS
+            CartoValidationErrorTypes.NOT_ENOUGH_ARGS
         );
     }
 }
@@ -28,7 +28,7 @@ export function checkExactNumberOfArguments (constructorArguments, numArguments,
     if (constructorArguments.length !== numArguments) {
         throw new CartoValidationError(
             `Expression '${expressionName}' accepts exactly ${numArguments} arguments, but ${constructorArguments.length} were passed.`,
-            CartoValidationTypes.WRONG_NUMBER_ARGS
+            CartoValidationErrorTypes.WRONG_NUMBER_ARGS
         );
     }
 }
@@ -118,7 +118,7 @@ export function getStringErrorPreface (expressionName, parameterName, parameterI
 
 export function throwInvalidType (expressionName, parameterName, parameterIndex, expectedType, actualType) {
     throw new CartoValidationError(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-        expected type was '${expectedType}', actual type was '${actualType}'`, CartoValidationTypes.INCORRECT_TYPE);
+        expected type was '${expectedType}', actual type was '${actualType}'`, CartoValidationErrorTypes.INCORRECT_TYPE);
 }
 
 export function throwInvalidInstance (expressionName, parameterName, parameterIndex, expectedClass) {
@@ -126,27 +126,27 @@ export function throwInvalidInstance (expressionName, parameterName, parameterIn
         ? expectedClass.join(', ')
         : expectedClass.name;
     throw new CartoValidationError(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-    expected type was instance of '${expectedClassNames}'`, CartoValidationTypes.INCORRECT_TYPE);
+    expected type was instance of '${expectedClassNames}'`, CartoValidationErrorTypes.INCORRECT_TYPE);
 }
 
 export function throwInvalidNumber (expressionName, parameterName, parameterIndex, number) {
     throw new CartoValidationError(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-    type of '${number}' is ${typeof number}, 'number' was expected`, CartoValidationTypes.INCORRECT_TYPE);
+    type of '${number}' is ${typeof number}, 'number' was expected`, CartoValidationErrorTypes.INCORRECT_TYPE);
 }
 
 export function throwInvalidArray (expressionName, parameterName, parameterIndex, array) {
     throw new CartoValidationError(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-    '${array}' is not an array`, CartoValidationTypes.INCORRECT_TYPE);
+    '${array}' is not an array`, CartoValidationErrorTypes.INCORRECT_TYPE);
 }
 
 export function throwInvalidString (expressionName, parameterName, parameterIndex, str) {
     throw new CartoValidationError(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-    expected type was 'string', but ${str}' is not a string`, CartoValidationTypes.INCORRECT_TYPE);
+    expected type was 'string', but ${str}' is not a string`, CartoValidationErrorTypes.INCORRECT_TYPE);
 }
 
 export function throwInvalidStringValue (expressionName, parameterName, parameterIndex, str, validValues) {
     throw new CartoValidationError(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-    value '${str}' is not valid. It should be one of ${validValues.map(v => `'${v}'`).join(', ')}`, CartoValidationTypes.INCORRECT_TYPE);
+    value '${str}' is not valid. It should be one of ${validValues.map(v => `'${v}'`).join(', ')}`, CartoValidationErrorTypes.INCORRECT_TYPE);
 }
 
 // Returns true if the argument is of a type that cannot be strictly checked at constructor time
@@ -167,7 +167,7 @@ export function isArgConstructorTimeTyped (arg) {
 export function checkExpression (expressionName, parameterName, parameterIndex, parameter) {
     if (!(parameter instanceof BaseExpression)) {
         throw new CartoValidationError(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-        '${parameter}' is not of type "carto.expressions.Base"`, CartoValidationTypes.INCORRECT_TYPE);
+        '${parameter}' is not of type "carto.expressions.Base"`, CartoValidationErrorTypes.INCORRECT_TYPE);
     }
 }
 
@@ -179,7 +179,7 @@ export function checkType (expressionName, parameterName, parameterIndex, expect
         );
         if (!ok) {
             throw new CartoValidationError(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-            expected type was one of ${expectedType.join()}, actual type was '${parameter.type}'`, CartoValidationTypes.INCORRECT_TYPE);
+            expected type was one of ${expectedType.join()}, actual type was '${parameter.type}'`, CartoValidationErrorTypes.INCORRECT_TYPE);
         }
     } else if (parameter.type !== expectedType) {
         throwInvalidType(expressionName, parameterName, parameterIndex, expectedType, parameter.type);
@@ -231,14 +231,14 @@ export function checkArray (expressionName, parameterName, parameterIndex, array
 export function checkFeatureIndependent (expressionName, parameterName, parameterIndex, parameter) {
     if (parameter.isFeatureDependent()) {
         throw new CartoValidationError(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-        parameter cannot be feature dependent`, CartoValidationTypes.INCORRECT_VALUE);
+        parameter cannot be feature dependent`, CartoValidationErrorTypes.INCORRECT_VALUE);
     }
 }
 
 export function checkFeatureDependent (expressionName, parameterName, parameterIndex, parameter) {
     if (!parameter.isFeatureDependent()) {
         throw new CartoValidationError(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-        parameter must be feature dependent`, CartoValidationTypes.INCORRECT_VALUE);
+        parameter must be feature dependent`, CartoValidationErrorTypes.INCORRECT_VALUE);
     }
 }
 

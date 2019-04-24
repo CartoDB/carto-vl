@@ -2,7 +2,7 @@ import BaseExpression from '../base';
 import { number } from '../../expressions';
 
 import { checkType, checkNumber } from '../utils';
-import CartoValidationError, { CartoValidationTypes } from '../../../../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../../../../errors/carto-validation-error';
 import ClassifierGLSLHelper from './ClassifierGLSLHelper';
 
 export const DEFAULT_HISTOGRAM_SIZE = 1000;
@@ -57,7 +57,7 @@ export default class Classifier extends BaseExpression {
         if (buckets <= 1) {
             throw new CartoValidationError(
                 `The number of 'buckets' must be >=2, but ${buckets} was used`,
-                CartoValidationTypes.INCORRECT_VALUE
+                CartoValidationErrorTypes.INCORRECT_VALUE
             );
         }
     }

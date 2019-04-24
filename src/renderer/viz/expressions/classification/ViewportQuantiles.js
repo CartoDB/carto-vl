@@ -1,6 +1,6 @@
 import Classifier from './Classifier';
 import { checkNumber, checkType, checkMaxArguments, checkMinArguments, implicitCast } from '../utils';
-import CartoValidationError, { CartoValidationTypes } from '../../../../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../../../../errors/carto-validation-error';
 
 import { viewportHistogram } from '../../expressions';
 import { DEFAULT_HISTOGRAM_SIZE } from './Classifier';
@@ -60,7 +60,7 @@ export default class ViewportQuantiles extends Classifier {
         if (histogramSize <= 0) {
             throw new CartoValidationError(
                 `The 'histogramSize' must be > 0, but ${histogramSize} was used`,
-                CartoValidationTypes.INCORRECT_VALUE
+                CartoValidationErrorTypes.INCORRECT_VALUE
             );
         }
     }

@@ -21,13 +21,13 @@ import CartoError from './carto-error';
  * @api
 */
 export default class CartoValidationError extends CartoError {
-    constructor (message, type = CartoValidationTypes.DEFAULT) {
+    constructor (message, type = CartoValidationErrorTypes.DEFAULT) {
         super({ message, type });
         this.name = 'CartoValidationError';
     }
 }
 
-export const CartoValidationTypes = {
+export const CartoValidationErrorTypes = {
     DEFAULT: '[Error]',
     MISSING_REQUIRED: '[Missing required property]',
     INCORRECT_TYPE: '[Property with an incorrect type]',

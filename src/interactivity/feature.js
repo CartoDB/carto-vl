@@ -1,5 +1,5 @@
 import FeatureVizProperty from './featureVizProperty';
-import CartoValidationError, { CartoValidationTypes } from '../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../errors/carto-validation-error';
 import { SUPPORTED_VIZ_PROPERTIES } from '../constants/viz';
 
 /**
@@ -135,7 +135,7 @@ export default class Feature {
             if (!(SUPPORTED_VIZ_PROPERTIES.includes(property))) {
                 throw new CartoValidationError(
                     `Property '${property}' is not a valid viz property`,
-                    CartoValidationTypes.INCORRECT_VALUE
+                    CartoValidationErrorTypes.INCORRECT_VALUE
                 );
             }
             const newValue = newVizProperties[property];

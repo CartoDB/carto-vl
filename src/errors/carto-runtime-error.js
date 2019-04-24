@@ -18,13 +18,13 @@ import CartoError from './carto-error';
  * @api
 */
 export default class CartoRuntimeError extends CartoError {
-    constructor (message, type = CartoRuntimeTypes.DEFAULT) {
+    constructor (message, type = CartoRuntimeErrorTypes.DEFAULT) {
         super({ message, type });
         this.name = 'CartoRuntimeError';
     }
 }
 
-export const CartoRuntimeTypes = {
+export const CartoRuntimeErrorTypes = {
     DEFAULT: '[Error]',
     NOT_SUPPORTED: '[Not supported]',
     WEB_GL: '[WebGL]',

@@ -4,7 +4,7 @@ import Viz from './Viz';
 import SourceBase from './sources/Base';
 import Renderer from './renderer/Renderer';
 import RenderLayer from './renderer/RenderLayer';
-import CartoValidationError, { CartoValidationTypes } from '../src/errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../src/errors/carto-validation-error';
 import CartoRuntimeError from '../src/errors/carto-runtime-error';
 
 import { cubic } from './renderer/viz/expressions';
@@ -558,34 +558,34 @@ export default class Layer {
 
     _checkId (id) {
         if (id === undefined) {
-            throw new CartoValidationError('\'id\'', CartoValidationTypes.MISSING_REQUIRED);
+            throw new CartoValidationError('\'id\'', CartoValidationErrorTypes.MISSING_REQUIRED);
         }
         if (!util.isString(id)) {
-            throw new CartoValidationError('\'id\' property must be a string.', CartoValidationTypes.INCORRECT_TYPE);
+            throw new CartoValidationError('\'id\' property must be a string.', CartoValidationErrorTypes.INCORRECT_TYPE);
         }
         if (id === '') {
-            throw new CartoValidationError('\'id\' property must be not empty.', CartoValidationTypes.INCORRECT_VALUE);
+            throw new CartoValidationError('\'id\' property must be not empty.', CartoValidationErrorTypes.INCORRECT_VALUE);
         }
     }
 
     _checkSource (source) {
         if (source === undefined) {
-            throw new CartoValidationError('\'source\'', CartoValidationTypes.MISSING_REQUIRED);
+            throw new CartoValidationError('\'source\'', CartoValidationErrorTypes.MISSING_REQUIRED);
         }
         if (!(source instanceof SourceBase)) {
-            throw new CartoValidationError('The given object is not a valid \'source\'. See "carto.source".', CartoValidationTypes.INCORRECT_TYPE);
+            throw new CartoValidationError('The given object is not a valid \'source\'. See "carto.source".', CartoValidationErrorTypes.INCORRECT_TYPE);
         }
     }
 
     _checkViz (viz) {
         if (util.isUndefined(viz)) {
-            throw new CartoValidationError('\'viz\'', CartoValidationTypes.MISSING_REQUIRED);
+            throw new CartoValidationError('\'viz\'', CartoValidationErrorTypes.MISSING_REQUIRED);
         }
 
         if (!(viz instanceof Viz)) {
             throw new CartoValidationError(
                 'The given object is not a valid \'viz\'. See "carto.Viz".',
-                CartoValidationTypes.INCORRECT_TYPE
+                CartoValidationErrorTypes.INCORRECT_TYPE
             );
         }
 
@@ -593,7 +593,7 @@ export default class Layer {
             // Not the required 1 on 1 relationship between layer & viz
             throw new CartoValidationError(
                 'The given Viz object is already bound to another layer. Vizs cannot be shared between different layers.',
-                CartoValidationTypes.INCORRECT_VALUE
+                CartoValidationErrorTypes.INCORRECT_VALUE
             );
         }
     }

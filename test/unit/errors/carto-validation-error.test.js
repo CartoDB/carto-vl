@@ -1,5 +1,5 @@
 import CartoError from '../../../src/errors/carto-error';
-import CartoValidationError, { CartoValidationTypes } from '../../../src/errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../../../src/errors/carto-validation-error';
 
 describe('errors/CartoValidationError', () => {
     it('should allow a simple error', () => {
@@ -17,12 +17,12 @@ describe('errors/CartoValidationError', () => {
 
     it('should allow an error message using several predefined categories', () => {
         const errors = [];
-        errors.push(new CartoValidationError('\'id\'', CartoValidationTypes.MISSING_REQUIRED));
-        errors.push(new CartoValidationError('\'id\' property must be a string.', CartoValidationTypes.INCORRECT_TYPE));
-        errors.push(new CartoValidationError('\'resolution\' must be less than 100.', CartoValidationTypes.INCORRECT_VALUE));
-        errors.push(new CartoValidationError(CartoValidationTypes.TOO_MANY_ARGS));
-        errors.push(new CartoValidationError(CartoValidationTypes.NOT_ENOUGH_ARGS));
-        errors.push(new CartoValidationError(CartoValidationTypes.WRONG_NUMBER_ARGS));
+        errors.push(new CartoValidationError('\'id\'', CartoValidationErrorTypes.MISSING_REQUIRED));
+        errors.push(new CartoValidationError('\'id\' property must be a string.', CartoValidationErrorTypes.INCORRECT_TYPE));
+        errors.push(new CartoValidationError('\'resolution\' must be less than 100.', CartoValidationErrorTypes.INCORRECT_VALUE));
+        errors.push(new CartoValidationError(CartoValidationErrorTypes.TOO_MANY_ARGS));
+        errors.push(new CartoValidationError(CartoValidationErrorTypes.NOT_ENOUGH_ARGS));
+        errors.push(new CartoValidationError(CartoValidationErrorTypes.WRONG_NUMBER_ARGS));
 
         errors.forEach(error => {
             expect(error instanceof CartoValidationError);

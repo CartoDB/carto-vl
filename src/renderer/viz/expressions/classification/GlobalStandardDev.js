@@ -1,7 +1,7 @@
 import Classifier from './Classifier';
 import { checkMaxArguments, checkMinArguments, checkNumber } from '../utils';
-import CartoValidationError, { CartoValidationTypes } from '../../../../errors/carto-validation-error';
-import CartoRuntimeError, { CartoRuntimeTypes } from '../../../../errors/carto-runtime-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../../../../errors/carto-validation-error';
+import CartoRuntimeError, { CartoRuntimeErrorTypes } from '../../../../errors/carto-runtime-error';
 
 import { average, standardDeviation } from '../stats';
 import { CLUSTER_FEATURE_COUNT } from '../../../../constants/metadata';
@@ -69,7 +69,7 @@ export default class GlobalStandardDev extends Classifier {
         if (classSize <= 0) {
             throw new CartoValidationError(
                 `The 'classSize' must be > 0.0, but ${classSize} was used.`,
-                CartoValidationTypes.INCORRECT_VALUE
+                CartoValidationErrorTypes.INCORRECT_VALUE
             );
         }
     }
@@ -84,7 +84,7 @@ export default class GlobalStandardDev extends Classifier {
         if (this.input.propertyName === CLUSTER_FEATURE_COUNT) {
             throw new CartoValidationError(
                 '\'clusterCount\' can not be used in GlobalStandardDev. Consider using ViewportStandardDev instead',
-                CartoValidationTypes.INCORRECT_TYPE
+                CartoValidationErrorTypes.INCORRECT_TYPE
             );
         }
         const name = this.input.name;
@@ -113,7 +113,7 @@ export function calculateBreakpoints (avg, stDev, buckets, classSize) {
     if (stDev === 0 || isNaN(stDev)) {
         throw new CartoRuntimeError(
             `There is no Standard Deviation, not possible to compute ${buckets} buckets (just one feature or maybe all share the same value...?)`,
-            CartoRuntimeTypes.NOT_SUPPORTED
+            CartoRuntimeErrorTypes.NOT_SUPPORTED
         );
     }
 

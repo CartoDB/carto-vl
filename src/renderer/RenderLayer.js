@@ -1,5 +1,5 @@
 import Feature from '../interactivity/feature';
-import CartoValidationError, { CartoValidationTypes } from '../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../errors/carto-validation-error';
 import { GEOMETRY_TYPE } from '../utils/geometry';
 import { getCompoundFeature } from '../interactivity/commonFeature';
 
@@ -57,7 +57,7 @@ export default class RenderLayer {
         if (this.type !== dataframe.type) {
             throw new CartoValidationError(
                 'Layer dataframes must always be of the same type',
-                CartoValidationTypes.INCORRECT_TYPE
+                CartoValidationErrorTypes.INCORRECT_TYPE
             );
         }
     }

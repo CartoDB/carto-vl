@@ -18,13 +18,13 @@ import CartoError from './carto-error';
 */
 
 export default class CartoMapsAPIError extends CartoError {
-    constructor (message, type = CartoMapsAPITypes.DEFAULT) {
+    constructor (message, type = CartoValidationErrorTypes.DEFAULT) {
         super({ message, type });
         this.name = 'CartoMapsAPIError';
     }
 }
 
-export const CartoMapsAPITypes = {
+export const CartoValidationErrorTypes = {
     DEFAULT: '[Error]',
     NOT_SUPPORTED: '[Not supported]',
     SECURITY: '[Security]'

@@ -1,6 +1,6 @@
 import BaseExpression from '../base';
 import { checkString, checkMaxArguments } from '../utils';
-import CartoValidationError, { CartoValidationTypes } from '../../../../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../../../../errors/carto-validation-error';
 
 /**
  * Alias to a named variable defined in the Viz.
@@ -41,7 +41,7 @@ export default function variable (name) {
     if (name === '') {
         throw new CartoValidationError(
             'variable(): invalid parameter, zero-length string',
-            CartoValidationTypes.INCORRECT_VALUE
+            CartoValidationErrorTypes.INCORRECT_VALUE
         );
     }
 
@@ -53,7 +53,7 @@ export default function variable (name) {
         } else {
             throw new CartoValidationError(
                 `variable() with name '${name}' doesn't exist`,
-                CartoValidationTypes.MISSING_REQUIRED
+                CartoValidationErrorTypes.MISSING_REQUIRED
             );
         }
     };
