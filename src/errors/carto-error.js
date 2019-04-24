@@ -10,6 +10,12 @@
  * @event CartoError
  * @api
  */
+
+/**
+ * @namespace CartoErrors
+ * @api
+ *
+*/
 export default class CartoError extends Error {
     /**
      * Build a cartoError from a generic error.

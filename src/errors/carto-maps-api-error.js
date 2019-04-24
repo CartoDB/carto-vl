@@ -5,6 +5,18 @@ import CartoError from './carto-error';
  *
  * @return {CartoError} A well formed object representing the error.
  */
+
+/**
+ * CartoMapsAPIError types:
+ * - [Error]
+ * - [Not supported]
+ * - [Security]
+ *
+ * @name CartoMapsAPIError
+ * @memberof CartoError
+ * @api
+*/
+
 export default class CartoMapsAPIError extends CartoError {
     constructor (message, type = CartoMapsAPITypes.DEFAULT) {
         super({ message, type });
