@@ -7,7 +7,6 @@ import CartoValidationError, { CartoValidationErrorTypes } from '../errors/carto
 import CartoMapsAPIError, { CartoMapsAPIErrorTypes } from '../errors/carto-maps-api-error';
 import { GEOMETRY_TYPE } from '../utils/geometry';
 import { CLUSTER_FEATURE_COUNT, aggregationTypes } from '../constants/metadata';
-import { decode } from 'punycode';
 
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
