@@ -1,6 +1,6 @@
 import BaseExpression from '../base';
 import { implicitCast, checkExpression, checkType, checkMaxArguments, clamp } from '../utils';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationTypes } from '../../../../errors/carto-validation-error';
 
 /**
  * Evaluates to a hsv color.
@@ -157,7 +157,7 @@ function genHSV (name, alpha) {
         if (parameter.type !== 'number' && parameter.type !== 'category' && parameter.type !== undefined) {
             throw new CartoValidationError(
                 `${name}(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`,
-                cvt.INCORRECT_TYPE
+                CartoValidationTypes.INCORRECT_TYPE
             );
         }
     }

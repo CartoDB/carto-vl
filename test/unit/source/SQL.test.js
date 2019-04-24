@@ -1,5 +1,5 @@
 import SQL from '../../../src/sources/SQL';
-import { CartoValidationTypes as cvt } from '../../../src/errors/carto-validation-error';
+import { CartoValidationTypes } from '../../../src/errors/carto-validation-error';
 
 describe('sources/SQL', () => {
     const query = 'SELECT * from table0';
@@ -33,19 +33,19 @@ describe('sources/SQL', () => {
         it('should throw an error if query is not valid', function () {
             expect(function () {
                 new SQL();
-            }).toThrowError(cvt.MISSING_REQUIRED + ' \'query\'');
+            }).toThrowError(CartoValidationTypes.MISSING_REQUIRED + ' \'query\'');
 
             expect(function () {
                 new SQL(1234);
-            }).toThrowError(cvt.INCORRECT_TYPE + ' \'query\' property must be a string.');
+            }).toThrowError(CartoValidationTypes.INCORRECT_TYPE + ' \'query\' property must be a string.');
 
             expect(function () {
                 new SQL('');
-            }).toThrowError(cvt.INCORRECT_VALUE + ' \'query\' property must be not empty.');
+            }).toThrowError(CartoValidationTypes.INCORRECT_VALUE + ' \'query\' property must be not empty.');
 
             expect(function () {
                 new SQL('ABC');
-            }).toThrowError(cvt.INCORRECT_VALUE + ' \'query\' property must be a SQL query.');
+            }).toThrowError(CartoValidationTypes.INCORRECT_VALUE + ' \'query\' property must be a SQL query.');
         });
 
         it('should build a new Source with query having the_geom_webmercator', () => {

@@ -1,8 +1,8 @@
 import * as rsys from '../client/rsys';
 import Dataframe from '../renderer/Dataframe';
 import Metadata from './GeoJSONMetadata';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../../src/errors/carto-validation-error';
-import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../../src/errors/carto-runtime-error';
+import CartoValidationError, { CartoValidationTypes } from '../../src/errors/carto-validation-error';
+import CartoRuntimeError, { CartoRuntimeTypes } from '../../src/errors/carto-runtime-error';
 import util from '../utils/util';
 import Base from './Base';
 import schema from '../renderer/schema';
@@ -58,7 +58,7 @@ export default class GeoJSON extends Base {
         } else if (data.type === 'Feature') {
             this._features = [data];
         } else {
-            throw new CartoValidationError('\'data\' property must be a GeoJSON object.', cvt.INCORRECT_VALUE);
+            throw new CartoValidationError('\'data\' property must be a GeoJSON object.', CartoValidationTypes.INCORRECT_VALUE);
         }
 
         this._features = this._initializeFeatureProperties(this._features);
@@ -109,10 +109,10 @@ export default class GeoJSON extends Base {
 
     _checkData (data) {
         if (util.isUndefined(data)) {
-            throw new CartoValidationError('\'data\'', cvt.MISSING_REQUIRED);
+            throw new CartoValidationError('\'data\'', CartoValidationTypes.MISSING_REQUIRED);
         }
         if (!util.isObject(data)) {
-            throw new CartoValidationError('\'data\' property must be an object.', cvt.INCORRECT_TYPE);
+            throw new CartoValidationError('\'data\' property must be an object.', CartoValidationTypes.INCORRECT_TYPE);
         }
     }
 
@@ -175,7 +175,7 @@ export default class GeoJSON extends Base {
         if (this._catFields.has(propertyName) || this._dateFields.has(propertyName)) {
             throw new CartoValidationError(
                 `Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`,
-                cvt.INCORRECT_TYPE
+                CartoValidationTypes.INCORRECT_TYPE
             );
         }
         this._addNumericColumnField(propertyName);
@@ -203,7 +203,7 @@ export default class GeoJSON extends Base {
         if (this._catFields.has(propertyName) || this._numFields.has(propertyName)) {
             throw new CartoRuntimeError(
                 `Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`,
-                crt.NOT_SUPPORTED
+                CartoRuntimeTypes.NOT_SUPPORTED
             );
         }
         this._addDateColumnField(propertyName);
@@ -246,7 +246,7 @@ export default class GeoJSON extends Base {
         if (this._numFields.has(propertyName) || this._dateFields.has(propertyName)) {
             throw new CartoRuntimeError(
                 `Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`,
-                crt.NOT_SUPPORTED
+                CartoRuntimeTypes.NOT_SUPPORTED
             );
         }
         if (!this._catFields.has(propertyName)) {
@@ -339,7 +339,7 @@ export default class GeoJSON extends Base {
             if (this._type !== type) {
                 throw new CartoValidationError(
                     `multiple geometry types not supported: found '${type}' instead of '${this._type}'.`,
-                    cvt.INCORRECT_TYPE
+                    CartoValidationTypes.INCORRECT_TYPE
                 );
             }
             if (type === 'Point') {

@@ -13,8 +13,8 @@ export default class CartoRuntimeError extends CartoError {
 }
 
 export const CartoRuntimeTypes = {
-    DEFAULT: '[Error]:',
-    NOT_SUPPORTED: '[Not supported]:',
-    WEB_GL: '[WebGL]:',
-    MVT: '[MVT]:'
+    DEFAULT: '[Error]',
+    NOT_SUPPORTED: '[Not supported]',
+    WEB_GL: '[WebGL]',
+    MVT: '[MVT]'
 };

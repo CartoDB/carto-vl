@@ -1,6 +1,6 @@
 import BaseExpression from '../base';
 import { checkString, hexToRgb, getStringErrorPreface, checkMaxArguments } from '../utils';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationTypes } from '../../../../errors/carto-validation-error';
 
 /**
  * Create a color from its hexadecimal description.
@@ -37,7 +37,7 @@ export default class Hex extends BaseExpression {
             const preface = getStringErrorPreface('hex', 'hexadecimalColor', 0);
             throw new CartoValidationError(
                 `${preface} \nInvalid hexadecimal color string`,
-                cvt.INCORRECT_VALUE
+                CartoValidationTypes.INCORRECT_VALUE
             );
         }
         this.hexadecimalColor = hexadecimalColor;

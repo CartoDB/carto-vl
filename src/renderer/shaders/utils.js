@@ -1,5 +1,5 @@
 import Cache from './Cache';
-import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../../errors/carto-runtime-error';
+import CartoRuntimeError, { CartoRuntimeTypes } from '../../errors/carto-runtime-error';
 
 let programID = 1;
 const shaderCache = new Cache();
@@ -33,7 +33,7 @@ export function compileProgram (gl, glslvertexShader, glslfragmentShader) {
     gl.deleteShader(fragmentShader);
 
     if (!gl.getProgramParameter(shader.program, gl.LINK_STATUS)) {
-        throw new CartoRuntimeError(`Unable to link the shader program: ${gl.getProgramInfoLog(shader.program)}.`, crt.WEB_GL);
+        throw new CartoRuntimeError(`Unable to link the shader program: ${gl.getProgramInfoLog(shader.program)}.`, CartoRuntimeTypes.WEB_GL);
     }
 
     shader.programID = programID++;
@@ -54,7 +54,7 @@ function _compileShader (gl, sourceCode, type) {
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
         const log = gl.getShaderInfoLog(shader);
         gl.deleteShader(shader);
-        throw new CartoRuntimeError(`An error occurred compiling the shaders: ${log}\nSource:\n${sourceCode}`, crt.WEB_GL);
+        throw new CartoRuntimeError(`An error occurred compiling the shaders: ${log}\nSource:\n${sourceCode}`, CartoRuntimeTypes.WEB_GL);
     }
 
     shaderCache.set(gl, sourceCode, shader);

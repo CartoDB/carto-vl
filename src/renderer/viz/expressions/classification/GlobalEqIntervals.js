@@ -1,7 +1,7 @@
 import Classifier from './Classifier';
 import { checkExactNumberOfArguments } from '../utils';
 import { CLUSTER_FEATURE_COUNT } from '../../../../constants/metadata';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationTypes } from '../../../../errors/carto-validation-error';
 
 /**
  * Classify `input` by using the equal intervals method with `n` buckets.
@@ -44,7 +44,7 @@ export default class GlobalEqIntervals extends Classifier {
         if (this.input.propertyName === CLUSTER_FEATURE_COUNT) {
             throw new CartoValidationError(
                 '\'clusterCount\' can not be used in GlobalEqIntervals. Consider using ViewportEqIntervals instead',
-                cvt.INCORRECT_TYPE
+                CartoValidationTypes.INCORRECT_TYPE
             );
         }
 

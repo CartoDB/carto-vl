@@ -1,7 +1,7 @@
 import { decodePoint } from './pointDecoder';
 import { decodeLine } from './lineDecoder';
 import { decodePolygon } from './polygonDecoder';
-import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../../errors/carto-runtime-error';
+import CartoRuntimeError, { CartoRuntimeTypes } from '../../errors/carto-runtime-error';
 import { GEOMETRY_TYPE } from '../../utils/geometry';
 
 export function decodeGeom (geomType, geom) {
@@ -15,7 +15,7 @@ export function decodeGeom (geomType, geom) {
         default:
             throw new CartoRuntimeError(
                 `Unimplemented geometry type: '${geomType}'.`,
-                crt.NOT_SUPPORTED
+                CartoRuntimeTypes.NOT_SUPPORTED
             );
     }
 }

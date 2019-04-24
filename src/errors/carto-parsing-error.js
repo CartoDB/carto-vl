@@ -7,7 +7,7 @@ import CartoError from './carto-error';
  */
 export default class CartoParsingError extends CartoError {
     constructor (message) {
-        const type = '[Error]:';
+        const type = '[Error]';
         super({ message, type });
         this.name = 'CartoParsingError';
     }

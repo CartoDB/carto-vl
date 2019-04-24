@@ -1,5 +1,5 @@
 import { Layer, Viz, source } from '../../src/index';
-import { CartoValidationTypes as cvt } from '../../src/errors/carto-validation-error';
+import { CartoValidationTypes } from '../../src/errors/carto-validation-error';
 import { GEOMETRY_TYPE } from '../../src/utils/geometry';
 const { Dataset, GeoJSON, SQL } = source;
 
@@ -36,42 +36,42 @@ describe('api/layer', () => {
         it('should throw an error if id is not valid', () => {
             expect(() => {
                 new Layer();
-            }).toThrowError(cvt.MISSING_REQUIRED + ' \'id\'');
+            }).toThrowError(CartoValidationTypes.MISSING_REQUIRED + ' \'id\'');
 
             expect(() => {
                 new Layer({});
-            }).toThrowError(cvt.INCORRECT_TYPE + ' \'id\' property must be a string.');
+            }).toThrowError(CartoValidationTypes.INCORRECT_TYPE + ' \'id\' property must be a string.');
 
             expect(() => {
                 new Layer('');
-            }).toThrowError(cvt.INCORRECT_VALUE + ' \'id\' property must be not empty.');
+            }).toThrowError(CartoValidationTypes.INCORRECT_VALUE + ' \'id\' property must be not empty.');
         });
 
         it('should throw an error if source is not valid', () => {
             expect(() => {
                 new Layer('layer0');
-            }).toThrowError(cvt.MISSING_REQUIRED + ' \'source\'');
+            }).toThrowError(CartoValidationTypes.MISSING_REQUIRED + ' \'source\'');
 
             expect(() => {
                 new Layer('layer0', {});
-            }).toThrowError(cvt.INCORRECT_TYPE + ' The given object is not a valid \'source\'. See "carto.source".');
+            }).toThrowError(CartoValidationTypes.INCORRECT_TYPE + ' The given object is not a valid \'source\'. See "carto.source".');
         });
 
         it('should throw an error if viz is not valid', () => {
             expect(() => {
                 new Layer('layer0', source);
-            }).toThrowError(cvt.MISSING_REQUIRED + ' \'viz\'');
+            }).toThrowError(CartoValidationTypes.MISSING_REQUIRED + ' \'viz\'');
 
             expect(() => {
                 new Layer('layer0', source, {});
-            }).toThrowError(cvt.INCORRECT_TYPE + ' The given object is not a valid \'viz\'. See "carto.Viz".');
+            }).toThrowError(CartoValidationTypes.INCORRECT_TYPE + ' The given object is not a valid \'viz\'. See "carto.Viz".');
         });
 
         it('should throw an error if a viz is already added to another layer', () => {
             new Layer('layer1', source, viz);
             expect(() => {
                 new Layer('layer2', source, viz);
-            }).toThrowError(cvt.INCORRECT_VALUE + ' The given Viz object is already bound to another layer. Vizs cannot be shared between different layers.');
+            }).toThrowError(CartoValidationTypes.INCORRECT_VALUE + ' The given Viz object is already bound to another layer. Vizs cannot be shared between different layers.');
         });
     });
 
@@ -121,14 +121,14 @@ describe('api/layer', () => {
         it('should reject the promise if viz is undefined', (done) => {
             const layer = new Layer('layer0', source, viz);
             layer.blendToViz().catch(error => {
-                expect(error.message).toBe(cvt.MISSING_REQUIRED + ' \'viz\'');
+                expect(error.message).toBe(CartoValidationTypes.MISSING_REQUIRED + ' \'viz\'');
                 done();
             });
         });
         it('should reject the promise when viz is not a valid viz', (done) => {
             const layer = new Layer('layer0', source, viz);
             layer.blendToViz(2).catch(error => {
-                expect(error.message).toBe(cvt.INCORRECT_TYPE + ' The given object is not a valid \'viz\'. See "carto.Viz".');
+                expect(error.message).toBe(CartoValidationTypes.INCORRECT_TYPE + ' The given object is not a valid \'viz\'. See "carto.Viz".');
                 done();
             });
         });
@@ -136,7 +136,7 @@ describe('api/layer', () => {
             const layer = new Layer('layer0', source, viz);
             new Layer('layer1', source, viz2);
             layer.blendToViz(viz2).catch(error => {
-                expect(error.message).toBe(cvt.INCORRECT_VALUE + ' The given Viz object is already bound to another layer. Vizs cannot be shared between different layers.');
+                expect(error.message).toBe(CartoValidationTypes.INCORRECT_VALUE + ' The given Viz object is already bound to another layer. Vizs cannot be shared between different layers.');
                 done();
             });
         });

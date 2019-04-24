@@ -1,5 +1,5 @@
 import * as util from '../utils/util';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../../src/errors/carto-validation-error';
+import CartoValidationError, { CartoValidationTypes } from '../../src/errors/carto-validation-error';
 
 let defaultConfig;
 
@@ -40,7 +40,7 @@ function cleanDefaultConfig () {
 function checkConfig (config) {
     if (config) {
         if (!util.isObject(config)) {
-            throw new CartoValidationError('\'config\' property must be an object.', cvt.INCORRECT_TYPE);
+            throw new CartoValidationError('\'config\' property must be an object.', CartoValidationTypes.INCORRECT_TYPE);
         }
         _checkServerURL(config.serverURL);
     }
@@ -48,7 +48,7 @@ function checkConfig (config) {
 
 function _checkServerURL (serverURL) {
     if (!util.isString(serverURL)) {
-        throw new CartoValidationError('\'serverURL\' property must be a string.', cvt.INCORRECT_TYPE);
+        throw new CartoValidationError('\'serverURL\' property must be a string.', CartoValidationTypes.INCORRECT_TYPE);
     }
 }
 

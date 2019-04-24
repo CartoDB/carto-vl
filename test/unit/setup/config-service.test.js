@@ -1,5 +1,5 @@
 import { setDefaultConfig, getDefaultConfig, checkConfig, cleanDefaultConfig } from '../../../src/setup/config-service';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../../../src/errors/carto-validation-error';
+import CartoValidationError, { CartoValidationTypes } from '../../../src/errors/carto-validation-error';
 import { regExpThatContains as thatContains } from '../../../src/utils/util';
 
 describe('api/setup/config-service', () => {
@@ -29,13 +29,13 @@ describe('api/setup/config-service', () => {
         it('should throw an error if config is not valid', function () {
             expect(function () {
                 checkConfig(1234);
-            }).toThrowError(CartoValidationError, thatContains(cvt.INCORRECT_TYPE + ' \'config\''));
+            }).toThrowError(CartoValidationError, thatContains(CartoValidationTypes.INCORRECT_TYPE + ' \'config\''));
         });
 
         it('should throw an error if config.serverURL is not valid', function () {
             expect(function () {
                 checkConfig({ serverURL: 1234 });
-            }).toThrowError(CartoValidationError, thatContains(cvt.INCORRECT_TYPE + ' \'serverURL\''));
+            }).toThrowError(CartoValidationError, thatContains(CartoValidationTypes.INCORRECT_TYPE + ' \'serverURL\''));
         });
     });
 

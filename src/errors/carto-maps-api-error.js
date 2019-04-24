@@ -13,7 +13,7 @@ export default class CartoMapsAPIError extends CartoError {
 }
 
 export const CartoMapsAPITypes = {
-    DEFAULT: '[Error]:',
-    NOT_SUPPORTED: '[Not supported]:',
-    SECURITY: '[Security]:'
+    DEFAULT: '[Error]',
+    NOT_SUPPORTED: '[Not supported]',
+    SECURITY: '[Security]'
 };

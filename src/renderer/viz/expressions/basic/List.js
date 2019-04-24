@@ -3,7 +3,7 @@ import { checkExpression, implicitCast, getOrdinalFromIndex, checkMaxArguments }
 import ListImage from '../ListImage';
 import ListGeneric from './ListGeneric';
 import ListTransform from '../ListTransform';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationTypes } from '../../../../errors/carto-validation-error';
 
 const SUPPORTED_CHILD_TYPES = ['number', 'category', 'color', 'date', 'image', 'transformation'];
 
@@ -40,7 +40,7 @@ export default class List extends Base {
         if (!elems) {
             throw new CartoValidationError(
                 'list(): invalid parameters: must receive at least one argument.',
-                cvt.MISSING_REQUIRED
+                CartoValidationTypes.MISSING_REQUIRED
             );
         }
 
@@ -53,7 +53,7 @@ export default class List extends Base {
         if (!elems.length) {
             throw new CartoValidationError(
                 'list(): invalid parameters: must receive at least one argument.',
-                cvt.MISSING_REQUIRED
+                CartoValidationTypes.MISSING_REQUIRED
             );
         }
 
@@ -72,7 +72,7 @@ export default class List extends Base {
         if (SUPPORTED_CHILD_TYPES.indexOf(this.childType) === -1) {
             throw new CartoValidationError(
                 `list(): invalid parameters type: ${this.childType}.`,
-                cvt.INCORRECT_TYPE
+                CartoValidationTypes.INCORRECT_TYPE
             );
         }
 
@@ -82,7 +82,7 @@ export default class List extends Base {
             if (item.type !== this.childType) {
                 throw new CartoValidationError(
                     `list(): invalid ${getOrdinalFromIndex(index + 1)} parameter type, invalid argument type combination.`,
-                    cvt.INCORRECT_TYPE
+                    CartoValidationTypes.INCORRECT_TYPE
                 );
             }
         });

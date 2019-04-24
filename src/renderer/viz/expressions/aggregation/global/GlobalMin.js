@@ -6,7 +6,7 @@ import ClusterAvg from '../cluster/ClusterAvg';
 import ClusterMax from '../cluster/ClusterMax';
 import ClusterMin from '../cluster/ClusterMin';
 
-import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationTypes } from '../../../../../errors/carto-validation-error';
 
 /**
  * Return the minimum of the feature property for the entire source data.
@@ -50,7 +50,7 @@ export default class GlobalMin extends GlobalAggregation {
             } else {
                 throw new CartoValidationError(
                     'Invalid globlalAvg input',
-                    cvt.INCORRECT_TYPE
+                    CartoValidationTypes.INCORRECT_TYPE
                 );
             }
         }

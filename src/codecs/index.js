@@ -1,7 +1,7 @@
 import NumberCodec from './Number';
 import CategoryCodec from './Category';
 import DateCodec from './Date';
-import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../errors/carto-runtime-error';
+import CartoRuntimeError, { CartoRuntimeTypes } from '../errors/carto-runtime-error';
 
 export default function codecFactory (metadata, type, propertyName) {
     switch (type) {
@@ -14,7 +14,7 @@ export default function codecFactory (metadata, type, propertyName) {
         default:
             throw new CartoRuntimeError(
                 `Feature property value of type '${type}' cannot be decoded.`,
-                crt.NOT_SUPPORTED
+                CartoRuntimeTypes.NOT_SUPPORTED
             );
     }
 }

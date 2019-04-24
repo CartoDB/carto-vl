@@ -1,6 +1,6 @@
 import NumberCodec from './Number';
 import CategoryCodec from './Category';
-import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../../errors/carto-runtime-error';
+import CartoRuntimeError, { CartoRuntimeTypes } from '../../errors/carto-runtime-error';
 
 export default function MVTCodecFactory (metadata, type, propertyName) {
     switch (type) {
@@ -11,7 +11,7 @@ export default function MVTCodecFactory (metadata, type, propertyName) {
         default:
             throw new CartoRuntimeError(
                 `MVT decoding error. Feature property value of type '${type}' cannot be decoded.`,
-                crt.MVT
+                CartoRuntimeTypes.MVT
             );
     }
 }

@@ -1,6 +1,6 @@
 import { vec4 } from 'gl-matrix';
 import { average } from '../renderer/viz/expressions/stats';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationTypes } from '../errors/carto-validation-error';
 
 export const GEOMETRY_TYPE = {
     UNKNOWN: 'unknown',
@@ -189,7 +189,7 @@ export function computeCentroids (decodedGeometry, type) {
         default:
             throw new CartoValidationError(
                 'Invalid type argument, decoded geometry must have a point, line or polygon type.',
-                cvt.INCORRECT_VALUE
+                CartoValidationTypes.INCORRECT_VALUE
             );
     }
 }

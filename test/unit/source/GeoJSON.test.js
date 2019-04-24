@@ -1,5 +1,5 @@
 import GeoJSON from '../../../src/sources/GeoJSON';
-import { CartoValidationTypes as cvt } from '../../../src/errors/carto-validation-error';
+import { CartoValidationTypes } from '../../../src/errors/carto-validation-error';
 import { regExpThatContains as thatContains } from '../../../src/utils/util';
 
 describe('sources/GeoJSON', () => {
@@ -160,15 +160,15 @@ describe('sources/GeoJSON', () => {
         it('should throw an error if data is not valid', function () {
             expect(function () {
                 new GeoJSON();
-            }).toThrowError(thatContains(cvt.MISSING_REQUIRED + ' \'data\''));
+            }).toThrowError(thatContains(CartoValidationTypes.MISSING_REQUIRED + ' \'data\''));
 
             expect(function () {
                 new GeoJSON(1234);
-            }).toThrowError(thatContains(cvt.INCORRECT_TYPE + ' \'data\' property must be an object.'));
+            }).toThrowError(thatContains(CartoValidationTypes.INCORRECT_TYPE + ' \'data\' property must be an object.'));
 
             expect(function () {
                 new GeoJSON({});
-            }).toThrowError(thatContains(cvt.INCORRECT_VALUE + ' \'data\' property must be a GeoJSON object.'));
+            }).toThrowError(thatContains(CartoValidationTypes.INCORRECT_VALUE + ' \'data\' property must be a GeoJSON object.'));
         });
 
         it('should throw an error if data has different feature types', function () {
@@ -191,7 +191,7 @@ describe('sources/GeoJSON', () => {
             });
             expect(function () {
                 source.requestData();
-            }).toThrowError(thatContains(cvt.INCORRECT_TYPE + ' multiple geometry types not supported: found \'LineString\' instead of \'Point\'.'));
+            }).toThrowError(thatContains(CartoValidationTypes.INCORRECT_TYPE + ' multiple geometry types not supported: found \'LineString\' instead of \'Point\'.'));
         });
 
         describe('decodeGeometry', () => {

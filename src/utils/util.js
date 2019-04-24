@@ -5,7 +5,7 @@ import { unproject } from './geometry';
 /**
  * Export util functions
  */
-import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationTypes } from '../errors/carto-validation-error';
 
 const DEG2RAD = Math.PI / 180;
 const EARTH_RADIUS = 6378137;
@@ -52,7 +52,7 @@ export function castDate (date) {
     } else {
         throw new CartoValidationError(
             'Invalid Date type',
-            cvt.INCORRECT_TYPE
+            CartoValidationTypes.INCORRECT_TYPE
         );
     }
 }

@@ -13,11 +13,11 @@ export default class CartoValidationError extends CartoError {
 }
 
 export const CartoValidationTypes = {
-    DEFAULT: '[Error]:',
-    MISSING_REQUIRED: '[Missing required property]:',
-    INCORRECT_TYPE: '[Property with an incorrect type]:',
-    INCORRECT_VALUE: '[Incorrect value]:',
-    TOO_MANY_ARGS: '[Too many arguments]:',
-    NOT_ENOUGH_ARGS: '[Not enough arguments]:',
-    WRONG_NUMBER_ARGS: '[Wrong number of arguments]:'
+    DEFAULT: '[Error]',
+    MISSING_REQUIRED: '[Missing required property]',
+    INCORRECT_TYPE: '[Property with an incorrect type]',
+    INCORRECT_VALUE: '[Incorrect value]',
+    TOO_MANY_ARGS: '[Too many arguments]',
+    NOT_ENOUGH_ARGS: '[Not enough arguments]',
+    WRONG_NUMBER_ARGS: '[Wrong number of arguments]'
 };
