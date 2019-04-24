@@ -75,6 +75,8 @@ export default class Layer {
         this._initialViz = viz;
         this._renderWaiters = [];
         this._cameraMatrix = mat4.identity([]);
+
+        this.updateLayer = this.update(source, viz);
     }
 
     /**
@@ -95,16 +97,6 @@ export default class Layer {
         this._visible = visible;
         if (visible !== initial) {
             this._fire('updated', 'visibility change');
-        }
-    }
-
-    async init () {
-        if (this._initialSource && this._initialViz) {
-            try {
-                this._sourcePromise = await this.update(this._initialSource, this._initialViz);
-            } catch (err) {
-                throw err;
-            }
         }
     }
 
@@ -169,11 +161,11 @@ export default class Layer {
      */
     async addTo (map, beforeLayerID) {
         // Manage errors, whether they are an Evented Error or a common Error
-        try {
-            await this.init();
-        } catch (err) {
-            throw err;
-        }
+        // try {
+        //     await this.init();
+        // } catch (err) {
+        //     throw err;
+        // }
 
         try {
             map.once('error', (data) => {
@@ -376,7 +368,7 @@ export default class Layer {
      */
     async blendToViz (viz, ms = 400, interpolator = cubic) {
         this._checkViz(viz);
-        await this._sourcePromise;
+        await this.updateLayer;
 
         // It doesn't make sense to blendTo if a new request is required
         if (this._viz && !this._source.requiresNewMetadata(viz)) {
