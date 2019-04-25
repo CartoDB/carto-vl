@@ -1,7 +1,7 @@
 import BaseExpression from '../base';
 import { checkString, checkMaxArguments, getStringErrorPreface } from '../utils';
 import { CSS_COLOR_NAMES } from './cssColorNames';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../../../../errors/carto-validation-error';
 
 /**
  * Create a color from its name.
@@ -32,7 +32,10 @@ export default class NamedColor extends BaseExpression {
 
         if (!CSS_COLOR_NAMES.includes(colorName.toLowerCase())) {
             const preface = getStringErrorPreface('namedColor', 'colorName', 0);
-            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} ${preface}\nInvalid color name:  '${colorName}'`);
+            throw new CartoValidationError(
+                `${preface}\nInvalid color name:  '${colorName}'`,
+                CartoValidationErrorTypes.INCORRECT_VALUE
+            );
         }
         super({});
         this.type = 'color';

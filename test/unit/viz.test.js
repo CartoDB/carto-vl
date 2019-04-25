@@ -1,7 +1,8 @@
 import { Viz, expressions as s } from '../../src/index';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../../src/errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../../src/errors/carto-validation-error';
 import { regExpThatContains as thatContains } from '../../src/utils/util';
 import { SUPPORTED_VIZ_PROPERTIES } from '../../src/constants/viz';
+import CartoError from '../../src/errors/carto-error';
 
 // Generic Style defaults
 const DEFAULT_COLOR_EXPRESSION = s.rgb(0, 0, 0);
@@ -81,7 +82,7 @@ describe('api/viz', () => {
             it('should throw an error when parameter is not an object neither a string', function () {
                 expect(function () {
                     new Viz(1234);
-                }).toThrowError(CartoValidationError, thatContains(cvt.INCORRECT_VALUE + ' viz \'definition\' should be a vizSpec object or a valid viz string.'));
+                }).toThrowError(CartoValidationError, thatContains(CartoValidationErrorTypes.INCORRECT_VALUE + ' viz \'definition\' should be a vizSpec object or a valid viz string.'));
             });
 
             it('should throw an error when resolution is not a number', () => {
@@ -90,7 +91,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError(CartoValidationError, cvt.INCORRECT_TYPE + ' \'resolution\' property must be a number.');
+                }).toThrowError(CartoValidationError, CartoValidationErrorTypes.INCORRECT_TYPE + ' \'resolution\' property must be a number.');
             });
 
             it('should throw an error when resolution is too small', () => {
@@ -99,7 +100,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError(CartoValidationError, cvt.INCORRECT_VALUE + ' \'resolution\' is 0, must be greater than 0.');
+                }).toThrowError(CartoValidationError, CartoValidationErrorTypes.INCORRECT_VALUE + ' \'resolution\' is 0, must be greater than 0.');
             });
 
             it('should throw an error when resolution is too big', () => {
@@ -108,7 +109,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError(CartoValidationError, cvt.INCORRECT_VALUE + ' \'resolution\' is 10000, must be lower than 256.');
+                }).toThrowError(CartoValidationError, CartoValidationErrorTypes.INCORRECT_VALUE + ' \'resolution\' is 10000, must be lower than 256.');
             });
 
             it('should throw an error when color is not a valid expression', () => {
@@ -117,7 +118,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError(CartoValidationError, thatContains(cvt.INCORRECT_TYPE + ' \'color\''));
+                }).toThrowError(CartoValidationError, thatContains(CartoValidationErrorTypes.INCORRECT_TYPE + ' \'color\''));
             });
 
             it('should throw an error when width is not a valid expression', () => {
@@ -126,7 +127,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError(CartoValidationError, thatContains(cvt.INCORRECT_TYPE + ' \'width\''));
+                }).toThrowError(CartoValidationError, thatContains(CartoValidationErrorTypes.INCORRECT_TYPE + ' \'width\''));
             });
 
             it('should throw an error when strokeColor is not a valid expression', () => {
@@ -135,7 +136,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError(CartoValidationError, thatContains(cvt.INCORRECT_TYPE + ' \'strokeColor\''));
+                }).toThrowError(CartoValidationError, thatContains(CartoValidationErrorTypes.INCORRECT_TYPE + ' \'strokeColor\''));
             });
 
             it('should throw an error when strokeWidth is not a valid expression', () => {
@@ -144,7 +145,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError(CartoValidationError, thatContains(cvt.INCORRECT_TYPE + ' \'strokeWidth\''));
+                }).toThrowError(CartoValidationError, thatContains(CartoValidationErrorTypes.INCORRECT_TYPE + ' \'strokeWidth\''));
             });
 
             it('should throw an error when order is not a valid expression', () => {
@@ -153,7 +154,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError(CartoValidationError, thatContains(cvt.INCORRECT_TYPE + ' \'order\''));
+                }).toThrowError(CartoValidationError, thatContains(CartoValidationErrorTypes.INCORRECT_TYPE + ' \'order\''));
             });
 
             it('should add a console.warn when non supported properties are included', () => {
@@ -372,7 +373,7 @@ describe('api/viz', () => {
             expect(() => new Viz(`width: ramp(linear($numeric, 0, 10), [0.10,0.20,0.30]) * __cartovl_variable_ten
                 __cartovl_variable_oneHundred: __cartovl_variable_ten * __cartovl_variable_ten
                 __cartovl_variable_ten: __cartovl_variable_oneHundred / 10
-            `)).toThrowError('Viz contains a circular dependency');
+            `)).toThrowError(CartoError, thatContains('Viz contains a circular dependency'));
         });
     });
 
@@ -399,7 +400,8 @@ describe('api/viz', () => {
                     order: noOrder()
                     resolution: 1
                     strokeColor: rgba(0,0,0)
-                    strokeWidth:0 symbol: svg()
+                    strokeWidth:0
+                    symbol: image()
                     symbolPlacement: placement(0,1)
                     transform: translate(0,0)
                     width:1
@@ -431,7 +433,7 @@ describe('api/viz', () => {
                     resolution: 1
                     strokeColor: ramp($category,Prism)
                     strokeWidth: 0
-                    symbol: svg()
+                    symbol: image()
                     symbolPlacement: placement(0,1)
                     transform: translate(0,0)
                     width: 1

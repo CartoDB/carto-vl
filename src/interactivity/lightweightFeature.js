@@ -1,5 +1,5 @@
 import { generateBlenderFunction, generateResetFunction } from './blendUtils';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../errors/carto-validation-error';
 import { SUPPORTED_VIZ_PROPERTIES } from '../constants/viz';
 
 /**
@@ -114,7 +114,10 @@ function _defineRootBlendToMethod (targetObject) {
             const blendTo = (newVizProperties, duration = 500) => {
                 Object.keys(newVizProperties).forEach((property) => {
                     if (!(SUPPORTED_VIZ_PROPERTIES.includes(property))) {
-                        throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Property '${property}' is not a valid viz property`);
+                        throw new CartoValidationError(
+                            `Property '${property}' is not a valid viz property`,
+                            CartoValidationErrorTypes.INCORRECT_VALUE
+                        );
                     }
                     const newValue = newVizProperties[property];
                     this[property].blendTo(newValue, duration);

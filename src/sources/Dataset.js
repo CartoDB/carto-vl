@@ -1,4 +1,4 @@
-import CartoValidationError, { CartoValidationTypes as cvt } from '../../src/errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../../src/errors/carto-validation-error';
 import util from '../utils/util';
 import BaseWindshaft from './BaseWindshaft';
 
@@ -57,13 +57,13 @@ export default class Dataset extends BaseWindshaft {
 
     _checkTableName (tableName) {
         if (util.isUndefined(tableName)) {
-            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} 'tableName'`);
+            throw new CartoValidationError('\'tableName\'', CartoValidationErrorTypes.MISSING_REQUIRED);
         }
         if (!util.isString(tableName)) {
-            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'tableName' property must be a string.`);
+            throw new CartoValidationError('\'tableName\' property must be a string.', CartoValidationErrorTypes.INCORRECT_TYPE);
         }
         if (tableName === '') {
-            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'tableName' property must be not empty.`);
+            throw new CartoValidationError('\'tableName\' property must be not empty.', CartoValidationErrorTypes.INCORRECT_VALUE);
         }
     }
 }
