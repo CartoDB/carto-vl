@@ -2,7 +2,7 @@ import BaseExpression from '../base';
 import { number } from '../../expressions';
 
 import { checkType, checkNumber } from '../utils';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../../../../errors/carto-validation-error';
 import ClassifierGLSLHelper from './ClassifierGLSLHelper';
 
 export const DEFAULT_HISTOGRAM_SIZE = 1000;
@@ -55,7 +55,10 @@ export default class Classifier extends BaseExpression {
         const buckets = this.buckets.value;
         checkNumber(this.expressionName, 'buckets', 1, buckets);
         if (buckets <= 1) {
-            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} The number of 'buckets' must be >=2, but ${buckets} was used`);
+            throw new CartoValidationError(
+                `The number of 'buckets' must be >=2, but ${buckets} was used`,
+                CartoValidationErrorTypes.INCORRECT_VALUE
+            );
         }
     }
 

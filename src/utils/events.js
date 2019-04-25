@@ -1,4 +1,4 @@
-import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../errors/carto-validation-error';
 
 let registeredHandlers = [];
 
@@ -45,7 +45,10 @@ export function on (eventName, layerList, callback) {
             internalCallbacks.push(internalCallback);
         });
     } else {
-        throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Event name '${eventName}' is not supported by "carto.on". Supported event names are: 'loaded' and 'updated'.`);
+        throw new CartoValidationError(
+            `Event name '${eventName}' is not supported by "carto.on". Supported event names are: 'loaded' and 'updated'.`,
+            CartoValidationErrorTypes.INCORRECT_VALUE
+        );
     }
     registeredHandlers.push({
         eventName,

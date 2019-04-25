@@ -1,5 +1,5 @@
 import Dataset from '../../../src/sources/Dataset';
-import { CartoValidationTypes as cvt } from '../../../src/errors/carto-validation-error';
+import { CartoValidationErrorTypes } from '../../../src/errors/carto-validation-error';
 import { regExpThatContains as thatContains } from '../../../src/utils/util';
 
 describe('sources/dataset', () => {
@@ -34,15 +34,15 @@ describe('sources/dataset', () => {
         it('should throw an error if tableName is not valid', function () {
             expect(function () {
                 new Dataset();
-            }).toThrowError(thatContains(cvt.MISSING_REQUIRED + ' \'tableName\''));
+            }).toThrowError(thatContains(CartoValidationErrorTypes.MISSING_REQUIRED + ' \'tableName\''));
 
             expect(function () {
                 new Dataset(1234);
-            }).toThrowError(thatContains(cvt.INCORRECT_TYPE + ' \'tableName\''));
+            }).toThrowError(thatContains(CartoValidationErrorTypes.INCORRECT_TYPE + ' \'tableName\''));
 
             expect(function () {
                 new Dataset('');
-            }).toThrowError(thatContains(cvt.INCORRECT_VALUE + ' \'tableName\''));
+            }).toThrowError(thatContains(CartoValidationErrorTypes.INCORRECT_VALUE + ' \'tableName\''));
         });
     });
 });
