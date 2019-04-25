@@ -275,7 +275,7 @@ width: sqrt(clusterSum($pop_max) / 5000) + 5
 
 In the previous expression, the aggregated population in the cluster is used to determine the circle size (helped with some maths to manually adjust values to pixels).
 
-But if you just replace that property in the current `viz` configuration, you'll get a `CartoValidationError: [Incorrect value]: Incompatible combination of cluster aggregation usages`, because you are mixing aggregated and unaggregated usages of the same property *pop_max*. So it is better if you just simplify the viz.
+But if you just replace that property in the current `viz` configuration, you'll get a `CartoValidationError: [Incorrect value] Incompatible combination of cluster aggregation usages`, because you are mixing aggregated and unaggregated usages of the same property *pop_max*. So it is better if you just simplify the viz.
 
 Change your `viz` code to this:
 ```js

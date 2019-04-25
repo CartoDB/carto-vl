@@ -2,7 +2,7 @@ import NumberCodec from '../Number';
 import CategoryCodec from '../Category';
 import WindshaftDateCodec from './WindshaftDate';
 import TimeRangeCodec from './TimeRange';
-import CartoMapsAPIError, { CartoMapsAPITypes as cmt } from '../../errors/carto-maps-api-error';
+import CartoMapsAPIError, { CartoMapsAPIErrorTypes } from '../../errors/carto-maps-api-error';
 
 export default function windshaftCodecFactory (metadata, type, propertyName) {
     switch (type) {
@@ -16,7 +16,7 @@ export default function windshaftCodecFactory (metadata, type, propertyName) {
             return new TimeRangeCodec(metadata, propertyName);
         default:
             throw new CartoMapsAPIError(
-                `${cmt.NOT_SUPPORTED} Windshaft MVT decoding error. Feature property value of type '${type}' cannot be decoded.`
-            );
+                `Windshaft MVT decoding error. Feature property value of type '${type}' cannot be decoded.`,
+                CartoMapsAPIErrorTypes.NOT_SUPPORTED);
     }
 }
