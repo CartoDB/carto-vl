@@ -1,5 +1,5 @@
 import { version } from '../../package';
-import CartoMapsAPIError, { CartoMapsAPITypes as cmt } from '../errors/carto-maps-api-error';
+import CartoMapsAPIError, { CartoMapsAPIErrorTypes } from '../errors/carto-maps-api-error';
 
 const REQUEST_GET_MAX_URL_LENGTH = 2048;
 
@@ -41,14 +41,16 @@ export default class WinshaftRequestHelper {
     _dealWithWindshaftErrors (response, layergroup) {
         if (response.status === 401) {
             throw new CartoMapsAPIError(
-                `${cmt.SECURITY} Unauthorized access to Maps API: invalid combination of user('${this._source._username}') and apiKey('${this._source._apiKey}')`
+                `Unauthorized access to Maps API: invalid combination of user('${this._source._username}') and apiKey('${this._source._apiKey}')`,
+                CartoMapsAPIErrorTypes.SECURITY
             );
         } else if (response.status === 403) {
             throw new CartoMapsAPIError(
-                `${cmt.SECURITY} Unauthorized access to dataset: the provided apiKey('${this._source._apiKey}') doesn't provide access to the requested data`
+                `Unauthorized access to dataset: the provided apiKey('${this._source._apiKey}') doesn't provide access to the requested data`,
+                CartoMapsAPIErrorTypes.SECURITY
             );
         }
-        throw new CartoMapsAPIError(`SQL errors: ${JSON.stringify(layergroup.errors)}`);
+        throw new CartoMapsAPIError(`${JSON.stringify(layergroup.errors)}`, CartoMapsAPIErrorTypes.SQL);
     }
 
     _mapConfigPayload () {

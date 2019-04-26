@@ -4,7 +4,7 @@ import ClusterTimeDimension from './aggregation/cluster/ClusterTimeDimension';
 import ClusterAggregation from './aggregation/cluster/ClusterAggregation';
 import ClusterCount from './aggregation/cluster/ClusterCount';
 import { implicitCast } from './utils';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../../../errors/carto-validation-error';
 import CartoRuntimeError from '../../../errors/carto-runtime-error';
 import { genLightweightFeatureClass } from '../../../interactivity/lightweightFeature';
 import { getCompoundFeature } from '../../../interactivity/commonFeature';
@@ -87,7 +87,7 @@ export default class ViewportFeatures extends BaseExpression {
     _resetViewportAgg (metadata, renderLayer) {
         if (!this._FeatureProxy) {
             if (!this._requiredProperties.every(p => validProperty(p))) {
-                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} viewportFeatures arguments can only be properties`);
+                throw new CartoValidationError('viewportFeatures arguments can only be properties', CartoValidationErrorTypes.INCORRECT_TYPE);
             }
 
             const propertyNames = this._requiredProperties.map((p) => {

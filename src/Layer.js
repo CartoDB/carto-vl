@@ -4,7 +4,7 @@ import Viz from './Viz';
 import SourceBase from './sources/Base';
 import Renderer from './renderer/Renderer';
 import RenderLayer from './renderer/RenderLayer';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../src/errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../src/errors/carto-validation-error';
 import CartoRuntimeError from '../src/errors/carto-runtime-error';
 
 import { cubic } from './renderer/viz/expressions';
@@ -71,9 +71,12 @@ export default class Layer {
         this._renderLayer = new RenderLayer();
 
         this.concurrencyHelper = new LayerConcurrencyHelper();
-        this._sourcePromise = this.update(source, viz);
+        this._initialSource = source;
+        this._initialViz = viz;
         this._renderWaiters = [];
         this._cameraMatrix = mat4.identity([]);
+
+        this._updateLayer = this.update(source, viz);
     }
 
     /**
@@ -156,7 +159,7 @@ export default class Layer {
      * @instance
      * @api
      */
-    addTo (map, beforeLayerID) {
+    async addTo (map, beforeLayerID) {
         // Manage errors, whether they are an Evented Error or a common Error
         try {
             map.once('error', (data) => {
@@ -359,7 +362,7 @@ export default class Layer {
      */
     async blendToViz (viz, ms = 400, interpolator = cubic) {
         this._checkViz(viz);
-        await this._sourcePromise;
+        await this._updateLayer;
 
         // It doesn't make sense to blendTo if a new request is required
         if (this._viz && !this._source.requiresNewMetadata(viz)) {
@@ -558,35 +561,43 @@ export default class Layer {
 
     _checkId (id) {
         if (id === undefined) {
-            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} 'id'`);
+            throw new CartoValidationError('\'id\'', CartoValidationErrorTypes.MISSING_REQUIRED);
         }
         if (!util.isString(id)) {
-            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'id' property must be a string.`);
+            throw new CartoValidationError('\'id\' property must be a string.', CartoValidationErrorTypes.INCORRECT_TYPE);
         }
         if (id === '') {
-            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'id' property must be not empty.`);
+            throw new CartoValidationError('\'id\' property must be not empty.', CartoValidationErrorTypes.INCORRECT_VALUE);
         }
     }
 
     _checkSource (source) {
         if (source === undefined) {
-            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} 'source'`);
+            throw new CartoValidationError('\'source\'', CartoValidationErrorTypes.MISSING_REQUIRED);
         }
         if (!(source instanceof SourceBase)) {
-            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} The given object is not a valid 'source'. See "carto.source".`);
+            throw new CartoValidationError('The given object is not a valid \'source\'. See "carto.source".', CartoValidationErrorTypes.INCORRECT_TYPE);
         }
     }
 
     _checkViz (viz) {
         if (util.isUndefined(viz)) {
-            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} 'viz'`);
+            throw new CartoValidationError('\'viz\'', CartoValidationErrorTypes.MISSING_REQUIRED);
         }
+
         if (!(viz instanceof Viz)) {
-            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} The given object is not a valid 'viz'. See "carto.Viz".`);
+            throw new CartoValidationError(
+                'The given object is not a valid \'viz\'. See "carto.Viz".',
+                CartoValidationErrorTypes.INCORRECT_TYPE
+            );
         }
+
         if (viz._boundLayer && viz._boundLayer !== this) {
             // Note the required 1 on 1 relationship between layer & viz
-            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} The given Viz object is already bound to another layer. Vizs cannot be shared between different layers.`);
+            throw new CartoValidationError(
+                'The given Viz object is already bound to another layer. Vizs cannot be shared between different layers.',
+                CartoValidationErrorTypes.INCORRECT_VALUE
+            );
         }
     }
 

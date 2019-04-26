@@ -2,7 +2,7 @@ import BaseExpression from './base';
 import { checkType, implicitCast, checkFeatureIndependent, checkInstance, checkMaxArguments } from './utils';
 import Property from './basic/property';
 import { number } from '../expressions';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../../../errors/carto-validation-error';
 import { OTHERS_INDEX, OTHERS_GLSL_VALUE, OTHERS_LABEL } from './constants';
 
 // Careful! This constant must match with the shader code of the Top expression
@@ -100,7 +100,8 @@ export default class Top extends BaseExpression {
             const prev = this.buckets.eval();
             setTimeout(() => {
                 throw new CartoValidationError(
-                    `${cvt.INCORRECT_VALUE} top() function has a limit of ${MAX_TOP_BUCKETS} buckets but '${prev}' buckets were specified.`
+                    `top() function has a limit of ${MAX_TOP_BUCKETS} buckets but '${prev}' buckets were specified.`,
+                    CartoValidationErrorTypes.INCORRECT_VALUE
                 );
             });
             buckets = 0;

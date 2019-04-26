@@ -5,8 +5,8 @@ import schema from '../renderer/schema';
 import * as windshaftFiltering from './windshaft-filtering';
 import WindshaftRequestHelper from './WindshaftRequestHelper';
 
-import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
-import CartoMapsAPIError, { CartoMapsAPITypes as cmt } from '../errors/carto-maps-api-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../errors/carto-validation-error';
+import CartoMapsAPIError, { CartoMapsAPIErrorTypes } from '../errors/carto-maps-api-error';
 import { GEOMETRY_TYPE } from '../utils/geometry';
 import { CLUSTER_FEATURE_COUNT, aggregationTypes } from '../constants/metadata';
 
@@ -102,9 +102,11 @@ export default class Windshaft {
             const aggregatedUsage = usages.some(x => x.type === aggregationTypes.AGGREGATED);
             const unAggregatedUsage = usages.some(x => x.type === aggregationTypes.UNAGGREGATED);
             if (aggregatedUsage && unAggregatedUsage) {
-                throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Incompatible combination of cluster aggregation usages (${
-                    JSON.stringify(usages.filter(x => x.type !== 'aggregated'))
-                }) with unaggregated usage for property '${propertyName}'`);
+                const aggregationUssages = JSON.stringify(usages.filter(x => x.type !== 'aggregated'));
+                throw new CartoValidationError(
+                    `Incompatible combination of cluster aggregation usages (${aggregationUssages}) with unaggregated usage for property '${propertyName}'`,
+                    CartoValidationErrorTypes.INCORRECT_VALUE
+                );
             }
         });
     }
@@ -232,7 +234,7 @@ export default class Windshaft {
 
     _checkLayerMeta (MNS) {
         if (!this._isAggregated() && this._requiresAggregation(MNS)) {
-            throw new CartoMapsAPIError(`${cmt.NOT_SUPPORTED} Aggregation not supported for this dataset`);
+            throw new CartoMapsAPIError('Aggregation not supported for this dataset', CartoMapsAPIErrorTypes.NOT_SUPPORTED);
         }
     }
 
@@ -399,7 +401,7 @@ export default class Windshaft {
                 const dimType = adaptColumnType(dimensionStats.type);
                 const { column, ...params } = dimension;
                 if (properties[column].dimension) {
-                    throw new CartoMapsAPIError(`${cmt.NOT_SUPPORTED} Multiple dimensions based on same column '${column}'.`);
+                    throw new CartoMapsAPIError(`Multiple dimensions based on same column '${column}'.`, CartoMapsAPIErrorTypes.NOT_SUPPORTED);
                 }
                 properties[column].dimension = {
                     propertyName: dimName,
@@ -459,7 +461,7 @@ function adaptGeometryType (type) {
         case 'ST_LineString':
             return GEOMETRY_TYPE.LINE;
         default:
-            throw new CartoMapsAPIError(`${cmt.NOT_SUPPORTED} Unimplemented geometry type '${type}'.`);
+            throw new CartoMapsAPIError(`Unimplemented geometry type '${type}'.`, CartoMapsAPIErrorTypes.NOT_SUPPORTED);
     }
 }
 

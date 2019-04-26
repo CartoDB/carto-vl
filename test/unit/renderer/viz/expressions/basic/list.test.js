@@ -1,12 +1,12 @@
 import * as s from '../../../../../../src/renderer/viz/expressions';
 import { validateMaxArgumentsError, validateTypeErrors } from '../utils';
-import { CartoValidationTypes as cvt } from '../../../../../../src/errors/carto-validation-error';
+import { CartoValidationErrorTypes } from '../../../../../../src/errors/carto-validation-error';
 
 describe('src/renderer/viz/expressions/basic/list', () => {
     describe('error control', () => {
         validateMaxArgumentsError('list', ['number', 'number']);
-        validateTypeErrors('list', [], () => `${cvt.MISSING_REQUIRED} list(): invalid parameters: must receive at least one argument.`);
-        validateTypeErrors('list', [[]], () => `${cvt.MISSING_REQUIRED} list(): invalid parameters: must receive at least one argument.`);
+        validateTypeErrors('list', [], () => `${CartoValidationErrorTypes.MISSING_REQUIRED} list(): invalid parameters: must receive at least one argument.`);
+        validateTypeErrors('list', [[]], () => `${CartoValidationErrorTypes.MISSING_REQUIRED} list(): invalid parameters: must receive at least one argument.`);
         validateTypeErrors('list', [[1, 'a']]);
         validateTypeErrors('list', [[function () { }]]);
     });

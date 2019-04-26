@@ -1,21 +1,23 @@
-import bicycle from './svgs/bicycle.svg';
-import building from './svgs/building.svg';
-import bus from './svgs/bus.svg';
-import car from './svgs/car.svg';
-import circle from './svgs/circle.svg';
-import circleOutline from './svgs/circleOutline.svg';
-import cross from './svgs/cross.svg';
-import house from './svgs/house.svg';
-import flag from './svgs/flag.svg';
-import marker from './svgs/marker.svg';
-import markerOutline from './svgs/markerOutline.svg';
-import plus from './svgs/plus.svg';
-import square from './svgs/square.svg';
-import squareOutline from './svgs/squareOutline.svg';
-import star from './svgs/star.svg';
-import starOutline from './svgs/starOutline.svg';
-import triangle from './svgs/triangle.svg';
-import triangleOutline from './svgs/triangleOutline.svg';
+const DEFAULT_SYMBOLS_URL = 'https://libs.cartocdn.com/carto-vl/assets/symbols';
+
+const bicycle = `${DEFAULT_SYMBOLS_URL}/bicycle.svg`;
+const building = `${DEFAULT_SYMBOLS_URL}/building.svg`;
+const bus = `${DEFAULT_SYMBOLS_URL}/bus.svg`;
+const car = `${DEFAULT_SYMBOLS_URL}/car.svg`;
+const circle = `${DEFAULT_SYMBOLS_URL}/circle.svg`;
+const circleOutline = `${DEFAULT_SYMBOLS_URL}/circleOutline.svg`;
+const cross = `${DEFAULT_SYMBOLS_URL}/cross.svg`;
+const house = `${DEFAULT_SYMBOLS_URL}/house.svg`;
+const flag = `${DEFAULT_SYMBOLS_URL}/flag.svg`;
+const marker = `${DEFAULT_SYMBOLS_URL}/marker.svg`;
+const markerOutline = `${DEFAULT_SYMBOLS_URL}/markerOutline.svg`;
+const plus = `${DEFAULT_SYMBOLS_URL}/plus.svg`;
+const square = `${DEFAULT_SYMBOLS_URL}/square.svg`;
+const squareOutline = `${DEFAULT_SYMBOLS_URL}/squareOutline.svg`;
+const star = `${DEFAULT_SYMBOLS_URL}/star.svg`;
+const starOutline = `${DEFAULT_SYMBOLS_URL}/starOutline.svg`;
+const triangle = `${DEFAULT_SYMBOLS_URL}/triangle.svg`;
+const triangleOutline = `${DEFAULT_SYMBOLS_URL}/triangleOutline.svg`;
 
 export default {
     bicycle,

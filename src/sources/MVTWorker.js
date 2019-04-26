@@ -4,8 +4,8 @@ import * as rsys from '../client/rsys';
 import { decodeLines, decodePolygons } from '../client/mvt/feature-decoder';
 import MVTMetadata from './MVTMetadata';
 import DummyDataframe from '../renderer/DummyDataframe';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
-import CartoRuntimeError, { CartoRuntimeTypes as runtimeErrors } from '../errors/carto-runtime-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../errors/carto-validation-error';
+import CartoRuntimeError, { CartoRuntimeErrorTypes } from '../errors/carto-runtime-error';
 import { GEOMETRY_TYPE } from '../utils/geometry';
 
 // TODO import correctly
@@ -69,7 +69,8 @@ export class MVTWorker {
 
         if (Object.keys(tile.layers).length > 1 && !layerID) {
             throw new CartoValidationError(
-                `${cvt.MISSING_REQUIRED} LayerID parameter wasn't specified and the MVT tile contains multiple layers: ${JSON.stringify(Object.keys(tile.layers))}.`
+                `LayerID parameter wasn't specified and the MVT tile contains multiple layers: ${JSON.stringify(Object.keys(tile.layers))}.`,
+                CartoValidationErrorTypes.MISSING_REQUIRED
             );
         }
 
@@ -102,7 +103,7 @@ export class MVTWorker {
             case GEOMETRY_TYPE.POLYGON:
                 return this._decode(mvtLayer, metadata, mvtExtent, [], decodePolygons);
             default:
-                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} MVT: invalid geometry type '${metadata.geomType}'`);
+                throw new CartoValidationError(`MVT: invalid geometry type '${metadata.geomType}'`, CartoValidationErrorTypes.INCORRECT_TYPE);
         }
     }
 
@@ -116,7 +117,7 @@ export class MVTWorker {
             case mvtDecoderGeomTypes.polygon:
                 return GEOMETRY_TYPE.POLYGON;
             default:
-                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} MVT: invalid geometry type '${type}'`);
+                throw new CartoValidationError(`MVT: invalid geometry type '${type}'`, CartoValidationErrorTypes.INCORRECT_TYPE);
         }
     }
 
@@ -154,7 +155,8 @@ export class MVTWorker {
             }
             if (f.properties[metadata.idProperty] === undefined) {
                 throw new CartoRuntimeError(
-                    `${runtimeErrors.MVT} MVT feature with undefined idProperty '${metadata.idProperty}'`
+                    `MVT feature with undefined idProperty '${metadata.idProperty}'`,
+                    CartoRuntimeErrorTypes.MVT
                 );
             }
             this._decodeProperties(metadata, scalarPropertyCodecs, rangePropertyCodecs, properties, f, numFeatures);
@@ -170,7 +172,8 @@ export class MVTWorker {
         const actual = MVT_TO_CARTO_TYPES[type];
         if (actual !== expected) {
             throw new CartoRuntimeError(
-                `${runtimeErrors.MVT} MVT: mixed geometry types in the same layer. Layer has type: ${expected} but feature was ${actual}`
+                `MVT: mixed geometry types in the same layer. Layer has type: ${expected} but feature was ${actual}`,
+                CartoRuntimeErrorTypes.MVT
             );
         }
     }

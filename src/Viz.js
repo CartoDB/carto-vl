@@ -6,7 +6,7 @@ import BaseExpression from './renderer/viz/expressions/base';
 import { implicitCast, noOverrideColor } from './renderer/viz/expressions/utils';
 import { parseVizDefinition } from './renderer/viz/parser';
 import util from './utils/util';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../src/errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../src/errors/carto-validation-error';
 import CartoRuntimeError from '../src/errors/carto-runtime-error';
 import pointVertexShaderGLSL from './renderer/shaders/geometry/point/pointVertexShader.glsl';
 import pointFragmentShaderGLSL from './renderer/shaders/geometry/point/pointFragmentShader.glsl';
@@ -14,7 +14,7 @@ import lineVertexShaderGLSL from './renderer/shaders/geometry/line/lineVertexSha
 import lineFragmentShaderGLSL from './renderer/shaders/geometry/line/lineFragmentShader.glsl';
 import polygonVertexShaderGLSL from './renderer/shaders/geometry/polygon/polygonVertexShader.glsl';
 import polygonFragmentShaderGLSL from './renderer/shaders/geometry/polygon/polygonFragmentShader.glsl';
-import SVG from './renderer/viz/expressions/SVG';
+import Image from './renderer/viz/expressions/Image';
 import svgs from './renderer/viz/defaultSVGs';
 import Placement from './renderer/viz/expressions/Placement';
 import Translate from './renderer/viz/expressions/transformation/Translate';
@@ -27,7 +27,7 @@ const DEFAULT_STROKE_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_STROKE_WIDTH_EXPRESSION = () => _markDefault(s.number(0));
 const DEFAULT_ORDER_EXPRESSION = () => _markDefault(s.noOrder());
 const DEFAULT_FILTER_EXPRESSION = () => _markDefault(s.constant(1));
-const DEFAULT_SYMBOL_EXPRESSION = () => _markDefault(new SVG(svgs.circle));
+const DEFAULT_SYMBOL_EXPRESSION = () => _markDefault(new Image(svgs.circle));
 const DEFAULT_SYMBOLPLACEMENT_EXPRESSION = () => _markDefault(new Placement(s.constant(0), s.constant(1)));
 const DEFAULT_TRANSFORM_EXPRESSION = () => _markDefault(new Translate(s.constant(0), s.constant(0)));
 const DEFAULT_RESOLUTION = () => _markDefault(s.number(1));
@@ -390,7 +390,10 @@ export default class Viz {
         if (util.isString(definition)) {
             return this._setDefaults(parseVizDefinition(definition));
         }
-        throw new CartoValidationError(`${cvt.INCORRECT_VALUE} viz 'definition' should be a vizSpec object or a valid viz string.`);
+        throw new CartoValidationError(
+            'viz \'definition\' should be a vizSpec object or a valid viz string.',
+            CartoValidationErrorTypes.INCORRECT_VALUE
+        );
     }
 
     /**
@@ -441,13 +444,23 @@ export default class Viz {
 
         if (util.isNumber(resolutionValue)) {
             if (resolution <= MIN_RESOLUTION) {
-                throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'resolution' is ${resolution}, must be greater than ${MIN_RESOLUTION}.`);
+                throw new CartoValidationError(
+                    `'resolution' is ${resolution}, must be greater than ${MIN_RESOLUTION}.`,
+                    CartoValidationErrorTypes.INCORRECT_VALUE
+                );
             }
+
             if (resolution >= MAX_RESOLUTION) {
-                throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'resolution' is ${resolution}, must be lower than ${MAX_RESOLUTION}.`);
+                throw new CartoValidationError(
+                    `'resolution' is ${resolution}, must be lower than ${MAX_RESOLUTION}.`,
+                    CartoValidationErrorTypes.INCORRECT_VALUE
+                );
             }
         } else {
-            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'resolution' property must be a number.`);
+            throw new CartoValidationError(
+                '\'resolution\' property must be a number.',
+                CartoValidationErrorTypes.INCORRECT_TYPE
+            );
         }
     }
 
@@ -467,7 +480,9 @@ export default class Viz {
 
         SUPPORTED_VIZ_PROPERTIES.forEach((parameter) => {
             if (!(vizSpec[parameter] instanceof BaseExpression)) {
-                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} '${parameter}' parameter is not a valid viz Expresion.`);
+                throw new CartoValidationError(
+                    `'${parameter}' parameter is not a valid viz Expresion.`,
+                    CartoValidationErrorTypes.INCORRECT_TYPE);
             }
         });
 
@@ -516,7 +531,8 @@ function checkVizPropertyTypes (viz) {
         const expected = expectedTypePerProperty[property];
         if (currentType !== expected) {
             throw new CartoValidationError(
-                `${cvt.INCORRECT_TYPE} Viz property '${property}': must be of type '${expected}' but it was of type '${currentType}'`
+                `Viz property '${property}': must be of type '${expected}' but it was of type '${currentType}'`,
+                CartoValidationErrorTypes.INCORRECT_TYPE
             );
         }
     });

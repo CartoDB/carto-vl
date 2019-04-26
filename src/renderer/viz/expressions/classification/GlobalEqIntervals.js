@@ -1,7 +1,7 @@
 import Classifier from './Classifier';
 import { checkExactNumberOfArguments } from '../utils';
 import { CLUSTER_FEATURE_COUNT } from '../../../../constants/metadata';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../../../../errors/carto-validation-error';
 
 /**
  * Classify `input` by using the equal intervals method with `n` buckets.
@@ -42,7 +42,10 @@ export default class GlobalEqIntervals extends Classifier {
 
     _updateBreakpointsWith (metadata) {
         if (this.input.propertyName === CLUSTER_FEATURE_COUNT) {
-            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'clusterCount' can not be used in GlobalEqIntervals. Consider using ViewportEqIntervals instead`);
+            throw new CartoValidationError(
+                '\'clusterCount\' can not be used in GlobalEqIntervals. Consider using ViewportEqIntervals instead',
+                CartoValidationErrorTypes.INCORRECT_TYPE
+            );
         }
 
         const name = this.input.name;

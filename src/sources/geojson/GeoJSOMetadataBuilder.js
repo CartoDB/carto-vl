@@ -4,8 +4,8 @@ import { DEFAULT_ID_PROPERTY } from '../../renderer/Metadata';
 import schema from '../../renderer/schema';
 import util from '../../utils/util';
 
-import CartoRuntimeError, { CartoRuntimeTypes as runtimeErrors } from '../../../src/errors/carto-runtime-error';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../../../src/errors/carto-validation-error';
+import CartoRuntimeError, { CartoRuntimeErrorTypes } from '../../../src/errors/carto-runtime-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../../../src/errors/carto-validation-error';
 
 import GeoJSONMetadata from './GeoJSONMetadata';
 import { dataframeGeometryType } from './GeoJSONGeometryType';
@@ -104,7 +104,10 @@ export class GeoJSONMetadataBuilder {
 
     _addNumericPropertyToMetadata (propertyName, value) {
         if (this._catFields.has(propertyName) || this._dateFields.has(propertyName)) {
-            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
+            throw new CartoValidationError(
+                `Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`,
+                CartoValidationErrorTypes.INCORRECT_TYPE
+            );
         }
 
         this._addNumericColumnField(propertyName);
@@ -131,7 +134,8 @@ export class GeoJSONMetadataBuilder {
     _addDatePropertyToMetadata (propertyName, value) {
         if (this._catFields.has(propertyName) || this._numFields.has(propertyName)) {
             throw new CartoRuntimeError(
-                `${runtimeErrors.NOT_SUPPORTED} Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`
+                `Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`,
+                CartoRuntimeErrorTypes.NOT_SUPPORTED
             );
         }
         this._addDateColumnField(propertyName);
@@ -173,7 +177,8 @@ export class GeoJSONMetadataBuilder {
     _addCategoryPropertyToMetadata (propertyName, value) {
         if (this._numFields.has(propertyName) || this._dateFields.has(propertyName)) {
             throw new CartoRuntimeError(
-                `${runtimeErrors.NOT_SUPPORTED} Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`
+                `Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`,
+                CartoRuntimeErrorTypes.NOT_SUPPORTED
             );
         }
         if (!this._catFields.has(propertyName)) {

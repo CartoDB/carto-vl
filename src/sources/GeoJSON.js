@@ -2,7 +2,7 @@ import * as rsys from '../client/rsys';
 import Dataframe from '../renderer/Dataframe';
 import { DEFAULT_ID_PROPERTY } from '../renderer/Metadata';
 
-import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../errors/carto-validation-error';
 
 import util from '../utils/util';
 import Base from './Base';
@@ -71,10 +71,11 @@ export default class GeoJSON extends Base {
      */
     _checkData (data) {
         if (util.isUndefined(data)) {
-            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} 'data'`);
+            throw new CartoValidationError('\'data\'', CartoValidationErrorTypes.MISSING_REQUIRED);
         }
         if (!util.isObject(data)) {
-            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'data' property must be an object.`);
+            throw new CartoValidationError('\'data\' property must be an object.',
+                CartoValidationErrorTypes.INCORRECT_TYPE);
         }
     }
 
@@ -90,7 +91,7 @@ export default class GeoJSON extends Base {
         } else if (dataType === 'Feature') {
             features = [this._data];
         } else {
-            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'data' property must be a GeoJSON object.`);
+            throw new CartoValidationError('\'data\' property must be a GeoJSON object.', CartoValidationErrorTypes.INCORRECT_VALUE);
         }
 
         this._initializePropertiesIn(features);
@@ -268,7 +269,10 @@ export default class GeoJSON extends Base {
             const type = geometry.type;
             const coordinates = geometry.coordinates;
             if (this._geomType !== type) {
-                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} multiple geometry types not supported: found '${type}' instead of '${this._geomType}'.`);
+                throw new CartoValidationError(
+                    `multiple geometry types not supported: found '${type}' instead of '${this._geomType}'.`,
+                    CartoValidationErrorTypes.INCORRECT_TYPE
+                );
             }
             if (type === GeoJSONGeometryType.POINT) {
                 const point = this._geometryTransformer.computePoint(coordinates);

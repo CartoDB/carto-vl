@@ -1,6 +1,6 @@
 import mitt from 'mitt';
 import Layer from '../Layer';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../errors/carto-validation-error';
 
 const EVENTS = [
     'featureClick',
@@ -301,24 +301,41 @@ export default class Interactivity {
 
 function preCheckLayerList (layerList) {
     if (!Array.isArray(layerList)) {
-        throw new CartoValidationError(`${cvt.INCORRECT_TYPE} Invalid layer list, parameter must be an array of "carto.Layer" objects.`);
+        throw new CartoValidationError(
+            'Invalid layer list, parameter must be an array of "carto.Layer" objects.',
+            CartoValidationErrorTypes.INCORRECT_TYPE
+        );
     }
+
     if (!layerList.length) {
-        throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Invalid argument, layer list must not be empty.`);
+        throw new CartoValidationError(
+            'Invalid argument, layer list must not be empty.',
+            CartoValidationErrorTypes.INCORRECT_VALUE
+        );
     }
+
     if (!layerList.every(layer => layer instanceof Layer)) {
-        throw new CartoValidationError(`${cvt.INCORRECT_TYPE} Invalid layer, layer must be an instance of "carto.Layer".`);
+        throw new CartoValidationError(
+            'Invalid layer, layer must be an instance of "carto.Layer".',
+            CartoValidationErrorTypes.INCORRECT_TYPE
+        );
     }
 }
 
 function postCheckLayerList (layerList) {
     if (!layerList.every(layer => layer.map === layerList[0].map)) {
-        throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Invalid argument, all layers must belong to the same map.`);
+        throw new CartoValidationError(
+            'Invalid argument, all layers must belong to the same map.',
+            CartoValidationErrorTypes.INCORRECT_VALUE
+        );
     }
 }
 
 function checkEvent (eventName) {
     if (!EVENTS.includes(eventName)) {
-        throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Unrecognized event: '${eventName}'. Available events: ${EVENTS.join(', ')}.`);
+        throw new CartoValidationError(
+            `Unrecognized event: '${eventName}'. Available events: ${EVENTS.join(', ')}.`,
+            CartoValidationErrorTypes.INCORRECT_VALUE
+        );
     }
 }

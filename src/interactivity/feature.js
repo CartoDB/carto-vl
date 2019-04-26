@@ -1,5 +1,5 @@
 import FeatureVizProperty from './featureVizProperty';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../errors/carto-validation-error';
 import { SUPPORTED_VIZ_PROPERTIES } from '../constants/viz';
 
 /**
@@ -133,7 +133,10 @@ export default class Feature {
     blendTo (newVizProperties, duration = 500) {
         Object.keys(newVizProperties).forEach((property) => {
             if (!(SUPPORTED_VIZ_PROPERTIES.includes(property))) {
-                throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Property '${property}' is not a valid viz property`);
+                throw new CartoValidationError(
+                    `Property '${property}' is not a valid viz property`,
+                    CartoValidationErrorTypes.INCORRECT_VALUE
+                );
             }
             const newValue = newVizProperties[property];
             this[property].blendTo(newValue, duration);

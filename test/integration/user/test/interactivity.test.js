@@ -1,6 +1,6 @@
 import carto from '../../../../src';
 import * as util from '../../util';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../src/errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../../../../src/errors/carto-validation-error';
 
 // More info: https://github.com/CartoDB/carto-vl/wiki/Interactivity-tests
 
@@ -434,7 +434,7 @@ describe('Interactivity', () => {
 
             const int = new carto.Interactivity([layerA, layerB]);
             int._init([layerA, layerB]).catch((err) => {
-                expect(err).toEqual(new CartoValidationError(`${cvt.INCORRECT_VALUE} Invalid argument, all layers must belong to the same map.`));
+                expect(err).toEqual(new CartoValidationError('Invalid argument, all layers must belong to the same map.', CartoValidationErrorTypes.INCORRECT_VALUE));
                 document.body.removeChild(setupA.div);
                 document.body.removeChild(setupB.div);
                 done();

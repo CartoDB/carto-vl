@@ -1,6 +1,6 @@
 import Classifier from './Classifier';
 import { checkNumber, checkType, checkMaxArguments, checkMinArguments } from '../utils';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../../../../errors/carto-validation-error';
 
 import { viewportHistogram } from '../../expressions';
 import { calculateBreakpoints } from './GlobalStandardDev';
@@ -80,7 +80,10 @@ export default class ViewportStandardDev extends Classifier {
         const classSize = this._classSize.value;
         checkNumber(this.expressionName, 'classSize', 2, classSize);
         if (classSize <= 0) {
-            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} The 'classSize' must be > 0.0, but ${classSize} was used.`);
+            throw new CartoValidationError(
+                `The 'classSize' must be > 0.0, but ${classSize} was used.`,
+                CartoValidationErrorTypes.INCORRECT_VALUE
+            );
         }
     }
 
@@ -88,7 +91,10 @@ export default class ViewportStandardDev extends Classifier {
         const histogramSize = this._histogramSize.value;
         checkNumber(this.expressionName, 'histogramSize', 3, histogramSize);
         if (histogramSize <= 0) {
-            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} The 'histogramSize' must be > 0, but ${histogramSize} was used`);
+            throw new CartoValidationError(
+                `The 'histogramSize' must be > 0, but ${histogramSize} was used`,
+                CartoValidationErrorTypes.INCORRECT_VALUE
+            );
         }
     }
 
