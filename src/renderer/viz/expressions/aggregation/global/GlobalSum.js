@@ -5,7 +5,7 @@ import ClusterAggregation from '../cluster/ClusterAggregation';
 import ClusterCount from '../cluster/ClusterCount';
 import ClusterSum from '../cluster/ClusterSum';
 
-import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../../../../../errors/carto-validation-error';
 
 /**
  * Return the sum of the feature property for the entire source data.
@@ -44,7 +44,10 @@ export default class GlobalSum extends GlobalAggregation {
             } else if (property.isA(ClusterCount)) {
                 baseStats = '_count';
             } else {
-                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} Invalid globlalAvg input`);
+                throw new CartoValidationError(
+                    'Invalid globlalAvg input',
+                    CartoValidationErrorTypes.INCORRECT_TYPE
+                );
             }
         }
 

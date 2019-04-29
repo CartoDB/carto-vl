@@ -1,6 +1,6 @@
 import BaseExpression from './base';
 import { pow, blend, linear, zoom } from '../expressions';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../../../errors/carto-validation-error';
 import { implicitCast, checkType, checkExpression } from './utils';
 
 /**
@@ -39,9 +39,9 @@ export default class Zoomrange extends BaseExpression {
     _bindMetadata (metadata) {
         this._zoomBreakpointList._bindMetadata(metadata);
 
-        checkType('zoomrange', '_zoomBreakpointList', 0, 'number-list', this._zoomBreakpointList);
+        checkType('zoomrange', 'zoomBreakpointList', 0, 'number-list', this._zoomBreakpointList);
         if (this._zoomBreakpointList.elems.length < 2) {
-            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} zoomrange() function must receive a list with at least two elements.`);
+            throw new CartoValidationError('zoomrange() function must receive a list with at least two elements.', CartoValidationErrorTypes.INCORRECT_VALUE);
         }
 
         const breakpointListCopy = [...this._zoomBreakpointList.elems];

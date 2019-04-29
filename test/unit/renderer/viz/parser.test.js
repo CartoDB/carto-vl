@@ -1,6 +1,8 @@
 /* eslint quotes: "off" */
 
 import { parseVizDefinition, cleanComments } from '../../../../src/renderer/viz/parser';
+import CartoError from '../../../../src/errors/carto-error';
+import { regExpThatContains as thatContains } from '../../../../src/utils/util';
 
 describe('src/renderer/viz/parser', () => {
     // TODO: missing lots of tests here
@@ -85,7 +87,7 @@ describe('src/renderer/viz/parser', () => {
             expect(() => parseVizDefinition(`
                 width: 1
                 width: 2
-            `)).toThrowError('Property \'width\' is already defined.');
+            `)).toThrowError(CartoError, thatContains('Property \'width\' is already defined.'));
         });
     });
 
@@ -94,7 +96,7 @@ describe('src/renderer/viz/parser', () => {
             expect(() => parseVizDefinition(`
                 @a: 1
                 @a: 2
-            `)).toThrowError('Variable \'a\' is already defined.');
+            `)).toThrowError(CartoError, thatContains('Variable \'a\' is already defined.'));
         });
     });
 

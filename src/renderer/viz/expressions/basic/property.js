@@ -1,6 +1,6 @@
 import BaseExpression from '../base';
 import { checkString, checkMaxArguments } from '../utils';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationErrorTypes } from '../../../../errors/carto-validation-error';
 import { FP32_DESIGNATED_NULL_VALUE } from '../constants';
 import { aggregationTypes } from '../../../../constants/metadata';
 /**
@@ -38,7 +38,10 @@ export default class Property extends BaseExpression {
         checkString('property', 'name', 0, name);
 
         if (name === '') {
-            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} property(): invalid parameter, zero-length string`);
+            throw new CartoValidationError(
+                'property(): invalid parameter, zero-length string',
+                CartoValidationErrorTypes.INCORRECT_VALUE
+            );
         }
         super({});
         this.name = name;
@@ -60,7 +63,10 @@ export default class Property extends BaseExpression {
 
     eval (feature) {
         if (!feature) {
-            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} A property needs to be evaluated in a 'feature'.`);
+            throw new CartoValidationError(
+                'A property needs to be evaluated in a \'feature\'.',
+                CartoValidationErrorTypes.MISSING_REQUIRED
+            );
         }
 
         return feature[this.name] && feature[this.name] === FP32_DESIGNATED_NULL_VALUE
@@ -82,7 +88,10 @@ export default class Property extends BaseExpression {
         const metaColumn = metadata.properties[this.name];
 
         if (!metaColumn) {
-            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} Property '${this.name}' does not exist`);
+            throw new CartoValidationError(
+                `Property '${this.name}' does not exist`,
+                CartoValidationErrorTypes.MISSING_REQUIRED
+            );
         }
 
         this._metadata = metadata;

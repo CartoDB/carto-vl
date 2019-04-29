@@ -1,7 +1,8 @@
 import BaseExpression from './base';
 import { implicitCast, getOrdinalFromIndex, checkMaxArguments, checkType, checkFeatureIndependent } from './utils';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
 import { OTHERS_INDEX, OTHERS_LABEL, OTHERS_GLSL_VALUE } from './constants';
+import CartoValidationError, { CartoValidationErrorTypes } from '../../../errors/carto-validation-error';
+
 /**
  * Given a property create "sub-groups" based on the given breakpoints.
  *
@@ -125,7 +126,8 @@ export default class Buckets extends BaseExpression {
 
         if (this.input.type !== 'number' && this.input.type !== 'category') {
             throw new CartoValidationError(
-                `${cvt.INCORRECT_TYPE} buckets(): invalid first parameter type\n\t'input' type was ${this.input.type}`
+                `buckets(): invalid first parameter type\n\t'input' type was ${this.input.type}`,
+                CartoValidationErrorTypes.INCORRECT_TYPE
             );
         }
 
@@ -136,12 +138,14 @@ export default class Buckets extends BaseExpression {
         this.list.elems.map((item, index) => {
             if (this.input.type !== item.type) {
                 throw new CartoValidationError(
-                    `${cvt.INCORRECT_TYPE} buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type` +
-                    `\n\texpected type was ${this.input.type}\n\tactual type was ${item.type}`
+                    `buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type` +
+                    `\n\texpected type was ${this.input.type}\n\tactual type was ${item.type}`,
+                    CartoValidationErrorTypes.INCORRECT_TYPE
                 );
             } else if (item.type !== 'number' && item.type !== 'category') {
                 throw new CartoValidationError(
-                    `${cvt.INCORRECT_TYPE} buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type\n\ttype was ${item.type}`
+                    `buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type\n\ttype was ${item.type}`,
+                    CartoValidationErrorTypes.INCORRECT_TYPE
                 );
             }
         });
