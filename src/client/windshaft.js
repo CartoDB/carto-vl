@@ -1,6 +1,7 @@
 
 import MVT from '../sources/MVT';
 import Metadata from './WindshaftMetadata';
+import { DEFAULT_ID_PROPERTY } from '../renderer/Metadata';
 import schema from '../renderer/schema';
 import * as windshaftFiltering from './windshaft-filtering';
 import WindshaftRequestHelper from './WindshaftRequestHelper';
@@ -14,7 +15,6 @@ const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
 const MAX_CATEGORIES = 32768;
 const TILE_EXTENT = 2048;
-const ID_PROPERTY = 'cartodb_id';
 
 export default class Windshaft {
     constructor (source) {
@@ -73,7 +73,7 @@ export default class Windshaft {
     }
 
     /**
-     * Get the minimum schema from the viz, validated and with ID_PROPERTY
+     * Get the minimum schema from the viz, validated and with DEFAULT_ID_PROPERTY
     */
     _getMinNeededSchemaFrom (viz) {
         const MNS = viz.getMinimumNeededSchema();
@@ -84,10 +84,10 @@ export default class Windshaft {
     }
 
     _forceIncludeCartodbId (MNS) {
-        // Force to include ID_PROPERTY in the MNS columns.
+        // Force to include DEFAULT_ID_PROPERTY in the MNS columns.
         // TODO: revisit this request to Maps API
-        if (!MNS[ID_PROPERTY]) {
-            MNS[ID_PROPERTY] = [{ type: aggregationTypes.UNAGGREGATED }];
+        if (!MNS[DEFAULT_ID_PROPERTY]) {
+            MNS[DEFAULT_ID_PROPERTY] = [{ type: aggregationTypes.UNAGGREGATED }];
         }
     }
 
@@ -133,7 +133,7 @@ export default class Windshaft {
     _needToInstantiateMap (vizInfo) {
         const { MNS, resolution, filtering } = vizInfo;
 
-        const schemaChanged = (schema.notEquals(this._MNS, MNS));
+        const schemaChanged = schema.notEquals(this._MNS, MNS);
         const resolutionChanged = this.resolution !== resolution;
         const filteringChanged = JSON.stringify(this.filtering) !== JSON.stringify(filtering);
         const shouldBeServerFiltered = this.metadata && (this.metadata.featureCount > MIN_FILTERING);
@@ -145,12 +145,13 @@ export default class Windshaft {
         return !!this.metadata;
     }
 
-    _intantiationChoices (metadata) {
+    _instantiationChoices (metadata) {
         let choices = {
             backendFilters: true // default choices
         };
 
-        if (metadata && metadata.featureCount >= 0) {
+        const thereAreFeatures = metadata && metadata.featureCount >= 0;
+        if (thereAreFeatures) {
             const shouldBeServerFiltered = metadata.featureCount > MIN_FILTERING;
             choices.backendFilters = shouldBeServerFiltered || !metadata.backendFiltersApplied;
         }
@@ -222,11 +223,11 @@ export default class Windshaft {
         // TODO: we shouldn't reinstantiate just to not apply backend filters
         // (we'd need to add a choice comparison function argument to repeatablePromise)
         let finalMetadata = null;
-        const initialChoices = this._intantiationChoices(this.metadata);
+        const initialChoices = this._instantiationChoices(this.metadata);
         const finalChoices = instantiation => {
             // first instantiation metadata is kept
             finalMetadata = instantiation.metadata;
-            return this._intantiationChoices(instantiation.metadata);
+            return this._instantiationChoices(instantiation.metadata);
         };
 
         return repeatablePromise(initialChoices, finalChoices, choices => this._instantiate(vizInfo, choices, finalMetadata));
@@ -259,7 +260,7 @@ export default class Windshaft {
 
         Object.keys(MNS)
             .forEach(propertyName => {
-                if (propertyName !== ID_PROPERTY) {
+                if (propertyName !== DEFAULT_ID_PROPERTY) {
                     const propertyUsages = MNS[propertyName];
                     propertyUsages.forEach(usage => {
                         if (usage.type === 'aggregated') {
@@ -289,7 +290,7 @@ export default class Windshaft {
     }
 
     _buildSelectClause (MNS) {
-        const columns = Object.keys(MNS).concat(['the_geom_webmercator', ID_PROPERTY]);
+        const columns = Object.keys(MNS).concat(['the_geom_webmercator', DEFAULT_ID_PROPERTY]);
         return columns.filter((item, pos) => columns.indexOf(item) === pos); // get unique values
     }
 
@@ -367,8 +368,7 @@ export default class Windshaft {
 
     async _getLayerGroupFromWindshaft (conf, mapConfigAgg) {
         const requestHelper = new WindshaftRequestHelper(conf, mapConfigAgg);
-        const layergroup = await requestHelper.getMapRequest();
-        return layergroup;
+        return requestHelper.getLayerGroup();
     }
 
     _adaptMetadata (meta, agg, MNS) {
@@ -445,7 +445,7 @@ export default class Windshaft {
             sample: stats.sample,
             geomType,
             isAggregated: aggregation.mvt,
-            idProperty: ID_PROPERTY
+            idProperty: DEFAULT_ID_PROPERTY
         });
     }
 }

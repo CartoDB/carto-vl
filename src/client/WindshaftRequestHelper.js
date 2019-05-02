@@ -3,7 +3,7 @@ import CartoMapsAPIError, { CartoMapsAPIErrorTypes } from '../errors/carto-maps-
 
 const REQUEST_GET_MAX_URL_LENGTH = 2048;
 
-export default class WinshaftRequestHelper {
+export default class WindshaftRequestHelper {
     constructor (conf, mapConfig) {
         this._conf = conf;
         this._mapConfig = mapConfig;
@@ -12,7 +12,10 @@ export default class WinshaftRequestHelper {
         this._client = this._encodeParameter('client', `vl-${version}`);
     }
 
-    async getMapRequest () {
+    /**
+     * Make a request to Windshaft for a LayerGroup, dealing internally with errors in the Maps API
+     */
+    async getLayerGroup () {
         let response;
         try {
             response = await fetch(this._makeHttpRequest());
