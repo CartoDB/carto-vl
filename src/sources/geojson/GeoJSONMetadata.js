@@ -1,5 +1,5 @@
-import Metadata from '../renderer/Metadata';
-import codecFactory from '../codecs';
+import Metadata from '../../renderer/Metadata';
+import codecFactory from '../../codecs';
 
 export default class GeoJSONMetadata extends Metadata {
     setCodecs () {
