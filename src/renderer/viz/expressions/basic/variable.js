@@ -45,7 +45,7 @@ export default function variable (name) {
         );
     }
 
-    let alias;
+    let alias, aliaser;
 
     const resolve = aliases => {
         if (aliases[name]) {
@@ -62,7 +62,7 @@ export default function variable (name) {
         return [alias];
     };
 
-    let aliaser = {
+    aliaser = {
         set: (obj, prop, value) => {
             if (prop === 'parent') {
                 obj[prop] = value;
@@ -77,34 +77,50 @@ export default function variable (name) {
             return true;
         },
 
+        value () {
+            return alias.value;
+        },
+
+        propertyName () {
+            return alias.propertyName;
+        },
+
+        name () {
+            return alias._dimension ? alias.propertyName : alias.name;
+        },
+
+        blendTo (obj, prop) {
+            return obj[prop];
+        },
+
+        toString () {
+            return alias.toString;  
+        },
+
+        _resolveAliases () {
+            return resolve;
+        },
+
+        _getDependencies () {
+            return _getDependencies;
+        },
+
+        _alias (property) {
+            return property !== undefined && property.bind
+                ? property.bind(alias)
+                : property;
+        },
+
+        _default (obj, prop) {
+            return alias !== undefined
+                ? aliaser._alias(alias[prop])
+                : obj[prop];
+        },
+
         get: (obj, prop) => {
-            switch (prop) {
-                case 'value':
-                    return alias.value;
-                case 'parent':
-                case 'notify':
-                case 'propertyName':
-                    return alias.propertyName;
-                case 'name':
-                    return alias._dimension ? alias.propertyName : alias.name;
-                case 'blendTo':
-                    return obj[prop];
-                case '_resolveAliases':
-                    return resolve;
-                case '_getDependencies':
-                    return _getDependencies;
-                default:
-                    if (alias !== undefined) {
-                        const p = alias[prop];
-                        if (p !== undefined) {
-                            if (p.bind) {
-                                return p.bind(alias);
-                            }
-                            return p;
-                        }
-                    }
-                    return obj[prop];
-            }
+            return aliaser[prop]
+                ? aliaser[prop](obj, prop)
+                : aliaser._default(obj, prop);
         }
     };
 

@@ -69,6 +69,10 @@ export default class Property extends BaseExpression {
             );
         }
 
+        if (feature._rawFeature) {
+            feature = feature._rawFeature;
+        }
+
         return feature[this.name] && feature[this.name] === FP32_DESIGNATED_NULL_VALUE
             ? null
             : feature[this.name];

@@ -90,10 +90,6 @@ export default class ViewportFeatures extends BaseExpression {
 
     _resetViewportAgg (metadata, renderLayer) {
         if (!this._FeatureProxy) {
-            if (!this._requiredProperties.every(p => validProperty(p))) {
-                throw new CartoValidationError('viewportFeatures arguments can only be properties', CartoValidationErrorTypes.INCORRECT_TYPE);
-            }
-
             const propertyNames = this._requiredProperties.map((p) => {
                 return { property: p.propertyName, variable: p._variableName };
             });
@@ -123,9 +119,4 @@ function _childrenFromProperties (properties) {
         childContainer['p' + ++i] = property;
     });
     return childContainer;
-}
-
-function validProperty (property) {
-    const validExpressions = [Property, ClusterAggregation, ClusterCount, ClusterTimeDimension];
-    return validExpressions.some(expression => property.isA(expression));
 }
