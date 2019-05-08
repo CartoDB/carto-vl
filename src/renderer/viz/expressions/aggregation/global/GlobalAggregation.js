@@ -69,8 +69,12 @@ export default class GlobalAggregation extends BaseExpression {
         return false;
     }
 
+    get value () {
+        return this._value.value;
+    }
+
     eval () {
-        return this._value.expr;
+        return this.value;
     }
 
     _resolveAliases (aliases) {
@@ -84,7 +88,7 @@ export default class GlobalAggregation extends BaseExpression {
         this.property._bindMetadata(metadata);
         const propertyName = this.property.name || this.property.propertyName;
         const value = this._getValueFromStats(metadata, propertyName);
-        this._value.expr = metadata.codec(propertyName).sourceToExternal(metadata, value);
+        this._value.value = metadata.codec(propertyName).sourceToExternal(metadata, value);
     }
 
     _getValueFromStats (metadata, propertyName) {

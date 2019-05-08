@@ -56,7 +56,7 @@ export const HSL = genHSL('hsl', false);
  */
 export const HSLA = genHSL('hsla', true);
 
-function genHSL (name, alpha) {
+function genHSL (name, alpha = null) {
     return class HSLA extends BaseExpression {
         constructor (h, s, l, a) {
             checkMaxArguments(arguments, 4, 'hsla');
@@ -64,6 +64,7 @@ function genHSL (name, alpha) {
             [h, s, l, a] = [h, s, l, a].map(implicitCast);
 
             const children = { h, s, l };
+
             if (alpha) {
                 checkExpression(name, 'a', 3, a);
                 children.a = a;
@@ -74,44 +75,22 @@ function genHSL (name, alpha) {
             checkExpression(name, 'l', 2, l);
 
             super(children);
+            this._alpha = alpha;
             this.type = 'color';
         }
+
         get value () {
-            return this.eval();
+            return this.eval(null);
         }
-        eval (f) {
-            const normalize = (value, hue = false) => {
-                if (value.type === 'category') {
-                    return value.eval(f) / (hue ? value.numCategories + 1 : value.numCategories);
-                }
-                return value.eval(f);
-            };
-            const h = clamp(normalize(this.h, true), 0, 1);
-            const s = clamp(normalize(this.s), 0, 1);
-            const l = clamp(normalize(this.l), 0, 1);
 
-            const hslToRgb = (h, s, l) => {
-                const c = {
-                    r: Math.abs(h * 6 - 3) - 1,
-                    g: 2 - Math.abs(h * 6 - 2),
-                    b: 2 - Math.abs(h * 6 - 4),
-                    a: alpha ? this.a.eval(f) : 1
-                };
+        eval (feature) {
+            const h = clamp(normalize(this.h, feature, true), 0, 1);
+            const s = clamp(normalize(this.s, feature), 0, 1);
+            const l = clamp(normalize(this.l, feature), 0, 1);
+            const a = this.a;
+            const alpha = this._alpha;
 
-                const C = (1 - Math.abs(2 * l - 1)) * s;
-
-                c.r = clamp(c.r, 0, 1);
-                c.g = clamp(c.g, 0, 1);
-                c.b = clamp(c.b, 0, 1);
-
-                c.r = ((c.r - 0.5) * C + l) * 255;
-                c.g = ((c.g - 0.5) * C + l) * 255;
-                c.b = ((c.b - 0.5) * C + l) * 255;
-
-                return c;
-            };
-
-            return hslToRgb(h, s, l);
+            return hslToRgb(h, s, l, a, alpha, feature);
         }
 
         _bindMetadata (meta) {
@@ -119,22 +98,17 @@ function genHSL (name, alpha) {
             hslCheckType('h', 0, this.h);
             hslCheckType('s', 1, this.s);
             hslCheckType('l', 2, this.l);
-            if (alpha) {
+
+            if (this._alpha) {
                 checkType('hsla', 'a', 3, 'number', this.a);
             }
 
-            const normalize = (value, hue = false) => {
-                if (value.type === 'category') {
-                    return `/${hue ? value.numCategories + 1 : value.numCategories}.`;
-                }
-                return '';
-            };
             super._setGenericGLSL(
                 inline => `vec4(HSLtoRGB(vec3(
-                    ${inline.h}${normalize(this.h, true)},
-                    clamp(${inline.s}${normalize(this.s)}, 0., 1.),
-                    clamp(${inline.l}${normalize(this.l)}, 0., 1.)
-                )), ${alpha ? `clamp(${inline.a}, 0., 1.)` : '1.'})`,
+                    ${inline.h}${normalizeGLSL(this.h, true)},
+                    clamp(${inline.s}${normalizeGLSL(this.s)}, 0., 1.),
+                    clamp(${inline.l}${normalizeGLSL(this.l)}, 0., 1.)
+                )), ${this._alpha ? `clamp(${inline.a}, 0., 1.)` : '1.'})`,
                 `
                     #ifndef HSL2RGB
                     #define HSL2RGB
@@ -160,5 +134,48 @@ function genHSL (name, alpha) {
                 CartoValidationErrorTypes.INCORRECT_TYPE
             );
         }
+    }
+
+    function hslToRgb (h, s, l, a, alpha, feature) {
+        const aValue = alpha ? (feature ? a.eval(feature) : a.value) : 1;
+
+        const c = {
+            r: Math.abs(h * 6 - 3) - 1,
+            g: 2 - Math.abs(h * 6 - 2),
+            b: 2 - Math.abs(h * 6 - 4),
+            a: aValue
+        };
+
+        const C = (1 - Math.abs(2 * l - 1)) * s;
+
+        c.r = clamp(c.r, 0, 1);
+        c.g = clamp(c.g, 0, 1);
+        c.b = clamp(c.b, 0, 1);
+
+        c.r = ((c.r - 0.5) * C + l) * 255;
+        c.g = ((c.g - 0.5) * C + l) * 255;
+        c.b = ((c.b - 0.5) * C + l) * 255;
+
+        return c;
+    }
+
+    function normalize (input, feature, hue = false) {
+        const data = feature !== null
+            ? input.eval(feature)
+            : input.value;
+
+        if (input.type === 'category') {
+            return data / (hue ? input.numCategories + 1 : input.numCategories);
+        }
+
+        return data;
+    }
+
+    function normalizeGLSL (input, hue = false) {
+        if (input.type === 'category') {
+            return `/${hue ? input.numCategories + 1 : input.numCategories}.`;
+        }
+
+        return '';
     }
 }

@@ -44,9 +44,13 @@ export default class GlobalPercentile extends BaseExpression {
         return false;
     }
 
-    eval () {
-        const p = this.percentile.eval() / 100;
+    get value () {
+        const p = this.percentile.value / 100;
         return this._copySample[Math.floor(p * this._copySample.length)];
+    }
+
+    eval () {
+        return this.value;
     }
 
     _bindMetadata (metadata) {
@@ -61,7 +65,7 @@ export default class GlobalPercentile extends BaseExpression {
     }
 
     _preDraw (...args) {
-        this._value.expr = this.value;
+        this._value.value = this.value;
         super._preDraw(...args);
     }
 

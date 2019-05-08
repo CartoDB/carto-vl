@@ -142,12 +142,12 @@ describe('src/renderer/viz/expressions/classifier', () => {
                 it('globalQuantiles($price, 2)', () => {
                     const q = globalQuantiles($price, 2);
                     prepare(q);
-                    expect(q.getBreakpointList()).toEqual([3]);
+                    expect(q._getBreakpointList()).toEqual([3]);
                 });
                 it('globalQuantiles($price, 3)', () => {
                     const q = globalQuantiles($price, 3);
                     prepare(q);
-                    expect(q.getBreakpointList()).toEqual([2, 4]);
+                    expect(q._getBreakpointList()).toEqual([2, 4]);
                 });
             });
 
@@ -155,7 +155,7 @@ describe('src/renderer/viz/expressions/classifier', () => {
                 it('globalEqIntervals($price, 2)', () => {
                     const q = globalEqIntervals($price, 2);
                     prepare(q);
-                    expect(q.getBreakpointList()).toEqual([2.5]);
+                    expect(q._getBreakpointList()).toEqual([2.5]);
                 });
             });
 
@@ -166,25 +166,25 @@ describe('src/renderer/viz/expressions/classifier', () => {
                 it('globalStandardDev($price, 2)', () => {
                     const q = globalStandardDev($price, 2);
                     prepare(q);
-                    expect(q.getBreakpointList()).toEqual([avg]);
+                    expect(q._getBreakpointList()).toEqual([avg]);
                 });
 
                 it('globalStandardDev($price, 3)', () => {
                     const q = globalStandardDev($price, 3);
                     prepare(q);
-                    expect(q.getBreakpointList()).toEqual([avg - std, avg + std]);
+                    expect(q._getBreakpointList()).toEqual([avg - std, avg + std]);
                 });
 
                 it('globalStandardDev($price, 4)', () => {
                     const q = globalStandardDev($price, 4);
                     prepare(q);
-                    expect(q.getBreakpointList()).toEqual([avg - std, avg, avg + std]);
+                    expect(q._getBreakpointList()).toEqual([avg - std, avg, avg + std]);
                 });
 
                 it('globalStandardDev($price, 5)', () => {
                     const q = globalStandardDev($price, 5);
                     prepare(q);
-                    expect(q.getBreakpointList()).toEqual([
+                    expect(q._getBreakpointList()).toEqual([
                         avg - (2 * std), avg - std, avg + std, avg + (2 * std)
                     ]);
                 });
@@ -192,7 +192,7 @@ describe('src/renderer/viz/expressions/classifier', () => {
                 it('globalStandardDev($price, 3, 0.5) --> using 1/2 standard deviation', () => {
                     const q = globalStandardDev($price, 3, 0.5);
                     prepare(q);
-                    expect(q.getBreakpointList()).toEqual([avg - 0.5 * std, avg + 0.5 * std]);
+                    expect(q._getBreakpointList()).toEqual([avg - 0.5 * std, avg + 0.5 * std]);
                 });
 
                 it('doesn\'t allow an invalid classSize (<=0)', () => {
@@ -240,18 +240,18 @@ describe('src/renderer/viz/expressions/classifier', () => {
                 it('viewportQuantiles($price, 2)', () => {
                     const q = viewportQuantiles($price, 2);
                     prepare(q);
-                    expect(q.getBreakpointList()).toEqual([3]);
+                    expect(q._getBreakpointList()).toEqual([3]);
                 });
                 it('viewportQuantiles($price, 3)', () => {
                     const q = viewportQuantiles($price, 3);
                     prepare(q);
-                    expect(q.getBreakpointList()).toEqual([2, 4]);
+                    expect(q._getBreakpointList()).toEqual([2, 4]);
                     expect(q._histogram._sizeOrBuckets).toEqual(DEFAULT_HISTOGRAM_SIZE);
                 });
                 it('viewportQuantiles($price, 3, 30)', () => {
                     const q = viewportQuantiles($price, 3, 30);
                     prepare(q);
-                    expect(q.getBreakpointList()).toEqual([2, 4]);
+                    expect(q._getBreakpointList()).toEqual([2, 4]);
                     expect(q._histogram._sizeOrBuckets).toEqual(30);
                 });
             });
@@ -260,13 +260,13 @@ describe('src/renderer/viz/expressions/classifier', () => {
                 it('viewportEqIntervals($price, 2)', () => {
                     const q = viewportEqIntervals($price, 2);
                     prepare(q);
-                    expect(q.getBreakpointList()).toEqual([2.5]);
+                    expect(q._getBreakpointList()).toEqual([2.5]);
                 });
                 it('viewportEqIntervals($price, 3)', () => {
                     const q = viewportEqIntervals($price, 3);
                     prepare(q);
-                    expect(q.getBreakpointList()[0]).toBeCloseTo(5 / 3, 4);
-                    expect(q.getBreakpointList()[1]).toBeCloseTo(10 / 3, 4);
+                    expect(q._getBreakpointList()[0]).toBeCloseTo(5 / 3, 4);
+                    expect(q._getBreakpointList()[1]).toBeCloseTo(10 / 3, 4);
                 });
             });
 
@@ -277,14 +277,14 @@ describe('src/renderer/viz/expressions/classifier', () => {
                 it('viewportStandardDev($price, 2)', () => {
                     const q = viewportStandardDev($price, 2);
                     prepare(q);
-                    expect(q.getBreakpointList()).toBeCloseTo([avg], 2);
+                    expect(q._getBreakpointList()).toBeCloseTo([avg], 2);
                 });
 
                 it('viewportStandardDev($price, 3)', () => {
                     const q = viewportStandardDev($price, 3);
                     prepare(q);
-                    expect(q.getBreakpointList()[0]).toBeCloseTo(avg - std, 2);
-                    expect(q.getBreakpointList()[1]).toBeCloseTo(avg + std, 2);
+                    expect(q._getBreakpointList()[0]).toBeCloseTo(avg - std, 2);
+                    expect(q._getBreakpointList()[1]).toBeCloseTo(avg + std, 2);
 
                     expect(q._histogram._sizeOrBuckets).toEqual(DEFAULT_HISTOGRAM_SIZE);
                 });
@@ -292,25 +292,25 @@ describe('src/renderer/viz/expressions/classifier', () => {
                 it('viewportStandardDev($price, 4)', () => {
                     const q = viewportStandardDev($price, 4);
                     prepare(q);
-                    expect(q.getBreakpointList()[0]).toBeCloseTo(avg - std, 2);
-                    expect(q.getBreakpointList()[1]).toBeCloseTo(avg, 2);
-                    expect(q.getBreakpointList()[2]).toBeCloseTo(avg + std, 2);
+                    expect(q._getBreakpointList()[0]).toBeCloseTo(avg - std, 2);
+                    expect(q._getBreakpointList()[1]).toBeCloseTo(avg, 2);
+                    expect(q._getBreakpointList()[2]).toBeCloseTo(avg + std, 2);
                 });
 
                 it('viewportStandardDev($price, 5)', () => {
                     const q = viewportStandardDev($price, 5);
                     prepare(q);
-                    expect(q.getBreakpointList()[0]).toBeCloseTo(avg - (2 * std), 2);
-                    expect(q.getBreakpointList()[1]).toBeCloseTo(avg - std, 2);
-                    expect(q.getBreakpointList()[2]).toBeCloseTo(avg + std, 2);
-                    expect(q.getBreakpointList()[3]).toBeCloseTo(avg + (2 * std), 2);
+                    expect(q._getBreakpointList()[0]).toBeCloseTo(avg - (2 * std), 2);
+                    expect(q._getBreakpointList()[1]).toBeCloseTo(avg - std, 2);
+                    expect(q._getBreakpointList()[2]).toBeCloseTo(avg + std, 2);
+                    expect(q._getBreakpointList()[3]).toBeCloseTo(avg + (2 * std), 2);
                 });
 
                 it('viewportStandardDev($price, 3, 0.5) --> using 1/2 standard deviation', () => {
                     const q = viewportStandardDev($price, 3, 0.5);
                     prepare(q);
-                    expect(q.getBreakpointList()[0]).toBeCloseTo(avg - 0.5 * std, 2);
-                    expect(q.getBreakpointList()[1]).toBeCloseTo(avg + 0.5 * std, 2);
+                    expect(q._getBreakpointList()[0]).toBeCloseTo(avg - 0.5 * std, 2);
+                    expect(q._getBreakpointList()[1]).toBeCloseTo(avg + 0.5 * std, 2);
                 });
 
                 describe('.histogramSize influence...', () => {
@@ -319,16 +319,16 @@ describe('src/renderer/viz/expressions/classifier', () => {
                         prepare(q);
                         expect(q._histogram._sizeOrBuckets).toEqual(2000);
 
-                        expect(q.getBreakpointList()[0]).toBeCloseTo(avg - std, 2);
-                        expect(q.getBreakpointList()[1]).toBeCloseTo(avg + std, 2);
+                        expect(q._getBreakpointList()[0]).toBeCloseTo(avg - std, 2);
+                        expect(q._getBreakpointList()[1]).toBeCloseTo(avg + std, 2);
                     });
                     it('viewportStandardDev($price, 3, 1, 30) --> 30 is not!...', () => {
                         const q = viewportStandardDev($price, 3, 1, 30);
                         prepare(q);
                         expect(q._histogram._sizeOrBuckets).toEqual(30);
 
-                        expect(q.getBreakpointList()[0]).toBeCloseTo(avg - std, 0); // vs (avg - std, 2);
-                        expect(q.getBreakpointList()[1]).toBeCloseTo(avg + std, 0); // vs (avg + std, 2);
+                        expect(q._getBreakpointList()[0]).toBeCloseTo(avg - std, 0); // vs (avg - std, 2);
+                        expect(q._getBreakpointList()[1]).toBeCloseTo(avg + std, 0); // vs (avg + std, 2);
                     });
                 });
 

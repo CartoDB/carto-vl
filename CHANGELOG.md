@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 - Internal refactor regarding data sources (GeoJSON and Windshaft)
+- Unify `.value`, `.eval()` and `.getLegendData()` methods to get expression values
 
 ## [1.2.5] - 2019-04-25
 

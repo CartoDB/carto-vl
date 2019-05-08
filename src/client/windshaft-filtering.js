@@ -93,7 +93,7 @@ class AggregationFiltering {
     _value (f) {
         f = this._removeBlend(f);
         if (f.isA(NumberExpression) || f.isA(ConstantExpression) || f.isA(CategoryExpression)) {
-            return f.expr;
+            return f.value;
         }
     }
 
@@ -346,7 +346,7 @@ class PreaggregationFiltering {
         if (f.isA(NumberExpression) || f.isA(ConstantExpression) || f.isA(CategoryExpression)) {
             return {
                 type: 'value',
-                value: f.expr
+                value: f.value
             };
         }
     }

@@ -18,17 +18,20 @@ export default class BaseCategory extends BaseExpression {
         checkString('category', 'categoryName', 0, categoryName);
 
         super({});
-        this.expr = categoryName;
+        this._value = categoryName;
         this.type = 'category';
     }
 
     get value () {
-        // Return the plain string
-        return this.expr;
+        return this._value;
+    }
+
+    set value (value) {
+        this.value = value;
     }
 
     eval () {
-        return this.expr;
+        return this.value;
     }
 
     isAnimated () {
@@ -55,7 +58,7 @@ export default class BaseCategory extends BaseExpression {
     }
 
     _preDraw (program, drawMetadata, gl) {
-        const id = this._metadata.categoryToID.get(this.expr);
+        const id = this._metadata.categoryToID.get(this.value);
         gl.uniform1f(this._getBinding(program).uniformLocation, id);
     }
 }

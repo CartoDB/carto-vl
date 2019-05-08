@@ -64,7 +64,7 @@ export default class Windshaft {
      */
     _getServerInfoFrom (viz) {
         const MNS = this._getMinNeededSchemaFrom(viz);
-        const resolution = viz.resolution.eval();
+        const resolution = viz.resolution.value;
         const filtering = windshaftFiltering.getFiltering(viz, { exclusive: this._exclusive });
 
         // TODO: properly document returned output at jsdoc (with typedef?)

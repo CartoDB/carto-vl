@@ -55,7 +55,7 @@ export default class GlobalEqIntervals extends Classifier {
 
         this.breakpoints.map((breakpoint, index) => {
             const p = (index + 1) / this.numCategories;
-            breakpoint.expr = min + (max - min) * p;
+            breakpoint.value = min + (max - min) * p;
         });
     }
 }

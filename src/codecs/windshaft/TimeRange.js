@@ -7,9 +7,11 @@ export default class TimeRangeCodec extends BaseCodec {
 
         const stats = metadata.stats(propertyName);
         const { min } = stats;
-        const tr = util.timeRange({ iso: min });
-        this._min = tr.startValue / 1000;
-        this._timeZone = stats.grouping && stats.grouping.timezone;
+        const timeZone = stats.grouping && stats.grouping.timezone;
+        const timeRange = util.timeRange({ timeZone, iso: min });
+
+        this._min = timeRange.startValue / 1000;
+        this._timeZone = timeZone;
     }
 
     isRange () {
@@ -17,8 +19,8 @@ export default class TimeRangeCodec extends BaseCodec {
     }
 
     sourceToInternal (metadata, propertyValue) {
-        const tr = util.timeRange({ iso: propertyValue });
-        return [tr.startValue / 1000, tr.endValue / 1000].map(v => (v - this._min));
+        const timeRange = util.timeRange({ iso: propertyValue });
+        return [timeRange.startValue / 1000, timeRange.endValue / 1000].map(v => (v - this._min));
     }
 
     internalToExternal (metadata, [lo, hi]) {
@@ -30,7 +32,7 @@ export default class TimeRangeCodec extends BaseCodec {
     }
 
     externalToSource (metadata, v) {
-        return util.castTimeRange(v, this._timeZone).text;
+        return util.castTimeRange(v, this._timeZone)._iso;
     }
 
     sourceToExternal (metadata, v) {

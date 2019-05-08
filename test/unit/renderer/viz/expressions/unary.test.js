@@ -84,13 +84,13 @@ describe('src/renderer/viz/expressions/unary', () => {
         test('isNull', 1.23, 0);
         test('isNull', s.TRUE, 0);
         test('isNull', s.FALSE, 0);
-        test('isNull', { eval: () => null }, 1);
+        test('isNull', { value: null }, 1);
     });
 
     // Helper function to test binary expressions
     function test (fn, param1, expected) {
         it(`${fn}(${param1}) should return ${expected}`, () => {
-            let actual = s[fn](param1).eval();
+            let actual = s[fn](param1).value;
             expect(actual).toEqual(expected);
             actual = s[fn](param1).value;
             expect(actual).toEqual(expected);

@@ -9,10 +9,12 @@ import { OTHERS_INDEX, OTHERS_GLSL_VALUE, OTHERS_LABEL } from './constants';
 const MAX_TOP_BUCKETS = 16;
 
 /**
- * Get the top `n` properties, aggregating the rest into an "others" bucket category.
+ * Get the top `n` properties, aggregating the rest into an "others" bucket category. The "others" label is by default CARTO_VL_OTHERS.
+ * This can be overwriten by setting the "others" label as the third parameter.
  *
  * @param {Category} property - Column of the table
  * @param {number} n - Number of top properties to be returned, the maximum value is 16, values higher than that will result in an error
+ * @param {string} othersLabel - Custom label for "others"
  * @return {Category}
  *
  * @example <caption>Use top 3 categories to define a color ramp.</caption>
@@ -26,17 +28,31 @@ const MAX_TOP_BUCKETS = 16;
  *   color: ramp(top($category, 3), VIVID)
  * `);
  *
+ * @example <caption>Set custom "others" label.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.ramp(s.top(s.prop('category'), 3, 'Others'), s.palettes.VIVID)
+ * });
+ *
+ * @example <caption>Set custom "others" label. (String)</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz(`
+ *   color: ramp(top($category, 3, 'Others'), VIVID)
+ * `);
+ *
  * @memberof carto.expressions
  * @name top
  * @function
  * @api
  */
 export default class Top extends BaseExpression {
-    constructor (property, buckets) {
-        checkMaxArguments(arguments, 2, 'top');
+    constructor (property, buckets, othersLabel = OTHERS_LABEL) {
+        checkMaxArguments(arguments, 3, 'top');
 
         buckets = implicitCast(buckets);
-        const children = { property, buckets };
+        othersLabel = implicitCast(othersLabel);
+
+        const children = { property, buckets, othersLabel };
         for (let i = 0; i < MAX_TOP_BUCKETS; i++) {
             children[`_top${i}`] = number(0);
         }
@@ -45,12 +61,7 @@ export default class Top extends BaseExpression {
     }
 
     get value () {
-        const buckets = [];
-        for (let i = 0; i < this.buckets - 1; i++) {
-            buckets.push(this[`_top${i}`].value);
-        }
-
-        return buckets;
+        return this.eval();
     }
 
     eval (feature) {
@@ -74,6 +85,8 @@ export default class Top extends BaseExpression {
         checkType('top', 'property', 0, 'category', this.property);
         checkFeatureIndependent('top', 'buckets', 1, this.buckets);
         checkType('top', 'buckets', 1, 'number', this.buckets);
+        checkType('top', 'othersLabel', 2, 'category', this.othersLabel);
+        checkFeatureIndependent('top', 'othersLabel', 2, this.othersLabel);
 
         this._metadata = metadata;
         this._textureBuckets = null;
@@ -174,12 +187,12 @@ export default class Top extends BaseExpression {
         );
 
         for (let i = 0; i < MAX_TOP_BUCKETS; i++) {
-            this[`_top${i}`].expr = Number.POSITIVE_INFINITY;
+            this[`_top${i}`].value = Number.POSITIVE_INFINITY;
         }
 
         orderedCategoryNames.forEach((cat, i) => {
             if (i < buckets) {
-                this[`_top${i}`].expr = this._metadata.categoryToID.get(cat.name);
+                this[`_top${i}`].value = this._metadata.categoryToID.get(cat.name);
             }
         });
 
@@ -196,6 +209,10 @@ export default class Top extends BaseExpression {
         const data = [];
         const name = this.toString();
         const divisor = this.numCategoriesWithoutOthers - 1 || 1;
+        const othersLabel = options && options.othersLabel
+            ? options.othersLabel
+            : this.othersLabel.value;
+
         orderedCategoryNames.forEach((category, i) => {
             if (i < buckets) {
                 const key = category.name;
@@ -204,10 +221,12 @@ export default class Top extends BaseExpression {
             }
         });
 
-        data.push({
-            key: options.othersLabel,
-            value: OTHERS_INDEX
-        });
+        if (othersLabel) {
+            data.push({
+                key: othersLabel,
+                value: OTHERS_INDEX
+            });
+        }
 
         return { name, data };
     }

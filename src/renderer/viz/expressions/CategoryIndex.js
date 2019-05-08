@@ -65,6 +65,10 @@ export default class CategoryIndex extends BaseExpression {
         this._calcTranslated();
     }
 
+    get value () {
+        return this.eval();
+    }
+
     eval (feature) {
         const name = this.property.eval(feature);
         const id = this._metadata.categoryToID.get(name);

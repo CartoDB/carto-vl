@@ -5,7 +5,7 @@ import CategoryIndex from './CategoryIndex';
 import ListImage from './ListImage';
 import Image from './Image';
 import Base from './base';
-import { OTHERS_GLSL_VALUE, DEFAULT_OPTIONS, DEFAULT_RAMP_OTHERS } from './constants';
+import { OTHERS_GLSL_VALUE, DEFAULT_RAMP_OTHERS } from './constants';
 
 const DEFAULT_RAMP_OTHERS_IMAGE = new Image(defaultSVGs.circle);
 export default class RampImage extends Base {
@@ -31,6 +31,10 @@ export default class RampImage extends Base {
         this.childrenNames.push('others');
     }
 
+    get value () {
+        return this.eval();
+    }
+
     eval (feature) {
         const index = this.input.eval(feature);
         return this._calcEval(index);
@@ -43,9 +47,8 @@ export default class RampImage extends Base {
     }
 
     getLegendData (options) {
-        const config = Object.assign({}, DEFAULT_OPTIONS, options);
         const type = this.input.type;
-        const legendData = this.input.getLegendData(config);
+        const legendData = this.input.getLegendData(options);
         const data = legendData.data.map(({ key, value }) => {
             value = this._calcEval(value);
             return { key, value };

@@ -79,6 +79,8 @@ export default function variable (name) {
 
         get: (obj, prop) => {
             switch (prop) {
+                case 'value':
+                    return alias.value;
                 case 'parent':
                 case 'notify':
                 case 'propertyName':
