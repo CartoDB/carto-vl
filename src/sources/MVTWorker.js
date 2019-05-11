@@ -3,7 +3,7 @@ import * as Protobuf from 'pbf';
 import * as rsys from '../client/rsys';
 import { decodeLines, decodePolygons } from '../client/mvt/feature-decoder';
 import MVTMetadata from './MVTMetadata';
-import DummyDataframe from '../renderer/DummyDataframe';
+import DummyDataframe from '../renderer/dataframe/DummyDataframe';
 import CartoValidationError, { CartoValidationErrorTypes } from '../errors/carto-validation-error';
 import CartoRuntimeError, { CartoRuntimeErrorTypes } from '../errors/carto-runtime-error';
 import { GEOMETRY_TYPE } from '../utils/geometry';

@@ -1,5 +1,5 @@
 
-import Dataframe from '../renderer/Dataframe';
+import Dataframe from '../renderer/dataframe/Dataframe';
 import Metadata from '../renderer/Metadata';
 import MVTMetadata from './MVTMetadata';
 import Base from './Base';

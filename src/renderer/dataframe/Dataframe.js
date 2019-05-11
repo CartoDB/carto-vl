@@ -1,9 +1,9 @@
-import { pointInTriangle, pointInCircle, GEOMETRY_TYPE } from '../utils/geometry';
-import { triangleCollides } from '../utils/collision';
+import { pointInTriangle, pointInCircle, GEOMETRY_TYPE } from '../../utils/geometry';
+import { triangleCollides } from '../../utils/collision';
 import DummyDataframe from './DummyDataframe';
-import { RESOLUTION_ZOOMLEVEL_ZERO } from '../constants/layer';
-import { WM_R } from '../utils/util';
-import { FILTERING_THRESHOLD } from './Renderer';
+import { RESOLUTION_ZOOMLEVEL_ZERO } from '../../constants/layer';
+import { WM_R } from '../../utils/util';
+import { FILTERING_THRESHOLD } from '../Renderer';
 
 // Maximum number of property textures that will be uploaded automatically to the GPU
 // in a non-lazy manner
@@ -12,6 +12,7 @@ const MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT = 32;
 const SIZE_SATURATION_PX = 1024;
 
 const featureClassCache = new Map();
+
 const AABBTestResults = {
     INSIDE: 1,
     OUTSIDE: -1,

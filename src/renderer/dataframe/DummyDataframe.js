@@ -1,5 +1,5 @@
-import { decodeGeom } from './decoder';
-import { GEOMETRY_TYPE, computeAABB, computeCentroids } from '../utils/geometry';
+import { decodeGeom } from '../decoder';
+import { GEOMETRY_TYPE, computeAABB, computeCentroids } from '../../utils/geometry';
 
 export default class DummyDataframe {
     constructor ({ center, scale, geom, properties, propertiesArrayBuffer, type, active, size, metadata }) {
