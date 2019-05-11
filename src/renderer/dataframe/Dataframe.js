@@ -4,6 +4,7 @@ import DummyDataframe from './DummyDataframe';
 import { RESOLUTION_ZOOMLEVEL_ZERO } from '../../constants/layer';
 import { WM_R } from '../../utils/util';
 import { FILTERING_THRESHOLD } from '../Renderer';
+import { genViewportFeatureClass } from './viewportFeature';
 
 // Maximum number of property textures that will be uploaded automatically to the GPU
 // in a non-lazy manner
@@ -656,48 +657,14 @@ export default class Dataframe extends DummyDataframe {
      */
     _genFeatureClass () {
         if (featureClassCache.has(this.metadata)) {
-            this._cls = featureClassCache.get(this.metadata);
+            this._featureClass = featureClassCache.get(this.metadata);
             return;
         }
 
-        // TODO: Extract class template creation to an external builder helper
-        const cls = class ViewportFeature {
-            constructor (index, dataframe) {
-                this._index = index;
-                this._dataframe = dataframe;
-            }
-        };
-        Object.defineProperties(cls.prototype, this._buildGetters());
+        const cls = genViewportFeatureClass(this.metadata);
 
         featureClassCache.set(this.metadata, cls);
-        this._cls = cls;
-    }
-
-    _buildGetters () {
-        const getters = {};
-        const metadata = this.metadata;
-        metadata.propertyKeys.forEach(propertyName => {
-            const codec = metadata.codec(propertyName);
-            if (codec.isRange()) {
-                const decodedProperties = metadata.decodedProperties(propertyName);
-                getters[propertyName] = {
-                    get: function () {
-                        const index = this._index;
-                        const args = decodedProperties.map(name => this._dataframe.properties[name][index]);
-                        return codec.internalToExternal(metadata, args);
-                    }
-                };
-            } else {
-                getters[propertyName] = {
-                    get: function () {
-                        const index = this._index;
-                        const value = this._dataframe.properties[propertyName][index];
-                        return codec.internalToExternal(metadata, value);
-                    }
-                };
-            }
-        });
-        return getters;
+        this._featureClass = cls;
     }
 
     /**
@@ -712,11 +679,11 @@ export default class Dataframe extends DummyDataframe {
             return this.cachedFeatures[index];
         }
 
-        if (!this._cls) {
+        if (!this._featureClass) {
             this._genFeatureClass();
         }
 
-        const feature = new this._cls(index, this);
+        const feature = new this._featureClass(index, this);
         this.cachedFeatures[index] = feature;
         return feature;
     }
