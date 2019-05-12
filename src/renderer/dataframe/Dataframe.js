@@ -5,6 +5,7 @@ import { RESOLUTION_ZOOMLEVEL_ZERO } from '../../constants/layer';
 import { WM_R } from '../../utils/util';
 import { FILTERING_THRESHOLD } from '../Renderer';
 import { genViewportFeatureClass } from './viewportFeature';
+import FeatureIdsHelper from './FeatureIdsHelper';
 
 // Maximum number of property textures that will be uploaded automatically to the GPU
 // in a non-lazy manner
@@ -33,7 +34,7 @@ export default class Dataframe extends DummyDataframe {
      */
     bindRenderer (renderer) {
         this.renderer = renderer;
-        this.height = this._getSize().height;
+        this.height = this.getSize().height;
 
         // Load alphanumeric properties to WebGL textures
         this.addProperties();
@@ -48,30 +49,9 @@ export default class Dataframe extends DummyDataframe {
     }
 
     /**
-     * Gets vertices from decoded geometries
-     */
-    _getVertices () {
-        return this.decodedGeom.vertices;
-    }
-
-    /**
-     * Gets breakpoints from decoded geometries
-     */
-    _getBreakpoints () {
-        return this.decodedGeom.breakpoints;
-    }
-
-    /**
-     * Gets normals from decoded geometries
-     */
-    _getNormals () {
-        return this.decodedGeom.normals;
-    }
-
-    /**
      * Gets width & height size, considering RTT_WIDTH and the number of features
      */
-    _getSize () {
+    getSize () {
         const width = this.renderer.RTT_WIDTH;
         const height = Math.ceil(this.numFeatures / width);
         return {
@@ -92,7 +72,7 @@ export default class Dataframe extends DummyDataframe {
      */
     _loadVertices () {
         const gl = this._getGL();
-        const vertices = this._getVertices();
+        const vertices = this.decodedGeom.vertices;
 
         this.vertexBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
@@ -104,7 +84,7 @@ export default class Dataframe extends DummyDataframe {
      */
     _loadNormals () {
         const gl = this._getGL();
-        const normals = this._getNormals();
+        const normals = this.decodedGeom.normals;
 
         if (normals) {
             this.normalBuffer = gl.createBuffer();
@@ -118,90 +98,13 @@ export default class Dataframe extends DummyDataframe {
      */
     _loadFeatureIds () {
         const gl = this._getGL();
-        const ids = this._getFeatureIds();
+
+        const helper = new FeatureIdsHelper(this);
+        const ids = helper.getFeatureIds();
 
         this.featureIDBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.featureIDBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, ids, gl.STATIC_DRAW);
-    }
-
-    /**
-     * Gets the featureId per each vertice.
-     */
-    _getFeatureIds () {
-        const breakpoints = this._getBreakpoints();
-        const isPointType = !breakpoints.length;
-
-        if (isPointType) {
-            return this._getFeatureIdsForPoints();
-        } else {
-            return this._getFeatureIdsForLinesOrPolygons();
-        }
-    }
-
-    _getFeatureIdsForPoints () {
-        const numVertices = this._getVertices().length;
-        let { tableX, tableY } = this._createTablesXY();
-
-        const ids = new Float32Array(numVertices);
-        const inc = 1 / (1024 * 64);
-        let index = 0;
-
-        for (let i = 0; i < numVertices; i += 6) {
-            ids[i + 0] = tableX[index];
-            ids[i + 1] = tableY[index];
-
-            if (ids[i + 0] === 0) {
-                ids[i + 0] += inc;
-            }
-            if (ids[i + 1] === 0) {
-                ids[i + 1] += inc;
-            }
-
-            ids[i + 2] = -ids[i + 0];
-            ids[i + 3] = ids[i + 1];
-
-            ids[i + 4] = ids[i + 0];
-            ids[i + 5] = -ids[i + 1];
-            index++;
-        }
-
-        return ids;
-    }
-
-    _getFeatureIdsForLinesOrPolygons () {
-        const numVertices = this._getVertices().length;
-        let { tableX, tableY } = this._createTablesXY();
-        const breakpoints = this._getBreakpoints();
-
-        const ids = new Float32Array(numVertices);
-        let index = 0;
-
-        for (let i = 0; i < numVertices; i += 2) {
-            while (i === breakpoints[index]) {
-                index++;
-            }
-            ids[i + 0] = tableX[index];
-            ids[i + 1] = tableY[index];
-        }
-
-        return ids;
-    }
-
-    _createTablesXY () {
-        let tableX = {};
-        let tableY = {};
-
-        const { height, width } = this._getSize();
-
-        for (let k = 0; k < this.numFeatures; k++) {
-            // Transform integer ID into a `vec2` to overcome WebGL 1 limitations,
-            // output IDs will be in the `vec2([0,1], [0,1])` range
-            tableX[k] = (k % width) / (width - 1);
-            tableY[k] = height > 1 ? Math.floor(k / width) / (height - 1) : 0.5;
-        }
-
-        return { tableX, tableY };
     }
 
     getFeaturesAtPosition (position, viz) {
@@ -259,7 +162,7 @@ export default class Dataframe extends DummyDataframe {
         const gl = this._getGL(); // Dataframe is already bound to this context, "hot update" it
         const propertiesFloat32Array = this.properties[propertyName];
 
-        const size = this._getSize();
+        const size = this.getSize();
         this.height = size.height; // TODO is this required here again? besides bindRenderer
 
         if (propertiesFloat32Array) {
@@ -308,7 +211,7 @@ export default class Dataframe extends DummyDataframe {
      * Checks if the point is inside the viewport.
      */
     _isPointInViewport (featureIndex) {
-        const vertices = this._getVertices();
+        const vertices = this.decodedGeom.vertices;
         const x = vertices[6 * featureIndex + 0];
         const y = vertices[6 * featureIndex + 1];
 
@@ -325,8 +228,8 @@ export default class Dataframe extends DummyDataframe {
         const aabbResult = this._compareAABBs(featureAABB);
 
         if (aabbResult === AABBTestResults.INTERSECTS) {
-            const vertices = this._getVertices();
-            const normals = this._getNormals();
+            const vertices = this.decodedGeom.vertices;
+            const normals = this.decodedGeom.normals;
             const range = this.decodedGeom.featureIDToVertexIndex.get(featureIndex);
             return this._isPolygonCollidingViewport(vertices, normals, range.start, range.end);
         }
@@ -427,7 +330,7 @@ export default class Dataframe extends DummyDataframe {
     }
 
     _getPointsAtPosition (position, viz) {
-        const points = this._getVertices();
+        const points = this.decodedGeom.vertices;
 
         // FIXME: points.length includes rejected points (out of tile)
         // so we use numFeatures here, but should fix the points size
@@ -521,9 +424,9 @@ export default class Dataframe extends DummyDataframe {
     }
 
     _getFeaturesAtPositionFromTriangles (geometryType, position, viz) {
-        const vertices = this._getVertices();
-        const normals = this._getNormals();
-        const breakpoints = this._getBreakpoints();
+        const vertices = this.decodedGeom.vertices;
+        const normals = this.decodedGeom.normals;
+        const breakpoints = this.decodedGeom.breakpoints;
 
         const features = [];
         // Linear search for all features
@@ -731,7 +634,7 @@ export default class Dataframe extends DummyDataframe {
         // TODO we are wasting 75% of the memory for the scalar attributes (width, strokeWidth),
         // since RGB components are discarded
         const gl = this._getGL();
-        const size = this._getSize();
+        const size = this.getSize();
 
         const texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, texture);
