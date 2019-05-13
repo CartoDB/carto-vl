@@ -1,10 +1,11 @@
 export default class FeatureIdsHelper {
     constructor (dataframe) {
         this.dataframe = dataframe;
-
-        this.decodedGeom = dataframe.decodedGeom;
-        this.numFeatures = dataframe.numFeatures;
     }
+
+    // References pointing to dataframe, to be in sync with its updates
+    get decodedGeom () { return this.dataframe.decodedGeom; }
+    get numFeatures () { return this.dataframe.numFeatures; }
 
     /**
      * Gets the featureId per each vertice.

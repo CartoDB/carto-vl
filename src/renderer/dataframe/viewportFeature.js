@@ -3,15 +3,15 @@
  * to access its properties, as declared in the `metadata`
  */
 export function genViewportFeatureClass (metadata) {
-    const cls = class ViewportFeature {
+    const classTemplate = class ViewportFeature {
         constructor (index, dataframe) {
             this._index = index;
             this._dataframe = dataframe;
         }
     };
-    Object.defineProperties(cls.prototype, buildGettersFrom(metadata));
+    Object.defineProperties(classTemplate.prototype, buildGettersFrom(metadata));
 
-    return cls;
+    return classTemplate;
 }
 
 function buildGettersFrom (metadata) {
