@@ -34,7 +34,7 @@ export default class Dataframe extends DummyDataframe {
      * Loads all the relevant information to the WebGL context, provided by the renderer.
      * This includes:
      *   - the textures for each property
-     *   - the buffers for vertices ∫& normals
+     *   - the buffers for vertices & normals
      *   - the auxiliary textures for style properties
      *
      * This method is very intensive in terms of computations, loading potentially a lot of CPU data to the GPU
@@ -43,7 +43,6 @@ export default class Dataframe extends DummyDataframe {
     bindRenderer (renderer) {
         this.renderer = renderer;
         this.height = this.getSize().height;
-
         this._initHelpers();
 
         // Load alphanumeric properties to WebGL textures
