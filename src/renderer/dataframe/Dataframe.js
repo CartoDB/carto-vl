@@ -21,8 +21,13 @@ export default class Dataframe extends DummyDataframe {
     }
 
     _initHelpers () {
-        this._featureIdsHelper = new FeatureIdsHelper(this);
-        this._viewportHelper = new ViewportHelper(this);
+        if (!this._featureIdsHelper) {
+            this._featureIdsHelper = new FeatureIdsHelper(this);
+        }
+
+        if (!this._viewportHelper) {
+            this._viewportHelper = new ViewportHelper(this);
+        }
     }
 
     /**
@@ -38,6 +43,8 @@ export default class Dataframe extends DummyDataframe {
     bindRenderer (renderer) {
         this.renderer = renderer;
         this.height = this.getSize().height;
+
+        this._initHelpers();
 
         // Load alphanumeric properties to WebGL textures
         this.addProperties();
