@@ -128,6 +128,7 @@ export default class Interactivity {
         this._prevHoverFeatures = [];
         this._prevClickFeatures = [];
         this._numListeners = {};
+        this._isAutoChangePointerEnabled = options.autoChangePointer;
 
         const allLayersReadyPromises = layerList.map(layer => layer._context);
         return Promise.all(allLayersReadyPromises)
@@ -135,8 +136,8 @@ export default class Interactivity {
                 postCheckLayerList(layerList);
                 this._subscribeToLayerEvents(layerList);
                 this._subscribeToMapEvents(layerList[0].map);
-            }).then(() => {
-                if (options.autoChangePointer) {
+
+                if (this._isAutoChangePointerEnabled) {
                     this._setInteractiveCursor();
                 }
             });
@@ -164,7 +165,7 @@ export default class Interactivity {
         this._onMouseMoveBound = this._onMouseMove.bind(this);
         map.on('mousemove', this._onMouseMoveBound);
 
-        this._onClickBound = this._onMouseMove.bind(this);
+        this._onClickBound = this._onClick.bind(this);
         map.on('click', this._onClickBound);
 
         this._disableWhileMovingMap(map);
@@ -204,7 +205,10 @@ export default class Interactivity {
         const map = this._layerList[0].map;
 
         this._removeLayerFromInteractivity(layer);
-        this._onFeatureHoverBound({ features: [] });
+
+        if (this._isAutoChangePointerEnabled) {
+            this._onFeatureHoverBound({ features: [] });
+        }
 
         if (!this._layerList.length) {
             this._unsubscribeToMapEvents(map);
