@@ -441,6 +441,7 @@ export default class Layer {
      * Custom Layer API: `onRemove` function
      */
     onRemove (map, gl) {
+        this._fire('removed');
     }
 
     /**
