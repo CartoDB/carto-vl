@@ -147,14 +147,17 @@ export default class Interactivity {
         if (!map.__carto_interactivities) {
             map.__carto_interactivities = new Set();
         }
-        this.on('featureHover', event => {
-            if (event.features.length) {
-                map.__carto_interactivities.add(this);
-            } else {
-                map.__carto_interactivities.delete(this);
-            }
-            map.getCanvas().style.cursor = (map.__carto_interactivities.size > 0) ? 'pointer' : '';
-        });
+        this._onFeatureHoverBound = this._onFeatureHover.bind(this, map);
+        this.on('featureHover', this._onFeatureHoverBound);
+    }
+
+    _onFeatureHover (map, event) {
+        if (event.features.length) {
+            map.__carto_interactivities.add(this);
+        } else {
+            map.__carto_interactivities.delete(this);
+        }
+        map.getCanvas().style.cursor = (map.__carto_interactivities.size > 0) ? 'pointer' : '';
     }
 
     _subscribeToMapEvents (map) {
@@ -198,10 +201,13 @@ export default class Interactivity {
     }
 
     _onLayerRemoved (layer) {
+        const map = this._layerList[0].map;
+
         this._removeLayerFromInteractivity(layer);
+        this._onFeatureHoverBound({ features: [] });
 
         if (!this._layerList.length) {
-            this._unsubscribeToMapEvents();
+            this._unsubscribeToMapEvents(map);
         }
     }
 
