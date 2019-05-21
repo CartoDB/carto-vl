@@ -158,9 +158,18 @@ export default class Interactivity {
     }
 
     _subscribeToMapEvents (map) {
-        map.on('mousemove', this._onMouseMove.bind(this));
-        map.on('click', this._onClick.bind(this));
+        this._onMouseMoveBound = this._onMouseMove.bind(this);
+        map.on('mousemove', this._onMouseMoveBound);
+
+        this._onClickBound = this._onMouseMove.bind(this);
+        map.on('click', this._onClickBound);
+
         this._disableWhileMovingMap(map);
+    }
+
+    _unsubscribeToMapEvents (map) {
+        map.off('mousemove', this._onMouseMoveBound);
+        map.off('click', this._onClickBound);
     }
 
     _disableWhileMovingMap (map) {
@@ -180,11 +189,30 @@ export default class Interactivity {
     _subscribeToLayerEvents (layers) {
         layers.forEach(layer => {
             layer.on('updated', this._onLayerUpdated.bind(this));
+            layer.on('removed', this._onLayerRemoved.bind(this));
         });
     }
 
     _onLayerUpdated () {
         this._onMouseMove(this._mouseEvent, true);
+    }
+
+    _onLayerRemoved (layer) {
+        this._removeLayerFromInteractivity(layer);
+
+        if (!this._layerList.length) {
+            this._unsubscribeToMapEvents();
+        }
+    }
+
+    _removeLayerFromInteractivity (layer) {
+        const layerIndex = this._layerList.indexOf(layer);
+
+        if (layerIndex === -1) {
+            return;
+        }
+
+        this._layerList.splice(layerIndex, 1);
     }
 
     _onMouseMove (event, emulated) {
