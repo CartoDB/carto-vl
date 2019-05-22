@@ -25,6 +25,7 @@
         // Add zoom controls
         const nav = new mapboxgl.NavigationControl();
         map.addControl(nav, 'top-left');
+        map.addControl(new mapboxgl.FullscreenControl(), 'top-left');
 
 
         // MAP EVENTS

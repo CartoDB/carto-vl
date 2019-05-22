@@ -42,6 +42,7 @@
       showCompass: false
     });
     map.addControl(nav, 'top-left');
+    map.addControl(new mapboxgl.FullscreenControl(), 'top-left');
 
     fetch('https://libs.cartocdn.com/carto-vl/assets/stations.geojson')
       .then(response => response.json())

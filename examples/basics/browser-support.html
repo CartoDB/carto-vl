@@ -52,6 +52,8 @@
         scrollZoom: false
       });
 
+      map.addControl(new mapboxgl.FullscreenControl(), 'top-left');
+
       carto.setDefaultAuth({
         username: 'cartovl',
         apiKey: 'default_public'

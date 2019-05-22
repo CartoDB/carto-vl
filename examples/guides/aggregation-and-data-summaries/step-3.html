@@ -36,6 +36,7 @@
         });
         const nav = new mapboxgl.NavigationControl();
         map.addControl(nav, 'top-left');
+        map.addControl(new mapboxgl.FullscreenControl(), 'top-left');
 
         carto.setDefaultAuth({
             username: 'cartovl',

@@ -50,6 +50,7 @@
             center: [-96, 41],
             zoom: 3.5,
         });
+        map.addControl(new mapboxgl.FullscreenControl(), 'top-left');
 
         carto.setDefaultAuth({
             username: 'cartovl',

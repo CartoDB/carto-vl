@@ -44,6 +44,7 @@
       showCompass: false
     });
     map.addControl(nav, 'top-left');
+    map.addControl(new mapboxgl.FullscreenControl(), 'top-left');
 
     // Define user
     carto.setDefaultAuth({
