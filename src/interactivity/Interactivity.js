@@ -202,8 +202,6 @@ export default class Interactivity {
     }
 
     _onLayerRemoved (layer) {
-        const map = this._layerList[0].map;
-
         this._removeLayerFromInteractivity(layer);
 
         if (this._isAutoChangePointerEnabled) {
@@ -211,7 +209,7 @@ export default class Interactivity {
         }
 
         if (!this._layerList.length) {
-            this._unsubscribeToMapEvents(map);
+            this._unsubscribeToMapEvents(this._layerList[0].map);
         }
     }
 
