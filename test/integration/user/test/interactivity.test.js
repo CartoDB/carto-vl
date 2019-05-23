@@ -456,16 +456,19 @@ describe('Interactivity', () => {
 });
 
 describe('Interactivity with multiple layers', () => {
-    let map, source1, viz1, layer1, source2, viz2, layer2, interactivity;
+    let map, div, source1, viz1, layer1, source2, viz2, layer2, interactivity;
 
     beforeEach(() => {
         const setup = util.createMap('map');
         map = setup.map;
-
-        const layers = {};
+        div = setup.div;
 
         map.addLayer = layer => { layer.onAdd(map); };
-        map.removeLayer = layerId => { layers[layerId].onRemove(map); };
+        map.removeLayer = layerId => {
+            interactivity && interactivity._layerList
+                .find(layer => layer.id === layerId)
+                .onRemove(map);
+        };
 
         source1 = new carto.source.GeoJSON(feature1);
         viz1 = new carto.Viz(`
@@ -474,7 +477,6 @@ describe('Interactivity with multiple layers', () => {
         `);
         layer1 = new carto.Layer('layer1', source1, viz1);
         layer1.onAdd = map => { layer1.map = map; };
-        layers.layer1 = layer1;
 
         source2 = new carto.source.GeoJSON(feature2);
         viz2 = new carto.Viz(`
@@ -482,7 +484,6 @@ describe('Interactivity with multiple layers', () => {
         `);
         layer2 = new carto.Layer('layer2', source2, viz2);
         layer2.onAdd = map => { layer2.map = map; };
-        layers.layer2 = layer2;
 
         layer1.addTo(map);
         layer2.addTo(map);
@@ -541,6 +542,11 @@ describe('Interactivity with multiple layers', () => {
                     });
             });
         });
+    });
+
+    afterEach(() => {
+        map.remove();
+        document.body.removeChild(div);
     });
 });
 
