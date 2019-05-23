@@ -451,7 +451,8 @@ import { Nin } from './expressions/belongs';
 
 import Between from './expressions/between';
 
-import { Mul } from './expressions/binary';
+// import { Mul } from './expressions/binary';
+import { Mul } from './expressions/binary/Mul';
 import { Div } from './expressions/binary';
 import { Add } from './expressions/binary';
 import { Sub } from './expressions/binary';

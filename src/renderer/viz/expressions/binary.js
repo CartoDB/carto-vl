@@ -40,6 +40,26 @@ export const Mul = genBinaryOp('mul',
     (x, y) => `(${x} * ${y})`
 );
 
+Mul.prototype.eval = function (featureA, featureB) {
+    const valueA = this.a.eval(featureA);
+    const valueB = this.b.eval(featureB);
+
+    if (this.a.type === 'color' && this.b.type === 'color') {
+        return _evalColors(valueA, valueB);
+    }
+
+    return valueA * valueB;
+};
+
+function _evalColors (colorA, colorB) {
+    return {
+        r: colorA.r * colorB.r / 255,
+        g: colorA.g * colorB.g / 255,
+        b: colorA.b * colorB.b / 255,
+        a: colorA.a * colorB.a
+    };
+}
+
 /**
  * Divide two numeric expressions.
  *
@@ -464,8 +484,10 @@ function genBinaryOp (name, allowedSignature, jsFn, glsl) {
             return jsFn(this.a.value, this.b.value);
         }
 
-        eval (feature) {
-            return jsFn(this.a.eval(feature), this.b.eval(feature));
+        eval (featureA, featureB) {
+            const valueA = this.a.eval(featureA);
+            const valueB = this.b.eval(featureB);
+            return jsFn(valueA, valueB);
         }
 
         _bindMetadata (meta) {

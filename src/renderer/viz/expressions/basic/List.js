@@ -63,6 +63,7 @@ export default class List extends Base {
 
         super(elems);
         this.elems = elems;
+        this.type = elems[0].type;
     }
 
     get value () {
@@ -71,6 +72,10 @@ export default class List extends Base {
 
     eval (feature) {
         return this.elems.map(elem => elem.eval(feature));
+    }
+
+    inlineMaker () {
+        return f => 'hellow';
     }
 
     _bindMetadata (metadata) {

@@ -100,7 +100,7 @@ export default class Classifier extends BaseExpression {
     _genBreakpoints () { }
 
     _applyToShaderSource (getGLSLforProperty) {
-        return this._GLSLhelper.applyToShaderSource(getGLSLforProperty);
+        return this._GLSLhelper ? this._GLSLhelper.applyToShaderSource(getGLSLforProperty) : null;
     }
 
     _preDraw (program, drawMetadata, gl) {

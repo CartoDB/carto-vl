@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script src="../../dist/carto-vl.js"></script>
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../../examples/style.css">
+</head>
+
+<body>
+  <div id="map"></div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Images</h1>
+      </header>
+      <section>
+        <p class="description open-sans">Assign images to categories</p>
+      </section>
+      <section>
+        <div id="controls">
+          <ul id="content"></ul>
+        </div>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+  <div id="loader">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
+
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: carto.basemaps.positron,
+      center: [-96.72033740507385, 32.84383032617839],
+      zoom: 10.2
+    });
+
+    carto.setDefaultAuth({
+      username: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    const source = new carto.source.Dataset('dallas_mkt');
+
+    // @colorList1: [#e8e8e8, #dfb0d6, #be64ac]
+    //     @colorList2: [#e8e8e8, #ace4e4, #5ac8c8]
+
+    //     @population: ramp(
+    //         globalQuantiles($pop_sqkm, 3),
+    //         @colorList1
+    //     )
+
+    //     @percent: ramp(
+    //         globalQuantiles($percent_25_29, 3),
+    //         @colorList2
+    //     )
+
+
+    const viz = new carto.Viz(`
+        strokeColor: rgba(255,255,255,0.2)
+        color: ramp(globalQuantiles($pop_sqkm, 3), [#e8e8e8, #dfb0d6, #be64ac]) * ramp(globalQuantiles($percent_25_29, 3), [#e8e8e8, #ace4e4, #5ac8c8])
+
+    `);
+
+    
+
+    const layer = new carto.Layer('layer', source, viz);
+    const interactivity = new carto.Interactivity(layer);
+    interactivity.on('featureHover', addInteractivity);
+    
+    layer.addTo(map);
+
+    layer.on('loaded', () => {
+          hideLoader();
+
+          const color = layer.viz.color;
+        });
+
+    function addInteractivity(event) {
+      let content = '';
+      for (let feature of event.features) {
+        content += `
+          <div class="container">
+            <p class="open-sans">${rgbToHex(feature.color)}</p>
+          </div>
+        `;
+      }
+      document.getElementById('content').innerHTML = content;
+    }
+
+    function hideLoader() {
+      document.getElementById('loader').style.opacity = '0';
+    }
+
+    function rgbToHex(color) {
+      return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
+    }
+
+  </script>
+</body>
+
+</html>
