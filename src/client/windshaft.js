@@ -1,8 +1,11 @@
-import { version } from '../../package';
+
 import MVT from '../sources/MVT';
 import Metadata from './WindshaftMetadata';
+import { DEFAULT_ID_PROPERTY } from '../renderer/Metadata';
 import schema from '../renderer/schema';
 import * as windshaftFiltering from './windshaft-filtering';
+import WindshaftRequestHelper from './WindshaftRequestHelper';
+
 import CartoValidationError, { CartoValidationErrorTypes } from '../errors/carto-validation-error';
 import CartoMapsAPIError, { CartoMapsAPIErrorTypes } from '../errors/carto-maps-api-error';
 import { GEOMETRY_TYPE } from '../utils/geometry';
@@ -10,7 +13,7 @@ import { CLUSTER_FEATURE_COUNT, aggregationTypes } from '../constants/metadata';
 
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
-const REQUEST_GET_MAX_URL_LENGTH = 2048;
+const MAX_CATEGORIES = 32768;
 const TILE_EXTENT = 2048;
 
 export default class Windshaft {
@@ -28,7 +31,9 @@ export default class Windshaft {
         this._mvtClient.bindLayer(addDataframe);
     }
 
-    _getInstantiationID (MNS, resolution, filtering, choices) {
+    _getInstantiationID (vizInfo, choices) {
+        const { MNS, resolution, filtering } = vizInfo;
+
         return JSON.stringify({
             MNS: schema.simplify(MNS),
             resolution,
@@ -38,39 +43,57 @@ export default class Windshaft {
     }
 
     /**
-     * Should be called whenever the viz changes (even if metadata is not going to be used)
+     * Should be called whenever the viz changes, even if metadata is not going to be used.
      * This not only computes metadata: it also updates the map (instantiates) for the new viz if needed
      * Returns  a promise to a Metadata
      * @param {*} viz
      */
     async getMetadata (viz) {
-        const MNS = viz.getMinimumNeededSchema();
-        this._checkAcceptableMNS(MNS);
-        const resolution = viz.resolution.eval();
-        const filtering = windshaftFiltering.getFiltering(viz, { exclusive: this._exclusive });
-        this._forceIncludeCartodbId(MNS);
-        if (this._needToInstantiate(MNS, resolution, filtering)) {
-            const instantiationData = await this._repeatableInstantiate(MNS, resolution, filtering);
+        const vizInfo = this._getServerInfoFrom(viz);
+
+        if (this._needToInstantiateMap(vizInfo)) {
+            const instantiationData = await this._repeatableInstantiate(vizInfo);
             this._updateStateAfterInstantiating(instantiationData);
         }
+
         return this.metadata;
     }
 
+    /**
+     * Get relevant info from Viz related to windshaft requests
+     */
+    _getServerInfoFrom (viz) {
+        const MNS = this._getMinNeededSchemaFrom(viz);
+        const resolution = viz.resolution.value;
+        const filtering = windshaftFiltering.getFiltering(viz, { exclusive: this._exclusive });
+
+        // TODO: properly document returned output at jsdoc (with typedef?)
+        const vizInfo = { MNS, resolution, filtering }; // TODO this looks like a Type or even a Class
+        return vizInfo;
+    }
+
+    /**
+     * Get the minimum schema from the viz, validated and with DEFAULT_ID_PROPERTY
+    */
+    _getMinNeededSchemaFrom (viz) {
+        const MNS = viz.getMinimumNeededSchema();
+        this._checkAcceptableMNS(MNS);
+        this._forceIncludeCartodbId(MNS);
+
+        return MNS;
+    }
+
     _forceIncludeCartodbId (MNS) {
-        // Force to include `cartodb_id` in the MNS columns.
+        // Force to include DEFAULT_ID_PROPERTY in the MNS columns.
         // TODO: revisit this request to Maps API
-        if (!MNS['cartodb_id']) {
-            MNS['cartodb_id'] = [{ type: aggregationTypes.UNAGGREGATED }];
+        if (!MNS[DEFAULT_ID_PROPERTY]) {
+            MNS[DEFAULT_ID_PROPERTY] = [{ type: aggregationTypes.UNAGGREGATED }];
         }
     }
 
     requiresNewMetadata (viz) {
-        const MNS = viz.getMinimumNeededSchema();
-        this._checkAcceptableMNS(MNS);
-        const resolution = viz.resolution;
-        const filtering = windshaftFiltering.getFiltering(viz, { exclusive: this._exclusive });
-        this._forceIncludeCartodbId(MNS);
-        return this._needToInstantiate(MNS, resolution, filtering);
+        const vizInfo = this._getServerInfoFrom(viz);
+        return this._needToInstantiateMap(vizInfo);
     }
 
     _checkAcceptableMNS (MNS) {
@@ -107,34 +130,38 @@ export default class Windshaft {
      *  - When the resolution changed.
      *  - When the filter conditions changed and the dataset should be server-filtered.
      */
-    _needToInstantiate (MNS, resolution, filtering) {
-        return !schema.equals(this._MNS, MNS) ||
-            resolution !== this.resolution ||
-            (
-                JSON.stringify(filtering) !== JSON.stringify(this.filtering) &&
-                this.metadata.featureCount > MIN_FILTERING
-            );
+    _needToInstantiateMap (vizInfo) {
+        const { MNS, resolution, filtering } = vizInfo;
+
+        const schemaChanged = schema.notEquals(this._MNS, MNS);
+        const resolutionChanged = this.resolution !== resolution;
+        const filteringChanged = JSON.stringify(this.filtering) !== JSON.stringify(filtering);
+        const shouldBeServerFiltered = this.metadata && (this.metadata.featureCount > MIN_FILTERING);
+
+        return schemaChanged || resolutionChanged || (filteringChanged && shouldBeServerFiltered);
     }
 
     _isInstantiated () {
         return !!this.metadata;
     }
 
-    _intantiationChoices (metadata) {
+    _instantiationChoices (metadata) {
         let choices = {
-            // default choices
-            backendFilters: true
+            backendFilters: true // default choices
         };
-        if (metadata) {
-            if (metadata.featureCount >= 0) {
-                choices.backendFilters = metadata.featureCount > MIN_FILTERING || !metadata.backendFiltersApplied;
-            }
+
+        const thereAreFeatures = metadata && metadata.featureCount >= 0;
+        if (thereAreFeatures) {
+            const shouldBeServerFiltered = metadata.featureCount > MIN_FILTERING;
+            choices.backendFilters = shouldBeServerFiltered || !metadata.backendFiltersApplied;
         }
+
         return choices;
     }
 
-    async _instantiateUncached (MNS, resolution, filters, choices = { backendFilters: true }, overrideMetadata = null) {
-        const conf = this._getConfig();
+    async _instantiateUncached (vizInfo, choices = { backendFilters: true }, overrideMetadata = null) {
+        const { MNS, resolution, filters } = vizInfo;
+
         const agg = await this._generateAggregation(MNS, resolution);
         let select = this._buildSelectClause(MNS);
         let aggSQL = this._buildQuery(select);
@@ -143,7 +170,6 @@ export default class Windshaft {
 
         let backendFilters = choices.backendFilters ? filters : null;
         let backendFiltersApplied = false;
-
         if (backendFilters && this._requiresAggregation(MNS)) {
             agg.filters = windshaftFiltering.getAggregationFilters(backendFilters);
             if (agg.filters) {
@@ -159,6 +185,7 @@ export default class Windshaft {
             aggSQL = filteredSQL;
         }
 
+        const conf = this._getConfig();
         let { urlTemplates, metadata } = await this._getInstantiationPromise(query, conf, agg, aggSQL, select, overrideMetadata, MNS);
         metadata.backendFiltersApplied = backendFiltersApplied;
 
@@ -181,34 +208,34 @@ export default class Windshaft {
         this._checkLayerMeta(MNS);
     }
 
-    async _instantiate (MNS, resolution, filters, choices, metadata) {
-        const id = this._getInstantiationID(MNS, resolution, filters, choices);
+    async _instantiate (vizInfo, choices, metadata) {
+        const id = this._getInstantiationID(vizInfo, choices);
         if (this.inProgressInstantiations[id]) {
             return this.inProgressInstantiations[id];
         }
-        const instantiationPromise = this._instantiateUncached(MNS, resolution, filters, choices, metadata);
+
+        const instantiationPromise = this._instantiateUncached(vizInfo, choices, metadata);
         this.inProgressInstantiations[id] = instantiationPromise;
         return instantiationPromise;
     }
 
-    async _repeatableInstantiate (MNS, resolution, filters) {
+    async _repeatableInstantiate (vizInfo) {
         // TODO: we shouldn't reinstantiate just to not apply backend filters
         // (we'd need to add a choice comparison function argument to repeatablePromise)
         let finalMetadata = null;
-        const initialChoices = this._intantiationChoices(this.metadata);
+        const initialChoices = this._instantiationChoices(this.metadata);
         const finalChoices = instantiation => {
             // first instantiation metadata is kept
             finalMetadata = instantiation.metadata;
-            return this._intantiationChoices(instantiation.metadata);
+            return this._instantiationChoices(instantiation.metadata);
         };
-        return repeatablePromise(initialChoices, finalChoices, choices => this._instantiate(MNS, resolution, filters, choices, finalMetadata));
+
+        return repeatablePromise(initialChoices, finalChoices, choices => this._instantiate(vizInfo, choices, finalMetadata));
     }
 
     _checkLayerMeta (MNS) {
-        if (!this._isAggregated()) {
-            if (this._requiresAggregation(MNS)) {
-                throw new CartoMapsAPIError('Aggregation not supported for this dataset', CartoMapsAPIErrorTypes.NOT_SUPPORTED);
-            }
+        if (!this._isAggregated() && this._requiresAggregation(MNS)) {
+            throw new CartoMapsAPIError('Aggregation not supported for this dataset', CartoMapsAPIErrorTypes.NOT_SUPPORTED);
         }
     }
 
@@ -217,7 +244,9 @@ export default class Windshaft {
     }
 
     _requiresAggregation (MNS) {
-        return Object.values(MNS).some(propertyUsages => propertyUsages.some(u => u.type === aggregationTypes.AGGREGATED));
+        return Object.values(MNS).some(propertyUsages =>
+            propertyUsages.some(u => u.type === aggregationTypes.AGGREGATED)
+        );
     }
 
     _generateAggregation (MNS, resolution) {
@@ -231,7 +260,7 @@ export default class Windshaft {
 
         Object.keys(MNS)
             .forEach(propertyName => {
-                if (propertyName !== 'cartodb_id') {
+                if (propertyName !== DEFAULT_ID_PROPERTY) {
                     const propertyUsages = MNS[propertyName];
                     propertyUsages.forEach(usage => {
                         if (usage.type === 'aggregated') {
@@ -261,7 +290,7 @@ export default class Windshaft {
     }
 
     _buildSelectClause (MNS) {
-        const columns = Object.keys(MNS).concat(['the_geom_webmercator', 'cartodb_id']);
+        const columns = Object.keys(MNS).concat(['the_geom_webmercator', DEFAULT_ID_PROPERTY]);
         return columns.filter((item, pos) => columns.indexOf(item) === pos); // get unique values
     }
 
@@ -286,6 +315,20 @@ export default class Windshaft {
     }
 
     async _getInstantiationPromise (query, conf, agg, aggSQL, columns, overrideMetadata, MNS) {
+        const mapConfigAgg = this._getMapConfigAgg(agg, aggSQL);
+        if (!overrideMetadata) {
+            this._completeMapConfigWithColumns(mapConfigAgg, columns);
+        }
+
+        const layergroup = await this._getLayerGroupFromWindshaft(conf, mapConfigAgg);
+
+        return {
+            urlTemplates: layergroup.metadata.tilejson.vector.tiles,
+            metadata: overrideMetadata || this._adaptMetadata(layergroup.metadata.layers[0].meta, agg, MNS)
+        };
+    }
+
+    _getMapConfigAgg (agg, aggSQL) {
         const mapConfigAgg = {
             buffersize: {
                 mvt: 1
@@ -303,46 +346,29 @@ export default class Windshaft {
                 }
             ]
         };
-        if (!overrideMetadata) {
-            const excludedColumns = ['the_geom', 'the_geom_webmercator'];
-            const includedColumns = columns.filter(name => !excludedColumns.includes(name));
-            mapConfigAgg.layers[0].options.metadata = {
-                geometryType: true,
-                columnStats: { topCategories: 32768, includeNulls: true },
-                dimensions: true,
-                sample: {
-                    num_rows: SAMPLE_ROWS,
-                    include_columns: includedColumns // TODO: when supported by Maps API: exclude_columns: excludedColumns
-                }
-            };
-        }
-        let response;
-        try {
-            response = await fetch(getMapRequest(conf, mapConfigAgg));
-        } catch (error) {
-            throw new CartoMapsAPIError(`Failed to connect to Maps API with your user('${this._source._username}')`);
-        }
-        const layergroup = await response.json();
-        if (!response.ok) {
-            if (response.status === 401) {
-                throw new CartoMapsAPIError(
-                    `Unauthorized access to Maps API: invalid combination of user('${this._source._username}') and apiKey('${this._source._apiKey}')`,
-                    CartoMapsAPIErrorTypes.SECURITY
-                );
-            } else if (response.status === 403) {
-                throw new CartoMapsAPIError(
-                    `Unauthorized access to dataset: the provided apiKey('${this._source._apiKey}') doesn't provide access to the requested data`,
-                    CartoMapsAPIErrorTypes.SECURITY
-                );
+        return mapConfigAgg;
+    }
+
+    _completeMapConfigWithColumns (mapConfigAgg, columns) {
+        const excludedColumns = ['the_geom', 'the_geom_webmercator'];
+        const includedColumns = columns.filter(name => !excludedColumns.includes(name));
+        mapConfigAgg.layers[0].options.metadata = {
+            geometryType: true,
+            columnStats: {
+                topCategories: MAX_CATEGORIES,
+                includeNulls: true
+            },
+            dimensions: true,
+            sample: {
+                num_rows: SAMPLE_ROWS,
+                include_columns: includedColumns // TODO: when supported by Maps API: exclude_columns: excludedColumns
             }
-
-            throw new CartoMapsAPIError(`${JSON.stringify(layergroup.errors)}`, CartoMapsAPIErrorTypes.SQL);
-        }
-
-        return {
-            urlTemplates: layergroup.metadata.tilejson.vector.tiles,
-            metadata: overrideMetadata || this._adaptMetadata(layergroup.metadata.layers[0].meta, agg, MNS)
         };
+    }
+
+    async _getLayerGroupFromWindshaft (conf, mapConfigAgg) {
+        const requestHelper = new WindshaftRequestHelper(conf, mapConfigAgg);
+        return requestHelper.getLayerGroup();
     }
 
     _adaptMetadata (meta, agg, MNS) {
@@ -392,6 +418,7 @@ export default class Windshaft {
                 }
             }
         });
+
         Object.values(properties).map(property => {
             property.type = adaptColumnType(property.type);
         });
@@ -412,9 +439,14 @@ export default class Windshaft {
             properties[CLUSTER_FEATURE_COUNT] = { type: 'number' };
         }
 
-        const idProperty = 'cartodb_id';
-
-        return new Metadata({ properties, featureCount, sample: stats.sample, geomType, isAggregated: aggregation.mvt, idProperty });
+        return new Metadata({
+            properties,
+            featureCount,
+            sample: stats.sample,
+            geomType,
+            isAggregated: aggregation.mvt,
+            idProperty: DEFAULT_ID_PROPERTY
+        });
     }
 }
 
@@ -451,46 +483,4 @@ async function repeatablePromise (initialAssumptions, assumptionsFromResult, pro
     } else {
         return promiseGenerator(finalAssumptions);
     }
-}
-
-function getMapRequest (conf, mapConfig) {
-    const mapConfigPayload = JSON.stringify(mapConfig);
-    const auth = encodeParameter('api_key', conf.apiKey);
-    const client = encodeParameter('client', `vl-${version}`);
-
-    const parameters = [auth, client, encodeParameter('config', mapConfigPayload)];
-    const url = generateUrl(generateMapsApiUrl(conf), parameters);
-    if (url.length < REQUEST_GET_MAX_URL_LENGTH) {
-        return new Request(url, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json'
-            }
-        });
-    }
-
-    return new Request(generateUrl(generateMapsApiUrl(conf), [auth, client]), {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: mapConfigPayload
-    });
-}
-
-function encodeParameter (name, value) {
-    return `${name}=${encodeURIComponent(value)}`;
-}
-
-function generateUrl (url, parameters = []) {
-    return `${url}?${parameters.join('&')}`;
-}
-
-function generateMapsApiUrl (conf, path) {
-    let url = `${conf.serverURL}/api/v1/map`;
-    if (path) {
-        url += path;
-    }
-    return url;
 }

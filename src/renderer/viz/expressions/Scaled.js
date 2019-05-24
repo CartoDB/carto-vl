@@ -30,22 +30,31 @@ export default class Scaled extends BaseExpression {
     constructor (width, zoomlevel = 0) {
         width = implicitCast(width);
         zoomlevel = implicitCast(zoomlevel);
+
         super({
             scale: div(mul(width, 0), pow(2, zoomlevel))
         });
+
         this.type = 'number';
         this.inlineMaker = inline => inline.scale;
     }
-    eval () {
-        return this.scale.eval();
+
+    get value () {
+        return this.scale.value;
     }
+
+    eval (feature) {
+        return this.scale.eval(feature);
+    }
+
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
         checkType('scaled', 'width', 0, 'number', this.scale.a.a);
         checkType('scaled', 'zoomlevel', 1, 'number', this.scale.b);
     }
+
     _preDraw (program, drawMetadata, gl) {
-        this.scale.a.b.expr = Math.pow(2, drawMetadata.zoomLevel);
+        this.scale.a.b.value = Math.pow(2, drawMetadata.zoomLevel);
         super._preDraw(program, drawMetadata, gl);
     }
 }

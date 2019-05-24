@@ -36,7 +36,7 @@ For serial, the type is `TimeRange` which encapsulates a period of time (a year,
 
 A `TimeRange` has these properties:
 * `text` an ISO8601-based representation of the period, e.g. '2018-04' for a month, '2018-04-01T03' for an hour.
-* `startDate`, `endDate` are the start and end of the period; note that the period is defined as `startDate <= t < endDate`, so the end date is just after the end of the period, for example the start of April 2018 is 2018-04-01T00:00:00 and the end is 2018-04-02T00:00:00. See below for information about the type of these dates, `TZDate`.
+* `startDate`, `endDate` are the start and end of the period; note that the period is defined as `startDate <= t < endDate`, so the end date is just after the end of the period, for example the start of April 2018 is 2018-04-01T00:00:00 and the end is 2018-04-02T00:00:00. See below for information about the type of these dates, `TimeZoneDate`.
 
 ### Cyclic (recurring) units as numeric values
 
@@ -81,7 +81,7 @@ viewportFeatures and interactivity is also compatible with clusterTime
 
 When applied to a `TimeRange` (e.g. through `clusterTime`), `animation` has a slightly different behavior than with other inputs.
 
-The progress of the animation will be a date (of class `TZDate`), and it will yield continuous values, interpolated from the start of the first time range to the end of the last time range. So even though the values of the input expression at each feature will be discrete values (e.g. months), the progress time will take continuous values, progressing through days, hours, etc.
+The progress of the animation will be a date (of class `TimeZoneDate`), and it will yield continuous values, interpolated from the start of the first time range to the end of the last time range. So even though the values of the input expression at each feature will be discrete values (e.g. months), the progress time will take continuous values, progressing through days, hours, etc.
 
 When the progress enters a given discrete value (a time range), the features with that value will match it for as long as the progress date remains within that range. The fade in and fade out durations will apply to progress values before and after entering the time range.
 
@@ -100,7 +100,7 @@ through the `clusterTime` expression (UTC by default). The backend provides this
 cannot be converted in the client to any other time zone.
 (Well, you can if you use a library such as [Moment Timezone](https://momentjs.com/timezone/) or [Luxon](https://moment.github.io/luxon/); note that the difficulty lies in than in general time zones are not a constant offset from UTC, but deal with DST --daylight saving time-- as well).
 
-So we don't use `Date` for the `TimeRange` limits, but a special type `TZDate`,
+So we don't use `Date` for the `TimeRange` limits, but a special type `TimeZoneDate`,
 that lets you access it as a text representation or as year, month, day, hour, minute, second fields, and also can contain an identification of the time zone used (not if defined by constant string).
 
 For example, if an `animation` is applied to a time range, like

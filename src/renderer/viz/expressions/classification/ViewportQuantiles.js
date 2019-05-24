@@ -99,7 +99,7 @@ export default class ViewportQuantiles extends Classifier {
                 }
             }
             const percentileValue = i / histogramBuckets * (max - min) + min;
-            breakpoint.expr = percentileValue;
+            breakpoint.value = percentileValue;
         });
     }
 

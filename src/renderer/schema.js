@@ -30,6 +30,10 @@ export function equals (a, b) {
     return JSON.stringify(simplify(a)) === JSON.stringify(simplify(b));
 }
 
+export function notEquals (a, b) {
+    return !equals(a, b);
+}
+
 function simplify (MNS) {
     const result = {};
     const propertyNames = Object.keys(MNS).sort();
@@ -53,4 +57,4 @@ export const column = {
     }
 };
 
-export default { column, equals, union, IDENTITY, simplify };
+export default { column, equals, notEquals, union, IDENTITY, simplify };

@@ -89,15 +89,19 @@ export default class ViewportHistogram extends Histogram {
         this._cached = null;
     }
 
-    eval () {
+    get value () {
         if (this._cached === null) {
             if (!this._histogram) {
                 return null;
             }
-            this._cached = super.eval();
+            this._cached = super.value;
         }
 
         return this._cached;
+    }
+
+    eval () {
+        return this.value;
     }
 
     /**

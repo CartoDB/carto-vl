@@ -29,17 +29,24 @@ export default class Constant extends BaseExpression {
         checkNumber('constant', 'x', 0, x);
 
         super({});
-        this.expr = x;
+        this._value = x;
         this.type = 'number';
         this.inlineMaker = () => `(${x.toFixed(20)})`;
     }
-    toString () {
-        return this.expr;
-    }
+
     get value () {
-        return this.eval();
+        return this._value;
     }
+
+    set value (value) {
+        this._value = value;
+    }
+
     eval () {
-        return this.expr;
+        return this.value;
+    }
+
+    toString () {
+        return `${this.value}`;
     }
 }

@@ -36,15 +36,23 @@ export default class Opacity extends BaseExpression {
         super({ input, alpha });
         this.inlineMaker = inline => `vec4((${inline.input}).rgb, ${inline.alpha})`;
     }
+
     get value () {
-        return this.eval();
+        const value = this.input.value;
+        const alpha = this.alpha.value;
+        value.a = alpha;
+
+        return value;
     }
-    eval (f) {
-        const input = this.input.eval(f);
-        const alpha = this.alpha.eval(f);
+
+    eval (feature) {
+        const input = this.input.eval(feature);
+        const alpha = this.alpha.eval(feature);
         input.a = alpha;
+
         return input;
     }
+
     _bindMetadata (meta) {
         super._bindMetadata(meta);
         checkType('opacity', 'input', 0, ['color', 'image'], this.input);

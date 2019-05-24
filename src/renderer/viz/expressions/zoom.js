@@ -31,11 +31,17 @@ export default class Zoom extends BaseExpression {
         this.type = 'number';
         super.inlineMaker = inline => inline.zoom;
     }
-    eval () {
-        return this.zoom.expr;
+
+    get value () {
+        return this.zoom.value;
     }
+
+    eval () {
+        return this.zoom.value;
+    }
+
     _preDraw (program, drawMetadata, gl) {
-        this.zoom.expr = drawMetadata.zoomLevel;
+        this.zoom.value = drawMetadata.zoomLevel;
         this.zoom._preDraw(program, drawMetadata, gl);
     }
 }

@@ -44,6 +44,14 @@ export default class clusterTimeDimension extends BaseExpression {
         return this._dimension.propertyName;
     }
 
+    get value () {
+        return {
+            name: this.propertyName,
+            range: this._range,
+            dimension: this._dimension
+        };
+    }
+
     eval (feature) {
         return feature[this.propertyName];
     }

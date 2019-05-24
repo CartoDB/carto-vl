@@ -42,12 +42,25 @@ import { checkType, implicitCast, checkMaxArguments } from '../utils';
  */
 
 export default class Rotate extends BaseExpression {
-    constructor (angle) {
+    constructor (input) {
         checkMaxArguments(arguments, 1, 'rotate');
 
-        angle = implicitCast(angle);
+        const angle = implicitCast(input);
         super({ angle });
         this.type = 'transformation';
+    }
+
+    get value () {
+        return this.angle.value;
+    }
+
+    eval (feature) {
+        return this.angle.eval(feature);
+    }
+
+    _bindMetadata (meta) {
+        super._bindMetadata(meta);
+        checkType('rotate', 'angle', 0, 'number', this.angle);
     }
 
     _applyToShaderSource (getGLSLforProperty) {
@@ -72,15 +85,5 @@ export default class Rotate extends BaseExpression {
 
             inline: `rotate${this._uid}`
         };
-    }
-
-    eval (feature) {
-        // TODO
-        return [0, 0];
-    }
-
-    _bindMetadata (meta) {
-        super._bindMetadata(meta);
-        checkType('rotate', 'angle', 0, 'number', this.angle);
     }
 }

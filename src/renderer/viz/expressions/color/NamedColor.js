@@ -46,10 +46,6 @@ export default class NamedColor extends BaseExpression {
     }
 
     get value () {
-        return this.eval();
-    }
-
-    eval () {
         return this.color;
     }
 

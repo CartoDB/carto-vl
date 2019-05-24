@@ -43,13 +43,16 @@ export default class Hex extends BaseExpression {
         this.hexadecimalColor = hexadecimalColor;
         this.inlineMaker = () => `vec4(${(this.color.r / 255).toFixed(4)}, ${(this.color.g / 255).toFixed(4)}, ${(this.color.b / 255).toFixed(4)}, ${(this.color.a).toFixed(4)})`;
     }
+
     toString () {
         return this.hexadecimalColor;
     }
+
     get value () {
-        return this.eval();
-    }
-    eval () {
         return this.color;
+    }
+
+    eval () {
+        return this.value;
     }
 }

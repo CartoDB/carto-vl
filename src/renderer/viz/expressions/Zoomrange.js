@@ -6,7 +6,7 @@ import { implicitCast, checkType, checkExpression } from './utils';
 /**
  * Define a list of interpolated zoom ranges based on an input breakpoint list. Useful in combination with ramp (see examples).
  *
- * @param {Number[]} zoomBreakpointList - list of zoom breakpoints with at least two elements
+ * @param {Number[]} _zoomBreakpointList - list of zoom breakpoints with at least two elements
  * @return {Number}
  *
  * @example <caption>Set the width to 1 at zoom levels < 7, set the width at 20 at zoom levels > 10, interpolate between 1 and 20 at zoom levels in the [7,10] range.</caption>
@@ -31,19 +31,20 @@ export default class Zoomrange extends BaseExpression {
 
         super({});
         checkExpression('zoomrange', 'zoomBreakpointList', 0, zoomBreakpointList);
-        this.zoomBreakpointList = zoomBreakpointList;
         this.type = 'number';
+        this._zoomBreakpointList = zoomBreakpointList;
         this.inlineMaker = inline => inline._impostor;
     }
 
     _bindMetadata (metadata) {
-        this.zoomBreakpointList._bindMetadata(metadata);
-        checkType('zoomrange', 'zoomBreakpointList', 0, 'number-list', this.zoomBreakpointList);
-        if (this.zoomBreakpointList.elems.length < 2) {
+        this._zoomBreakpointList._bindMetadata(metadata);
+
+        checkType('zoomrange', 'zoomBreakpointList', 0, 'number-list', this._zoomBreakpointList);
+        if (this._zoomBreakpointList.elems.length < 2) {
             throw new CartoValidationError('zoomrange() function must receive a list with at least two elements.', CartoValidationErrorTypes.INCORRECT_VALUE);
         }
 
-        const breakpointListCopy = [...this.zoomBreakpointList.elems];
+        const breakpointListCopy = [...this._zoomBreakpointList.elems];
 
         this._impostor = _genImpostor(breakpointListCopy, 0, breakpointListCopy.length - 1);
         this.childrenNames.push('_impostor');
@@ -52,6 +53,18 @@ export default class Zoomrange extends BaseExpression {
 
     eval (feature) {
         return this._impostor.eval(feature);
+    }
+
+    /**
+     * Get the zoomrange value
+     *
+     * @api
+     * @memberof expressions.Zoomrange
+     * @name value
+     * @return {Array} - Zoom range breakpoint list
+     */
+    get value () {
+        return this._zoomBreakpointList.elems.map(elem => elem.value);
     }
 }
 
