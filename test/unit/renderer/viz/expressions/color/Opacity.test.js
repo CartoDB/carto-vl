@@ -34,7 +34,7 @@ describe('src/renderer/viz/expressions/opacity', () => {
             const expected = {
                 name: 'color',
                 data: [{
-                    key: 'rgba(0, 0, 255, 0.5)',
+                    key: 'color',
                     value: {
                         r: 0,
                         g: 0,
@@ -52,7 +52,7 @@ describe('src/renderer/viz/expressions/opacity', () => {
             const expected = {
                 name: 'color',
                 data: [{
-                    key: 'rgba(255, 1, 255, 0.5)',
+                    key: 'color',
                     value: {
                         r: 255,
                         g: 1,
@@ -70,7 +70,7 @@ describe('src/renderer/viz/expressions/opacity', () => {
             const expected = {
                 name: 'color',
                 data: [{
-                    key: 'rgba(0, 0.9999316244751483, 0, 0.5)',
+                    key: 'color',
                     value: {
                         r: 0,
                         g: 0.9999316244751483,
@@ -88,7 +88,7 @@ describe('src/renderer/viz/expressions/opacity', () => {
             const expected = {
                 name: 'color',
                 data: [{
-                    key: 'rgba(0, 10.20000000000001, 255, 0.5)',
+                    key: 'color',
                     value: {
                         r: 0,
                         g: 10.20000000000001,
@@ -106,7 +106,7 @@ describe('src/renderer/viz/expressions/opacity', () => {
             const expected = {
                 name: 'color',
                 data: [{
-                    key: 'rgba(255, 255, 255, 0.5)',
+                    key: 'color',
                     value: {
                         r: 255,
                         g: 255,
@@ -124,7 +124,7 @@ describe('src/renderer/viz/expressions/opacity', () => {
             const expected = {
                 name: 'color',
                 data: [{
-                    key: 'rgba(250, 186, 218, 0.5)',
+                    key: 'color',
                     value: {
                         r: 250,
                         g: 186,
@@ -157,7 +157,7 @@ describe('src/renderer/viz/expressions/opacity', () => {
             const expected = {
                 type: 'category',
                 data: [{
-                    key: 'rgba(0, 0, 255, 0.5)',
+                    key: 'A',
                     value: {
                         r: 0,
                         g: 0,
@@ -165,7 +165,7 @@ describe('src/renderer/viz/expressions/opacity', () => {
                         a: 0.5
                     }
                 }, {
-                    key: 'rgba(255, 0, 0, 0.5)',
+                    key: 'B',
                     value: {
                         r: 255,
                         g: 0,
