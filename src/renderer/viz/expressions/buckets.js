@@ -150,6 +150,13 @@ export default class Buckets extends BaseExpression {
             }
         });
 
+        if (this.input.type === 'category') {
+            const property = metadata.properties[this.input.propertyName];
+            this._numDatasetCategories = property
+                ? property.categories.length
+                : this.list.elems.length - 1;
+        }
+
         this.numCategories = this.list.elems.length + 1;
         this.numCategoriesWithoutOthers = this.input.type === 'category' ? this.numCategories - 1 : this.numCategories;
     }
@@ -191,7 +198,7 @@ export default class Buckets extends BaseExpression {
         };
         const data = this.input.type === 'number'
             ? _getLegendDataNumeric(list)
-            : _getLegendDataCategory(list, config);
+            : _getLegendDataCategory(list, this._numDatasetCategories, config);
 
         return { data, name };
     }
@@ -211,8 +218,8 @@ function _getLegendDataNumeric (list) {
     return data;
 }
 
-function _getLegendDataCategory (list, config) {
-    const divisor = list.length - 1;
+function _getLegendDataCategory (list, numDatasetCategories, config) {
+    const divisor = list.length - 1 || 1;
     const data = list.map((category, index) => {
         const key = category;
         const value = index / divisor;
@@ -220,10 +227,12 @@ function _getLegendDataCategory (list, config) {
         return { key, value };
     });
 
-    data.push({
-        key: config.othersLabel,
-        value: OTHERS_INDEX
-    });
+    if (numDatasetCategories > list.length) {
+        data.push({
+            key: config.othersLabel,
+            value: OTHERS_INDEX
+        });
+    }
 
     return data;
 }

@@ -63,7 +63,7 @@ export default class Opacity extends BaseExpression {
                 const a = alpha;
 
                 return {
-                    key: `rgba(${r}, ${g}, ${b}, ${a})`,
+                    key,
                     value: { r, g, b, a }
                 };
             });
