@@ -53,6 +53,29 @@ export default class Opacity extends BaseExpression {
         return input;
     }
 
+    getLegendData (options) {
+        const legend = this.input.getLegendData(options);
+        const alpha = this.alpha.value;
+        const name = legend.name;
+
+        if (this.input.type === 'color') {
+            const data = legend.data.map(({ key, value }) => {
+                const { r, g, b } = value;
+                const a = alpha;
+
+                return {
+                    key: `rgba(${r}, ${g}, ${b}, ${a})`,
+                    value: { r, g, b, a }
+                };
+            });
+
+            return { name, data };
+        } else {
+            const data = legend.data;
+            return { name, data, alpha };
+        }
+    }
+
     _bindMetadata (meta) {
         super._bindMetadata(meta);
         checkType('opacity', 'input', 0, ['color', 'image'], this.input);

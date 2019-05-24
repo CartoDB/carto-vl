@@ -85,13 +85,17 @@ function genRGB (name, alpha) {
             };
         }
 
-        eval (feature) {
-            return {
-                r: this.r.eval(feature),
-                g: this.g.eval(feature),
-                b: this.b.eval(feature),
-                a: alpha ? this.a.eval(feature) : 1
-            };
+        eval () {
+            return this.value;
+        }
+
+        getLegendData () {
+            const name = 'color';
+            const value = this.value;
+            const key = `rgba(${value.r}, ${value.g}, ${value.b}, ${value.a})`;
+            const data = [{ key, value }];
+
+            return { name, data };
         }
 
         _bindMetadata (meta) {

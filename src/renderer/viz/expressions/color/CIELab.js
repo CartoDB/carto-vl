@@ -1,6 +1,7 @@
 import BaseExpression from '../base';
 import { implicitCast, checkType, checkExpression, checkMaxArguments } from '../utils';
 import CIELabGLSL from './CIELab.glsl';
+import { cielabToSRGB } from '../../colorspaces';
 
 /**
  * Evaluates to a CIELab color.
@@ -47,19 +48,24 @@ export default class CIELab extends BaseExpression {
     }
 
     get value () {
-        return {
-            l: this.l.value,
-            a: this.a.value,
-            b: this.b.value
-        };
+        return this.eval(null);
     }
 
     eval (feature) {
-        return {
+        return cielabToSRGB({
             l: this.l.eval(feature),
             a: this.a.eval(feature),
             b: this.b.eval(feature)
-        };
+        });
+    }
+
+    getLegendData () {
+        const name = 'color';
+        const value = this.value;
+        const key = `rgba(${value.r}, ${value.g}, ${value.b}, ${value.a})`;
+        const data = [{ key, value }];
+
+        return { name, data };
     }
 
     _bindMetadata (meta) {
