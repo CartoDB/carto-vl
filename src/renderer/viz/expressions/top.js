@@ -205,7 +205,7 @@ export default class Top extends BaseExpression {
         const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
             b.frequency - a.frequency
         );
-        const buckets = this.numBuckets;
+        const numBuckets = this.numBuckets;
         const data = [];
         const name = this.toString();
         const divisor = this.numCategoriesWithoutOthers - 1 || 1;
@@ -214,14 +214,14 @@ export default class Top extends BaseExpression {
             : this.othersLabel.value;
 
         orderedCategoryNames.forEach((category, i) => {
-            if (i < buckets) {
+            if (i < numBuckets) {
                 const key = category.name;
                 const value = i / divisor;
                 data.push({ key, value });
             }
         });
 
-        if (othersLabel) {
+        if (orderedCategoryNames > numBuckets && othersLabel) {
             data.push({
                 key: othersLabel,
                 value: OTHERS_INDEX
