@@ -65,6 +65,16 @@ export default class Image extends Base {
         return this.value;
     }
 
+    getLegendData (options) {
+        return {
+            name: 'image',
+            data: [{
+                key: 'url',
+                value: this.url
+            }]
+        };
+    }
+
     _free (gl) {
         if (this.texture) {
             gl.deleteTexture(this.texture);

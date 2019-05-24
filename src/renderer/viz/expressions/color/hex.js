@@ -55,4 +55,13 @@ export default class Hex extends BaseExpression {
     eval () {
         return this.value;
     }
+
+    getLegendData () {
+        const name = 'color';
+        const value = this.value;
+        const key = `rgba(${value.r}, ${value.g}, ${value.b}, ${value.a})`;
+        const data = [{ key, value }];
+
+        return { name, data };
+    }
 }
