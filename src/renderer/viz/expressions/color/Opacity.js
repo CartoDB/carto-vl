@@ -56,7 +56,6 @@ export default class Opacity extends BaseExpression {
     getLegendData (options) {
         const legend = this.input.getLegendData(options);
         const alpha = this.alpha.value;
-        const name = legend.name;
 
         if (this.input.type === 'color') {
             const data = legend.data.map(({ key, value }) => {
@@ -69,10 +68,10 @@ export default class Opacity extends BaseExpression {
                 };
             });
 
-            return { name, data };
+            return { ...legend, data };
         } else {
             const data = legend.data;
-            return { name, data, alpha };
+            return { ...legend, data, alpha };
         }
     }
 

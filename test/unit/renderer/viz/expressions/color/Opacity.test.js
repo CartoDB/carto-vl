@@ -1,5 +1,6 @@
 import { validateMaxArgumentsError, validateTypeErrors, validateDynamicType } from '../utils';
-import { opacity, rgba, mul, variable, rgb, hsl, hsv, cielab, namedColor, hex } from '../../../../../../src/renderer/viz/expressions';
+import { opacity, rgba, mul, variable, rgb, hsl, hsv, cielab, namedColor, hex, property, ramp } from '../../../../../../src/renderer/viz/expressions';
+import Metadata from '../../../../../../src/renderer/Metadata';
 
 describe('src/renderer/viz/expressions/opacity', () => {
     describe('error control', () => {
@@ -128,6 +129,47 @@ describe('src/renderer/viz/expressions/opacity', () => {
                         r: 250,
                         g: 186,
                         b: 218,
+                        a: 0.5
+                    }
+                }]
+            };
+
+            expect(actual).toEqual(expected);
+        });
+
+        it('should override the alpha channel when using a color ramp', () => {
+            const METADATA = new Metadata({
+                properties: {
+                    grade: {
+                        type: 'category',
+                        categories: [
+                            { name: 'A' },
+                            { name: 'B' }
+                        ]
+                    }
+                }
+            });
+
+            const color = opacity(ramp(property('grade'), [namedColor('blue'), namedColor('red')]), 0.5);
+            color._bindMetadata(METADATA);
+            const actual = color.getLegendData();
+
+            const expected = {
+                type: 'category',
+                data: [{
+                    key: 'rgba(0, 0, 255, 0.5)',
+                    value: {
+                        r: 0,
+                        g: 0,
+                        b: 255,
+                        a: 0.5
+                    }
+                }, {
+                    key: 'rgba(255, 0, 0, 0.5)',
+                    value: {
+                        r: 255,
+                        g: 0,
+                        b: 0,
                         a: 0.5
                     }
                 }]
