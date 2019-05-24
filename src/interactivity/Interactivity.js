@@ -134,8 +134,10 @@ export default class Interactivity {
         return Promise.all(allLayersReadyPromises)
             .then(() => {
                 postCheckLayerList(layerList);
+                this._map = layerList[0].map;
+
                 this._subscribeToLayerEvents(layerList);
-                this._subscribeToMapEvents(layerList[0].map);
+                this._subscribeToMapEvents(this._map);
 
                 if (this._isAutoChangePointerEnabled) {
                     this._setInteractiveCursor();
@@ -144,15 +146,13 @@ export default class Interactivity {
     }
 
     _setInteractiveCursor () {
-        const map = this._layerList[0].map; // All layers belong to the same map
-        if (!map.__carto_interactivities) {
-            map.__carto_interactivities = new Set();
+        if (!this._map.__carto_interactivities) {
+            this._map.__carto_interactivities = new Set();
         }
-        this._onFeatureHoverBound = this._onFeatureHover.bind(this, map);
-        this.on('featureHover', this._onFeatureHoverBound);
+        this.on('featureHover', event => this._onFeatureHover(event, this._map));
     }
 
-    _onFeatureHover (map, event) {
+    _onFeatureHover (event, map) {
         if (event.features.length) {
             map.__carto_interactivities.add(this);
         } else {
@@ -205,11 +205,11 @@ export default class Interactivity {
         this._removeLayerFromInteractivity(layer);
 
         if (this._isAutoChangePointerEnabled) {
-            this._onFeatureHoverBound({ features: [] });
+            this._onFeatureHover({ features: [] }, this._map);
         }
 
         if (!this._layerList.length) {
-            this._unsubscribeToMapEvents(this._layerList[0].map);
+            this._unsubscribeToMapEvents(this._map);
         }
     }
 
