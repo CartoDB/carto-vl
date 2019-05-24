@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Internal refactor regarding data sources (GeoJSON and Windshaft)
 - Unify `.value`, `.eval()` and `.getLegendData()` methods to get expression values
 
+### Fixed
+- Do not always add CARTO_VL_OTHERS when getting legend data from the buckets expression
+
 ## [1.2.5] - 2019-04-25
 
 ### Changed
