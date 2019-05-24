@@ -52,6 +52,15 @@ export default class NamedColor extends BaseExpression {
     toString () {
         return this.expressionName;
     }
+
+    getLegendData () {
+        const name = 'color';
+        const value = this.color;
+        const key = `rgba(${value.r}, ${value.g}, ${value.b}, ${value.a})`;
+        const data = [{ key, value }];
+
+        return { name, data };
+    }
 }
 
 const nameToRGBACache = {};
