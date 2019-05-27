@@ -1177,10 +1177,6 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         }, {
                             key: 'C',
                             value: BUILDING.url
-                        },
-                        {
-                            key: OTHERS_LABEL,
-                            value: r.others.value
                         }
                     ];
 
@@ -1203,8 +1199,26 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         }, {
                             key: 'C',
                             value: yellow.color
-                        },
+                        }
+                    ];
+
+                    expect(actual).toEqual(expected);
+                });
+
+                it('should return the legend data with other value', () => {
+                    const r = ramp(buckets($grade, ['A', 'B']), [red, blue]);
+
+                    r._bindMetadata(METADATA);
+
+                    actual = r.getLegendData().data;
+                    expected = [
                         {
+                            key: 'A',
+                            value: red.color
+                        }, {
+                            key: 'B',
+                            value: blue.color
+                        }, {
                             key: OTHERS_LABEL,
                             value: r.others.value
                         }

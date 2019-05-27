@@ -83,7 +83,7 @@ function genHSV (name, alpha) {
         }
 
         get value () {
-            return this.eval();
+            return this.eval(null);
         }
 
         eval (feature) {
@@ -117,6 +117,15 @@ function genHSV (name, alpha) {
             };
 
             return hsvToRgb(h, s, v);
+        }
+
+        getLegendData () {
+            const name = 'color';
+            const value = this.value;
+            const key = 'color';
+            const data = [{ key, value }];
+
+            return { name, data };
         }
 
         _bindMetadata (metadata) {
