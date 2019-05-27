@@ -46,6 +46,7 @@
 
     const nav = new mapboxgl.NavigationControl();
     map.addControl(nav, 'top-left');
+    map.addControl(new mapboxgl.FullscreenControl(), 'top-left');
 
     // Log some basic map events
     const events = ['mousedown', 'click', 'mousemove', 'mouseup', 'dragstart', 'dragend', 'movestart', 'moveend'];
