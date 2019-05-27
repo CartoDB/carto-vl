@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## UNRELEASED
 
+## [1.2.6] 2019-05-27
+
 ### Changed
 
 - Add fullscreen control to all public examples
