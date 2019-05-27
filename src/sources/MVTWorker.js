@@ -82,7 +82,7 @@ export class MVTWorker {
 
         const { geometries, properties, propertiesArrayBuffer, numFeatures } = this._decodeMVTLayer(mvtLayer, metadata, MVT_EXTENT);
         const rs = rsys.getRsysFromTile(x, y, z);
-        const dataframe = this._generateDataFrame(rs, geometries, properties, propertiesArrayBuffer, numFeatures, metadata.geomType, metadata);
+        const dataframe = this._generateDataFrame(rs, geometries, properties, propertiesArrayBuffer, numFeatures, metadata.geomType);
 
         return dataframe;
     }
@@ -242,7 +242,7 @@ export class MVTWorker {
         }
     }
 
-    _generateDataFrame (rs, geometry, properties, propertiesArrayBuffer, size, type, metadata) {
+    _generateDataFrame (rs, geometry, properties, propertiesArrayBuffer, size, type) {
         return new DummyDataframe({
             active: false,
             center: rs.center,
@@ -251,8 +251,7 @@ export class MVTWorker {
             propertiesArrayBuffer: propertiesArrayBuffer,
             scale: rs.scale,
             size: size,
-            type: type,
-            metadata
+            type: type
         });
     }
 }
