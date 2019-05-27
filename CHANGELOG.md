@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - Deregister removed layers in interactivity
 - Remove map listeners when there are no layers remaining in interactivity
+- Do not always add CARTO_VL_OTHERS when getting legend data from the buckets expression
 
 ## [1.2.5] - 2019-04-25
 
