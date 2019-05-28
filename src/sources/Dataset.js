@@ -51,7 +51,7 @@ export default class Dataset extends BaseWindshaft {
         return this._tableName;
     }
 
-    _clone () {
+    async _clone () {
         return new Dataset(this._tableName, this._auth, this._config);
     }
 

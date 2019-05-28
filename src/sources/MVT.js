@@ -73,7 +73,7 @@ export default class MVT extends Base {
         return this._workerInstance;
     }
 
-    _clone () {
+    async _clone () {
         return new MVT(this._templateURL, JSON.parse(JSON.stringify(this._metadata)), this._options);
     }
 
