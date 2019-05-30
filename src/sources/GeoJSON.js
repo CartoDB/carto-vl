@@ -1,5 +1,5 @@
 import * as rsys from '../client/rsys';
-import Dataframe from '../renderer/Dataframe';
+import Dataframe from '../renderer/dataframe/Dataframe';
 import { DEFAULT_ID_PROPERTY } from '../renderer/Metadata';
 
 import CartoValidationError, { CartoValidationErrorTypes } from '../errors/carto-validation-error';

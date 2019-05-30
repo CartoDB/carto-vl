@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `removed` event for Layer instances
 
 ### Changed
-- Internal refactor regarding data sources (GeoJSON and Windshaft)
+- Internal refactoring regarding data sources (GeoJSON and Windshaft) and Dataframe
 - Unify `.value`, `.eval()` and `.getLegendData()` methods to get expression values
 
 ### Fixed
