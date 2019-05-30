@@ -1,7 +1,8 @@
 import BaseExpression from './base';
 import { implicitCast, getOrdinalFromIndex, checkMaxArguments, checkType, checkFeatureIndependent } from './utils';
-import { OTHERS_INDEX, OTHERS_LABEL, OTHERS_GLSL_VALUE } from './constants';
+import { OTHERS_INDEX, OTHERS_LABEL } from './constants';
 import CartoValidationError, { CartoValidationErrorTypes } from '../../../errors/carto-validation-error';
+import BucketsGLSLHelper from './BucketsGLSLHelper';
 
 /**
  * Given a property create "sub-groups" based on the given breakpoints.
@@ -92,6 +93,8 @@ export default class Buckets extends BaseExpression {
         this.numCategories = null;
         this.numCategoriesWithoutOthers = null;
         this.type = 'category';
+
+        this._GLSLhelper = new BucketsGLSLHelper(this);
     }
 
     get value () {
@@ -162,32 +165,7 @@ export default class Buckets extends BaseExpression {
     }
 
     _applyToShaderSource (getGLSLforProperty) {
-        const childSourcesArray = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));
-        let childSources = {};
-        childSourcesArray.map((source, index) => {
-            childSources[this.childrenNames[index]] = source;
-        });
-
-        const funcName = `buckets${this._uid}`;
-        const cmp = this.input.type === 'category' ? '==' : '<';
-
-        // When there is "OTHERS" we don't need to take it into account
-        const divisor = this.numCategoriesWithoutOthers - 1 || 1;
-
-        const elif = (_, index) =>
-            `${index > 0 ? 'else' : ''} if (x${cmp}(${childSources.list.inline[index]})){
-                return ${index}./${divisor.toFixed(20)};
-            }`;
-        const funcBody = this.list.elems.map(elif).join('');
-        const preface = `float ${funcName}(float x){
-            ${funcBody}
-            return ${this.input.type === 'category' ? OTHERS_GLSL_VALUE : (this.numCategories - 1).toFixed(20)};
-        }`;
-
-        return {
-            preface: this._prefaceCode(childSources.input.preface + childSources.list.preface + preface),
-            inline: `${funcName}(${childSources.input.inline})`
-        };
+        return this._GLSLhelper.applyToShaderSource(getGLSLforProperty);
     }
 
     getLegendData (options) {
