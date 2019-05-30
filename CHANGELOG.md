@@ -7,10 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## UNRELEASED
 
+### Fixed
+- Fix memory exhausted error using Buckets with a long list
+
 ## [1.2.6] 2019-05-27
 
 ### Changed
-
 - Add fullscreen control to all public examples
 
 ## [1.2.5] - 2019-04-25
