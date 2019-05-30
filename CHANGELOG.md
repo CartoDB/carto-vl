@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 - Internal refactor regarding data sources (GeoJSON and Windshaft)
 - Unify `.value`, `.eval()` and `.getLegendData()` methods to get expression values
+- Upgrade to use Mapbox GL version 1.0.0
 
 ### Fixed
 - Deregister removed layers in interactivity

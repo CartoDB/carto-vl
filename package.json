@@ -72,7 +72,7 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^3.0.5",
     "lodash.template": "^4.4.0",
-    "mapbox-gl": "0.52.0",
+    "mapbox-gl": "1.0.0",
     "mocha": "^5.0.0",
     "puppeteer": "^1.1.0",
     "selenium-webdriver": "3.6.0",
@@ -133,7 +133,7 @@
     "not edge <17"
   ],
   "previousMapboxGLVersions": [
-    "v0.50.0",
-    "v0.51.0"
+    "v0.53.1",
+    "v0.54.0"
   ]
 }
