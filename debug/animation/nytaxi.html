@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <script src="../../dist/carto-vl.js"></script>
-  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
-  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.css" rel="stylesheet" />
   <style>
     body {
       margin: 0;
@@ -63,13 +63,13 @@
       @maxhour: globalMax(@hour)
       @minhour: globalMin(@hour)
     `);
-    
+
     const layer = new carto.Layer('layer', source, viz);
     layer.addTo(map);
-    
+
     let info = true;
     const animation = ['animation'].includes(viz.filter.expressionName) ? viz.filter : null;
-    
+
     layer.on('updated', () => {
       if (info) {
         info = !animation;

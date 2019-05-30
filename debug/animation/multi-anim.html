@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <script src="../../dist/carto-vl.js"></script>
-    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
-    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.css" rel="stylesheet" />
     <style>
         body {
             margin: 0;
@@ -51,7 +51,7 @@
             width: 12
         `));
         racetrackLayer.addTo(map, 'watername_ocean');
-        
+
         /* LAYER 2 - gpstrack */
         const source = new carto.source.Dataset('laptimer_0009_0033_20171119_164902');
         const viz = new carto.Viz(`
@@ -72,7 +72,7 @@
             select row_number() over() cartodb_id, the_geom, ST_Transform(the_geom, 3857) the_geom_webmercator
             from fishnet
         `);
-        
+
         const fishnet = new carto.Viz(`
             strokeWidth: 0.5
             strokeColor: opacity(grey, 0.4)
@@ -81,7 +81,7 @@
 
         const fishnetLayer = new carto.Layer('fishnet', fishnetSource, fishnet);
         fishnetLayer.addTo(map, 'watername_ocean');
-        
+
         /* LAYER 4 - accelerationsBg */
         const accelerationsSource = new carto.source.SQL(`
             WITH geoms AS (
@@ -113,7 +113,7 @@
         const accelerationsBgLayer = new carto.Layer('accelerationsBg', accelerationsSource, accelerationsBg);
         accelerationsBgLayer.addTo(map, 'watername_ocean');
 
-        
+
         /* LAYER 5 - accelerations */
         const accelerations = new carto.Viz(`
             width: 4
