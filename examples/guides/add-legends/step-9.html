@@ -44,6 +44,7 @@
       center: [0, 43],
       zoom: 1
     });
+    map.addControl(new mapboxgl.FullscreenControl(), 'top-left');
 
     const nav = new mapboxgl.NavigationControl({
       showCompass: false
