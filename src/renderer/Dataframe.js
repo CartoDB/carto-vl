@@ -25,7 +25,7 @@ export default class Dataframe extends DummyDataframe {
         const vertices = this.decodedGeom.vertices;
         const breakpoints = this.decodedGeom.breakpoints;
 
-        this.addProperties(this.properties);
+        this.addProperties();
 
         const width = this.renderer.RTT_WIDTH;
         const height = Math.ceil(this.numFeatures / width);
@@ -568,7 +568,7 @@ export default class Dataframe extends DummyDataframe {
 
     // Add new properties to the dataframe or overwrite previously stored ones.
     // `properties` is of the form: {propertyName: Float32Array}
-    addProperties (properties) {
+    addProperties () {
         for (let i = 0; i < this.metadata.propertyKeys.length; i++) {
             const propertyName = this.metadata.propertyKeys[i];
             this._addProperty(propertyName);

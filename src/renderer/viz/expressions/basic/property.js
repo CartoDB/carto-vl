@@ -54,7 +54,7 @@ export default class Property extends BaseExpression {
     }
 
     get value () {
-        return this.eval();
+        return this.propertyName;
     }
 
     get propertyName () {

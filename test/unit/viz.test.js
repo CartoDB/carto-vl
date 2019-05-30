@@ -27,7 +27,7 @@ describe('api/viz', () => {
                 expect(actual.strokeColor.eval()).toEqual(DEFAULT_STROKE_COLOR_EXPRESSION.eval());
                 expect(actual.strokeWidth.eval()).toEqual(DEFAULT_STROKE_WIDTH_EXPRESSION.eval());
                 expect(actual.filter.eval()).toEqual(DEFAULT_FILTER_EXPRESSION.eval());
-                expect(actual.order.expr).toEqual(DEFAULT_ORDER_EXPRESSION.expr);
+                expect(actual.order.value).toEqual(DEFAULT_ORDER_EXPRESSION.value);
                 expect(actual.resolution.eval()).toEqual(DEFAULT_RESOLUTION.eval());
             });
 
@@ -40,7 +40,7 @@ describe('api/viz', () => {
                 expect(actual.strokeColor.eval()).toEqual(DEFAULT_STROKE_COLOR_EXPRESSION.eval());
                 expect(actual.strokeWidth.eval()).toEqual(DEFAULT_STROKE_WIDTH_EXPRESSION.eval());
                 expect(actual.filter.eval()).toEqual(DEFAULT_FILTER_EXPRESSION.eval());
-                expect(actual.order.expr).toEqual(DEFAULT_ORDER_EXPRESSION.expr);
+                expect(actual.order.value).toEqual(DEFAULT_ORDER_EXPRESSION.value);
                 expect(actual.resolution.eval()).toEqual(DEFAULT_RESOLUTION.eval());
             });
 
@@ -62,7 +62,7 @@ describe('api/viz', () => {
                 expect(actual.strokeColor.eval()).toEqual(s.rgba(0, 0, 255, 1).eval());
                 expect(actual.strokeWidth.eval()).toEqual(s.number(15).eval());
                 expect(actual.filter.eval()).toEqual(s.number(0.5).eval());
-                expect(actual.order.expr).toEqual(s.asc(s.width()).expr);
+                expect(actual.order.value).toEqual(s.asc(s.width()).value);
                 expect(actual.resolution.eval()).toEqual(s.number(2).eval());
             });
 
@@ -186,7 +186,7 @@ describe('api/viz', () => {
                 expect(actual.strokeColor.eval()).toEqual(s.rgba(0, 0, 255, 1).eval());
                 expect(actual.strokeWidth.eval()).toEqual(s.number(15).eval());
                 expect(actual.filter.eval()).toEqual(s.number(0.5).eval());
-                expect(actual.order.expr).toEqual(s.asc(s.width()).expr);
+                expect(actual.order.value).toEqual(s.asc(s.width()).value);
                 expect(actual.resolution.eval()).toEqual(s.number(1).eval());
             });
         });

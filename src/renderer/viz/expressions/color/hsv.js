@@ -81,15 +81,17 @@ function genHSV (name, alpha) {
             super(children);
             this.type = 'color';
         }
+
         get value () {
-            return this.eval();
+            return this.eval(null);
         }
-        eval (f) {
+
+        eval (feature) {
             const normalize = (value, hue = false) => {
                 if (value.type === 'category') {
-                    return value.eval(f) / (hue ? value.numCategories + 1 : value.numCategories);
+                    return value.eval(feature) / (hue ? value.numCategories + 1 : value.numCategories);
                 }
-                return value.eval(f);
+                return value.eval(feature);
             };
             const h = clamp(normalize(this.h, true), 0, 1);
             const s = clamp(normalize(this.s), 0, 1);
@@ -100,7 +102,7 @@ function genHSV (name, alpha) {
                     r: Math.abs(h * 6 - 3) - 1,
                     g: 2 - Math.abs(h * 6 - 2),
                     b: 2 - Math.abs(h * 6 - 4),
-                    a: alpha ? clamp(this.a.eval(f), 0, 1) : 1
+                    a: alpha ? clamp(this.a.eval(feature), 0, 1) : 1
                 };
 
                 c.r = clamp(c.r, 0, 1);
@@ -116,6 +118,16 @@ function genHSV (name, alpha) {
 
             return hsvToRgb(h, s, v);
         }
+
+        getLegendData () {
+            const name = 'color';
+            const value = this.value;
+            const key = 'color';
+            const data = [{ key, value }];
+
+            return { name, data };
+        }
+
         _bindMetadata (metadata) {
             super._bindMetadata(metadata);
             hsvCheckType('h', 0, this.h);

@@ -35,7 +35,7 @@ export default class GlobalCount extends GlobalAggregation {
     }
 
     _bindMetadata (metadata) {
-        this._value.expr = metadata.featureCount;
+        this._value.value = metadata.featureCount;
     }
 
     _getMinimumNeededSchema () {

@@ -189,7 +189,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                             const r = ramp(buckets('D', ['A', 'B', 'C']), [red, blue, yellow], purple);
 
                             r._bindMetadata(METADATA);
-                            actual = r.eval();
+                            actual = r.value;
                             expected = purple.value;
 
                             expect(actual).toEqual(expected);
@@ -201,7 +201,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                             const r = ramp(buckets('E', ['A', 'B', 'C', 'D', 'E']), [red, blue, yellow, purple, green, orange], purple);
 
                             r._bindMetadata(METADATA);
-                            actual = r.eval();
+                            actual = r.value;
                             expected = purple.value;
 
                             expect(actual).not.toEqual(expected);
@@ -220,21 +220,21 @@ describe('src/renderer/viz/expressions/ramp', () => {
                             r = ramp(buckets('A', categories), colors);
                             r._bindMetadata(METADATA);
 
-                            actual = r.eval();
+                            actual = r.value;
                             expected = red.value;
                             expect(actual).toEqual(expected);
 
                             r = ramp(buckets('B', categories), colors);
                             r._bindMetadata(METADATA);
 
-                            actual = r.eval();
+                            actual = r.value;
                             expected = green.value;
                             expect(actual).toEqual(expected);
 
                             r = ramp(buckets('C', categories), colors);
                             r._bindMetadata(METADATA);
 
-                            actual = r.eval();
+                            actual = r.value;
                             expected = yellow.value;
                             expect(actual).toEqual(expected);
                         });
@@ -243,7 +243,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                             const r = ramp(buckets('D', ['A', 'B', 'C']), [red, blue, purple]);
                             r._bindMetadata(METADATA);
 
-                            actual = r.eval();
+                            actual = r.value;
                             expected = DEFAULT_COLOR.value;
 
                             expect(actual).toEqual(expected);
@@ -261,7 +261,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                                 r._bindMetadata(METADATA);
 
-                                actual = r.eval();
+                                actual = r.value;
                                 expected = colors[index].value;
 
                                 expect(actual).toEqual(expected);
@@ -276,7 +276,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                             const r = ramp(buckets('E', ['A', 'B', 'C', 'D']), [red, blue]);
 
                             r._bindMetadata(METADATA);
-                            actual = r.eval();
+                            actual = r.value;
                             expected = DEFAULT_COLOR.value;
 
                             expect(actual).toEqual(expected);
@@ -320,7 +320,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         r = ramp(buckets(1, RANGES), COLORS);
 
                         r._bindMetadata(METADATA);
-                        actual = r.eval();
+                        actual = r.value;
                         expected = red.value;
 
                         expect(actual).toEqual(expected);
@@ -328,7 +328,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         r = ramp(buckets(31, RANGES), COLORS);
 
                         r._bindMetadata(METADATA);
-                        actual = r.eval();
+                        actual = r.value;
                         expected = orange.value;
 
                         expect(actual).toEqual(expected);
@@ -347,7 +347,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         r = ramp(buckets(1, RANGES), COLORS);
 
                         r._bindMetadata(METADATA);
-                        actual = r.eval();
+                        actual = r.value;
                         expected = COLORS[0].value;
 
                         expect(actual).toEqual(expected);
@@ -355,7 +355,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         r = ramp(buckets(11, RANGES), COLORS);
 
                         r._bindMetadata(METADATA);
-                        actual = r.eval();
+                        actual = r.value;
                         expected = COLORS[1].value;
 
                         expect(actual).toEqual(expected);
@@ -363,7 +363,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         r = ramp(buckets(21, RANGES), COLORS);
 
                         r._bindMetadata(METADATA);
-                        actual = r.eval();
+                        actual = r.value;
                         expected = COLORS[2].value;
 
                         expect(actual).toEqual(expected);
@@ -373,7 +373,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         r = ramp(buckets(31, RANGES), COLORS);
 
                         r._bindMetadata(METADATA);
-                        actual = r.eval();
+                        actual = r.value;
                         expected = purple.value;
                     });
                 });
@@ -390,7 +390,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         r = ramp(buckets(1, RANGES), COLORS);
 
                         r._bindMetadata(METADATA);
-                        actual = r.eval();
+                        actual = r.value;
                         expected = COLORS[0].value;
 
                         expect(actual).toEqual(expected);
@@ -398,7 +398,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         r = ramp(buckets(11, RANGES), COLORS);
 
                         r._bindMetadata(METADATA);
-                        actual = r.eval();
+                        actual = r.value;
                         expected = COLORS[1].value;
 
                         expect(actual).not.toEqual(expected);
@@ -406,7 +406,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         r = ramp(buckets(21, RANGES), COLORS);
 
                         r._bindMetadata(METADATA);
-                        actual = r.eval();
+                        actual = r.value;
                         expected = COLORS[2].value;
 
                         expect(actual).not.toEqual(expected);
@@ -416,7 +416,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         r = ramp(buckets(51, RANGES), COLORS);
 
                         r._bindMetadata(METADATA);
-                        actual = r.eval();
+                        actual = r.value;
                         expected = yellow.value;
 
                         expect(actual).toEqual(expected);
@@ -469,7 +469,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         const r = ramp(buckets('Madrid', BREAKPOINTS), palettes.PRISM);
 
                         r._bindMetadata(METADATA);
-                        actual = r.eval();
+                        actual = r.value;
                         expected = hexToRgb(RAMP_COLORS[5]);
 
                         expect(actual).toEqual(expected);
@@ -480,8 +480,8 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         const r = ramp(buckets('Madrid', BREAKPOINTS), palettes.PRISM, red);
 
                         r._bindMetadata(METADATA);
-                        actual = r.eval();
-                        expected = red.eval();
+                        actual = r.value;
+                        expected = red.value;
 
                         expect(actual).toEqual(expected);
                     });
@@ -495,7 +495,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         const r = ramp(buckets('Barcelona', BREAKPOINTS), palettes.PRISM);
 
                         r._bindMetadata(METADATA);
-                        actual = r.eval();
+                        actual = r.value;
                         expected = hexToRgb(RAMP_COLORS[3]);
 
                         expect(actual).toEqual(expected);
@@ -505,7 +505,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         const r = ramp(buckets('Zaragoza', BREAKPOINTS), palettes.PRISM);
 
                         r._bindMetadata(METADATA);
-                        actual = r.eval();
+                        actual = r.value;
                         expected = hexToRgb(RAMP_COLORS[6]);
 
                         expect(actual).toEqual(expected);
@@ -534,7 +534,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                             const r = ramp(buckets(category - 1, BREAKPOINTS), palettes.BURG);
 
                             r._bindMetadata(METADATA);
-                            actual = r.eval();
+                            actual = r.value;
                             expected = hexToRgb(RAMP_COLORS[index]);
 
                             expect(actual).toEqual(expected);
@@ -551,7 +551,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         r = ramp(buckets(9, BREAKPOINTS), palettes.BURG);
 
                         r._bindMetadata(METADATA);
-                        actual = r.eval();
+                        actual = r.value;
                         expected = hexToRgb(RAMP_COLORS[0]);
 
                         expect(actual).toEqual(expected);
@@ -559,7 +559,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         r = ramp(buckets(10, BREAKPOINTS), palettes.BURG);
 
                         r._bindMetadata(METADATA);
-                        actual = r.eval();
+                        actual = r.value;
                         expected = hexToRgb(RAMP_COLORS[1]);
 
                         expect(actual).not.toEqual(expected);
@@ -980,7 +980,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 const fakeGL = { uniform1f: () => { }, uniform1i: () => { } };
                 const fakeDrawMetadata = { zoomLevel: 0 };
                 r._preDraw(null, fakeDrawMetadata, fakeGL);
-                const actual = r.eval();
+                const actual = r.value;
                 expect(actual).toEqual(100);
             });
 
@@ -991,7 +991,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 // See zoomrange() implementation to know more about how we create `fakeDrawMetadata`
                 const fakeDrawMetadata = { zoomLevel: Math.log2(Math.pow(2, 3) * 0.7 + 0.3 * Math.pow(2, 9)) };
                 r._preDraw(null, fakeDrawMetadata, fakeGL);
-                const actual = r.eval();
+                const actual = r.value;
                 expect(actual).toEqual(130);
             });
 
@@ -1001,7 +1001,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 const fakeGL = { uniform1f: () => { }, uniform1i: () => { } };
                 const fakeDrawMetadata = { zoomLevel: 100 };
                 r._preDraw(null, fakeDrawMetadata, fakeGL);
-                const actual = r.eval();
+                const actual = r.value;
                 expect(actual).toEqual(200);
             });
         });
@@ -1040,11 +1040,11 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     expected = [
                         {
                             key: [Number.NEGATIVE_INFINITY, 2.5],
-                            value: red.eval()
+                            value: red.value
                         },
                         {
                             key: [2.5, Number.POSITIVE_INFINITY],
-                            value: blue.eval()
+                            value: blue.value
                         }
                     ];
 
@@ -1065,11 +1065,11 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     expected = [
                         {
                             key: [Number.NEGATIVE_INFINITY, 2.5],
-                            value: red.eval()
+                            value: red.value
                         },
                         {
                             key: [2.5, Number.POSITIVE_INFINITY],
-                            value: blue.eval()
+                            value: blue.value
                         }
                     ];
 
@@ -1090,7 +1090,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     expected = [
                         {
                             key: 1,
-                            value: red.eval()
+                            value: red.value
                         },
                         {
                             key: 2.5,
@@ -1098,7 +1098,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         },
                         {
                             key: 4,
-                            value: blue.eval()
+                            value: blue.value
                         }
                     ];
                     expect(actual).toEqual(expected);
@@ -1110,6 +1110,14 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     r._bindMetadata(METADATA);
                     const colorLegend = r.getLegendData();
                     expect(colorLegend.name).toEqual('linear($price, globalMin($price), globalMax($price))');
+                });
+
+                it('should return an empty array if min and max values are the same', () => {
+                    const r = ramp(linear($price, 10, 10), [red, blue]);
+
+                    r._bindMetadata(METADATA);
+                    const colorLegend = r.getLegendData();
+                    expect(colorLegend.data).toEqual([]);
                 });
             });
         });
@@ -1135,19 +1143,18 @@ describe('src/renderer/viz/expressions/ramp', () => {
             describe('and it is a top input', () => {
                 it('should return legend data', () => {
                     const r = ramp(top($grade, 2), [red, blue]);
-
                     r._bindMetadata(METADATA);
                     actual = r.getLegendData().data;
                     expected = [
                         {
                             key: 'A',
-                            value: red.eval()
+                            value: red.value
                         }, {
                             key: 'B',
-                            value: blue.eval()
+                            value: blue.value
                         }, {
                             key: OTHERS_LABEL,
-                            value: r.others.eval()
+                            value: r.others.value
                         }
                     ];
                 });
@@ -1170,10 +1177,6 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         }, {
                             key: 'C',
                             value: BUILDING.url
-                        },
-                        {
-                            key: OTHERS_LABEL,
-                            value: r.others.eval()
                         }
                     ];
 
@@ -1196,10 +1199,28 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         }, {
                             key: 'C',
                             value: yellow.color
-                        },
+                        }
+                    ];
+
+                    expect(actual).toEqual(expected);
+                });
+
+                it('should return the legend data with other value', () => {
+                    const r = ramp(buckets($grade, ['A', 'B']), [red, blue]);
+
+                    r._bindMetadata(METADATA);
+
+                    actual = r.getLegendData().data;
+                    expected = [
                         {
+                            key: 'A',
+                            value: red.color
+                        }, {
+                            key: 'B',
+                            value: blue.color
+                        }, {
                             key: OTHERS_LABEL,
-                            value: r.others.eval()
+                            value: r.others.value
                         }
                     ];
 

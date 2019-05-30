@@ -69,6 +69,10 @@ export default class RampGeneric extends Base {
         return mix(paletteValues[clampMin], paletteValues[clampMax], m);
     }
 
+    get value () {
+        return this.eval();
+    }
+
     getLegendData (options) {
         const config = Object.assign({}, DEFAULT_OPTIONS, options);
         const type = this.input.type;

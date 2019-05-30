@@ -1,16 +1,18 @@
 import BaseExpression from './base';
-import { implicitCast, getOrdinalFromIndex, checkMaxArguments, checkType } from './utils';
+import { implicitCast, getOrdinalFromIndex, checkMaxArguments, checkType, checkFeatureIndependent } from './utils';
+import { OTHERS_INDEX, OTHERS_LABEL } from './constants';
 import CartoValidationError, { CartoValidationErrorTypes } from '../../../errors/carto-validation-error';
-import { OTHERS_INDEX } from './constants';
 import BucketsGLSLHelper from './BucketsGLSLHelper';
 
 /**
  * Given a property create "sub-groups" based on the given breakpoints.
  *
- * This returns a number or category expression depending on the input values.
+ * This returns a number or category expression depending on the input values. The "others" label is by default CARTO_VL_OTHERS.
+ * This can be overwriten by setting the "others" label as the third parameter.
  *
  * @param {Number|Category} property - The property to be evaluated and interpolated
  * @param {Number[]|Category[]} breakpoints - Expression containing the different breakpoints.
+ * @param {string} othersLabel - Custom label for "others"
  * @return {Number|Category}
  *
  * @example <caption>Display a traffic dataset in 4 colors depending on the numeric speed.</caption>
@@ -53,21 +55,38 @@ import BucketsGLSLHelper from './BucketsGLSLHelper';
  *    color: ramp(buckets($procesedSpeed, ['slow', 'medium', 'high']), PRISM)
  * `);
  *
+ * @example <caption>Set custom "others" label.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.ramp(
+ *     s.buckets(s.prop('procesedSpeed'), ['slow', 'medium', 'high'], 'Others'),
+ *     s.palettes.PRISM)
+ *   )
+ * });
+ *
+ * @example <caption>Set custom "others" label. (String)</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz(`
+ *    color: ramp(buckets($procesedSpeed, ['slow', 'medium', 'high'], 'Others'), PRISM)
+ * `);
+ *
  * @memberof carto.expressions
  * @name buckets
  * @function
  * @api
  */
 export default class Buckets extends BaseExpression {
-    constructor (input, list) {
-        checkMaxArguments(arguments, 2, 'buckets');
+    constructor (input, list, othersLabel = OTHERS_LABEL) {
+        checkMaxArguments(arguments, 3, 'buckets');
 
         input = implicitCast(input);
         list = implicitCast(list);
+        othersLabel = implicitCast(othersLabel);
 
         let children = {
             input,
-            list
+            list,
+            othersLabel
         };
 
         super(children);
@@ -79,7 +98,7 @@ export default class Buckets extends BaseExpression {
     }
 
     get value () {
-        return this.list.elems.map(elem => elem.value);
+        return this.eval();
     }
 
     eval (feature) {
@@ -116,6 +135,8 @@ export default class Buckets extends BaseExpression {
         }
 
         checkType('buckets', 'list', 1, ['number-list', 'category-list'], this.list);
+        checkType('buckets', 'othersLabel', 2, 'category', this.othersLabel);
+        checkFeatureIndependent('buckets', 'othersLabel', 2, this.othersLabel);
 
         this.list.elems.map((item, index) => {
             if (this.input.type !== item.type) {
@@ -132,6 +153,13 @@ export default class Buckets extends BaseExpression {
             }
         });
 
+        if (this.input.type === 'category') {
+            const property = metadata.properties[this.input.propertyName];
+            this._numDatasetCategories = property
+                ? property.categories.length
+                : this.list.elems.length - 1;
+        }
+
         this.numCategories = this.list.elems.length + 1;
         this.numCategoriesWithoutOthers = this.input.type === 'category' ? this.numCategories - 1 : this.numCategories;
     }
@@ -140,12 +168,15 @@ export default class Buckets extends BaseExpression {
         return this._GLSLhelper.applyToShaderSource(getGLSLforProperty);
     }
 
-    getLegendData (config) {
+    getLegendData (options) {
         const name = this.toString();
-        const list = this.list.elems.map(elem => elem.eval());
+        const list = this.list.elems.map(elem => elem.value);
+        const config = {
+            othersLabel: options && options.othersLabel ? options.othersLabel : this.othersLabel.value
+        };
         const data = this.input.type === 'number'
             ? _getLegendDataNumeric(list)
-            : _getLegendDataCategory(list, config);
+            : _getLegendDataCategory(list, this._numDatasetCategories, config);
 
         return { data, name };
     }
@@ -165,8 +196,8 @@ function _getLegendDataNumeric (list) {
     return data;
 }
 
-function _getLegendDataCategory (list, config) {
-    const divisor = list.length - 1;
+function _getLegendDataCategory (list, numDatasetCategories, config) {
+    const divisor = list.length - 1 || 1;
     const data = list.map((category, index) => {
         const key = category;
         const value = index / divisor;
@@ -174,10 +205,12 @@ function _getLegendDataCategory (list, config) {
         return { key, value };
     });
 
-    data.push({
-        key: config.othersLabel,
-        value: OTHERS_INDEX
-    });
+    if (numDatasetCategories > list.length) {
+        data.push({
+            key: config.othersLabel,
+            value: OTHERS_INDEX
+        });
+    }
 
     return data;
 }

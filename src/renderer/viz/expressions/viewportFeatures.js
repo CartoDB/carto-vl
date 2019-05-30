@@ -61,7 +61,7 @@ export default class ViewportFeatures extends BaseExpression {
         // in order for variables to be resolved.
         // And as an additional bonus we don't need to define _getMinimumNeededSchema
         super(_childrenFromProperties(properties));
-        this.expr = [];
+        this._value = [];
         this.type = 'featureList';
         this._isViewport = true;
         this._requiredProperties = properties;
@@ -77,11 +77,15 @@ export default class ViewportFeatures extends BaseExpression {
     }
 
     get value () {
-        return this.expr;
+        return this._value;
+    }
+
+    set value (value) {
+        this._value = value;
     }
 
     eval () {
-        return this.expr;
+        return this.value;
     }
 
     _resetViewportAgg (metadata, renderLayer) {
@@ -96,18 +100,18 @@ export default class ViewportFeatures extends BaseExpression {
 
             this._FeatureProxy = genLightweightFeatureClass(propertyNames, renderLayer);
         }
-        this.expr = [];
+        this._value = [];
     }
 
     accumViewportAgg (featurePieces) {
         featurePieces = Array.isArray(featurePieces) ? featurePieces : [featurePieces];
 
         if (featurePieces.length === 1) {
-            this.expr.push(new this._FeatureProxy(featurePieces[0]));
+            this._value.push(new this._FeatureProxy(featurePieces[0]));
         } else {
             const pieces = featurePieces.map((piece) => { return new this._FeatureProxy(piece); });
             const compoundFeature = getCompoundFeature(pieces);
-            this.expr.push(compoundFeature);
+            this._value.push(compoundFeature);
         }
     }
 }

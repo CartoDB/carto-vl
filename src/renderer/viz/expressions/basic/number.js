@@ -29,20 +29,24 @@ export default class BaseNumber extends BaseExpression {
         checkNumber('number', 'x', 0, x);
 
         super({});
-        this.expr = x;
+        this._value = x;
         this.type = 'number';
     }
 
     get value () {
-        return this.eval();
+        return this._value;
+    }
+
+    set value (value) {
+        this._value = value;
     }
 
     eval () {
-        return this.expr;
+        return this.value;
     }
 
     toString () {
-        return `${this.expr}`;
+        return `${this.value}`;
     }
 
     isAnimated () {
@@ -59,10 +63,12 @@ export default class BaseNumber extends BaseExpression {
             inline: `number${this._uid}`
         };
     }
+
     _postShaderCompile (program, gl) {
         this._getBinding(program).uniformLocation = gl.getUniformLocation(program, `number${this._uid}`);
     }
+
     _preDraw (program, drawMetadata, gl) {
-        gl.uniform1f(this._getBinding(program).uniformLocation, this.expr);
+        gl.uniform1f(this._getBinding(program).uniformLocation, this.value);
     }
 }

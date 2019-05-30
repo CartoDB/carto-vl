@@ -12,7 +12,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
         validateTypeErrors('buckets', ['category', 'number-list']);
         validateTypeErrors('buckets', ['color', 'number-list']);
         validateTypeErrors('buckets', ['number', 'color-list']);
-        validateMaxArgumentsError('buckets', ['number', 'number-list', 'number']);
+        validateMaxArgumentsError('buckets', ['number', 'number-list', 'number', 'number']);
     });
 
     describe('type', () => {

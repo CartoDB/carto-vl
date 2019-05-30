@@ -74,6 +74,21 @@ export class Fade extends BaseExpression {
             out: inline.fadeOut
         });
     }
+
+    get value () {
+        return {
+            fadeIn: this.fadeIn.value,
+            fadeOut: this.fadeOut.value
+        };
+    }
+
+    eval (feature) {
+        return {
+            fadeIn: this.fadeIn.eval(feature),
+            fadeOut: this.fadeOut.eval(feature)
+        };
+    }
+
     _bindMetadata (meta) {
         super._bindMetadata(meta);
         checkType('fade', 'param1', 0, 'number', this.fadeIn);

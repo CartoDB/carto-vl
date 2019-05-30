@@ -299,12 +299,15 @@ function genUnaryOp (name, jsFn, glsl, validTypes = 'number') {
             this.expressionName = name;
             this.inlineMaker = inlines => glsl(inlines.a);
         }
+
         get value () {
-            return this.eval();
+            return jsFn(this.a.value);
         }
+
         eval (feature) {
             return jsFn(this.a.eval(feature));
         }
+
         _bindMetadata (meta) {
             super._bindMetadata(meta);
             checkType(name, 'x', 0, validTypes, this.a);

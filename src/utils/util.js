@@ -44,9 +44,11 @@ export function castDate (date) {
     if (date instanceof Date) {
         return date;
     }
+
     if (typeof (date) === 'number') {
         return msToDate(date);
     }
+
     if (isString(date)) {
         return new Date(date);
     } else {
@@ -150,25 +152,23 @@ export default {
     computeViewportFromCameraMatrix
 };
 
-export function castTimeRange (v, tz = null) {
-    if (v === undefined || isTimeRange(v)) {
-        if (v && tz) {
-            return timeRange({ iso: v.text, timeZone: tz });
+export function castTimeRange (value, timeZone = null) {
+    if (value === undefined || isTimeRange(value)) {
+        if (value && timeZone) {
+            return timeRange({ iso: value._iso, timeZone });
         }
-        return v;
+        return value;
     }
-    if (typeof v === 'string') {
-        return timeRange({ iso: v, timeZone: tz });
+
+    if (typeof value === 'string') {
+        return timeRange({ iso: value, timeZone });
     }
 }
 
 export function timeRange (parameters) {
     const { start, end, iso, timeZone } = parameters;
-    if (iso) {
-        return TimeRange.fromText(iso, timeZone);
-    } else {
-        return TimeRange.fromStartEndValues(start, end, timeZone);
-    }
+
+    return new TimeRange(timeZone, iso, start, end);
 }
 
 export function isTimeRange (t) {

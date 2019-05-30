@@ -7,8 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## UNRELEASED
 
+### Changed
+- Internal refactor regarding data sources (GeoJSON and Windshaft)
+- Unify `.value`, `.eval()` and `.getLegendData()` methods to get expression values
+
 ### Fixed
-- Fix memory exhausted error using Buckets with a long list
+- Do not always add CARTO_VL_OTHERS when getting legend data from the buckets expression
+- Fix memory exhausted error using `buckets` with a long list
 
 ## [1.2.6] 2019-05-27
 

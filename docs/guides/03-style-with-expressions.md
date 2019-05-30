@@ -99,13 +99,85 @@ To access feature properties from a dataset, use the dollar sign (`$`). For exam
 
 We’ll use this extensively in the [Data-driven visualizations guide](/developers/carto-vl/guides/data-driven-visualizations-part-1/).
 
-### Access and modify visualization properties
+### Access and modify visualization properties and variables
 
-Once a visualization has been created, you can access and modify all styling properties through the returned `Visualization` object.
+Once a visualization has been created, you can access and modify all styling properties and variables through the returned `Visualization` object.
 
 Once you have a `Visualization` object, you can:
-- Get its property values by using the `.value` getter (`const currentColor = viz.color.value;`)
-- Modify its property values by using the `.blendTo()` method (`viz.color.blendTo(‘green’);`)
+
+
+#### Access
+
+There are three main use cases:
+
+1. When you need a single value
+
+Get its property value by using `.value`:
+
+```js
+const viz = new carto.Viz(`
+    color: red
+`);
+
+// ...
+
+const color = viz.color.value; // { r: 255, g: 0, b: 0, a: 1 }
+```
+
+2. When you need to get a single value from a *feature*
+
+Evaluate the feature by using `.eval(feature)`
+
+```js
+const viz = new carto.Viz(`
+    color: ramp($city, [ red, blue, yellow ])
+`);
+
+// ...
+const feature = {
+    city: 'New York'
+}
+const color = viz.color.eval(feature); // The color assigned to 'New York' city by the ramp expression
+```
+
+3. When you need to get all the values
+
+Get all the property values by using `.values` or `.getLegendData()` methods.
+
+```js
+const viz = new carto.Viz(`
+    color: ramp($city, [ red, blue, yellow ])
+`);
+
+// ...
+const color = viz.color.values;
+/*
+
+i.e: Let's asume there're three cities in the dataset
+
+[
+    {
+        key: 'New York,
+        value: { r: 255, g: 0, b: 0, a: 1 }
+    },
+    {
+        key: 'London',
+        value: { r: 255, g: 255, b: 0, a: 1 }
+    },
+    {
+        key: 'Madrid,
+        value: { r: 0, g: 0, b: 255, a: 1 }
+    }
+]
+
+*/
+```
+
+The `.values` method will only return the list of values, while `getLegendData()` will return also the name of the full expression and the data type. This last use case is very useful for creating **legends**. In the [Add Legends](/developers/carto-vl/guides/add-legends/) guide it's explained in more detail.
+
+#### Modify
+
+Modify its property values by using the `.blendTo()` method (`viz.color.blendTo(‘green’);`)
 
 The map below demonstrates how to access and modify the `color` property:
 

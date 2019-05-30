@@ -77,16 +77,25 @@ function genRGB (name, alpha) {
         }
 
         get value () {
-            return this.eval();
+            return {
+                r: this.r.value,
+                g: this.g.value,
+                b: this.b.value,
+                a: alpha ? this.a.value : 1
+            };
         }
 
-        eval (f) {
-            return {
-                r: this.r.eval(f),
-                g: this.g.eval(f),
-                b: this.b.eval(f),
-                a: alpha ? this.a.eval(f) : 1
-            };
+        eval () {
+            return this.value;
+        }
+
+        getLegendData () {
+            const name = 'color';
+            const value = this.value;
+            const key = 'color';
+            const data = [{ key, value }];
+
+            return { name, data };
         }
 
         _bindMetadata (meta) {
