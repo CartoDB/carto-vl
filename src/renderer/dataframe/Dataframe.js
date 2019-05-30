@@ -42,7 +42,7 @@ export default class Dataframe extends DummyDataframe {
      */
     bindRenderer (renderer) {
         this.renderer = renderer;
-        this.height = this.getSize().height;
+
         this._initHelpers();
 
         // Load alphanumeric properties to WebGL textures
@@ -168,14 +168,13 @@ export default class Dataframe extends DummyDataframe {
         const gl = this._getGL(); // Dataframe is already bound to this context, "hot update" it
         const propertiesFloat32Array = this.properties[propertyName];
 
-        const size = this.getSize();
-        this.height = size.height; // TODO is this required here again? besides bindRenderer
+        const { width, height } = this.getSize();
 
         if (propertiesFloat32Array) {
             this.propertyTex[propertyName] = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, this.propertyTex[propertyName]);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
-                size.width, size.height, 0, gl.ALPHA, gl.FLOAT,
+                width, height, 0, gl.ALPHA, gl.FLOAT,
                 propertiesFloat32Array);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
@@ -305,12 +304,12 @@ export default class Dataframe extends DummyDataframe {
         // TODO we are wasting 75% of the memory for the scalar attributes (width, strokeWidth),
         // since RGB components are discarded
         const gl = this._getGL();
-        const size = this.getSize();
+        const { width, height } = this.getSize();
 
         const texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-            size.width, size.height, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+            width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE,
             null); // empty!
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
