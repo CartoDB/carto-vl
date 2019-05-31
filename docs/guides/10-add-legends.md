@@ -223,26 +223,25 @@ You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-l
 
 ### Working with opacity
 
-To assign opacity to your mapped features, you will usually work with the `opacity` expression, combined with your `ramp`.
+To assign opacity to your mapped features, you will usually work with the `opacity` and `ramp` expressions.
 
-If you want, for this example, you can try using [variables](/developers/carto-vl/guides/Glossary/#variables) for both expressions.
+The styling below assigns a global `0.5` opacity to features, using some variables:
+
+* `@myPalette: [darkorange, darkviolet, darkturquoise]` for the colors assigned to each category
+* `@myOpacity: 0.5`
 
 **Note:**
 The use of [variables](/developers/carto-vl/guides/Glossary/#variables) is explored in greater detail in the [Add Widgets](/developers/carto-vl/guides/add-widgets/) guide.
-
-The styling below assigns a global `0.5` opacity to features, using two variables:
-* `@myRamp: ramp($weather, [darkorange, darkviolet, darkturquoise])` for the colors assigned to each category
-* `@myOpacity: 0.5` for the amount of opacity to assign to features
 
 The variables are then used in the `color` property inside of an `opacity` expression:
 
 ```CARTO_VL_Viz
 const viz = new carto.Viz(`
-    @myRamp: ramp($weather, [darkorange, darkviolet, darkturquoise])
+    @myPalette: [darkorange, darkviolet, darkturquoise]
     @myOpacity: 0.5
 
     width: 7
-    color: opacity(@myRamp, @myOpacity)
+    color: opacity(ramp($weather, @myPalette), @myOpacity)
     strokeWidth: 0.2
     strokeColor: black
 `);

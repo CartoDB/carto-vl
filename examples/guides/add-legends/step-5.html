@@ -46,11 +46,11 @@
 
         const source = new carto.source.Dataset("railroad_accidents");
         const viz = new carto.Viz(`
-            @myRamp: ramp($weather, [darkorange, darkviolet, darkturquoise])
+            @myPalette: [darkorange, darkviolet, darkturquoise]
             @myOpacity: 0.5
 
             width: 7
-            color: opacity(@myRamp, @myOpacity)
+            color: opacity(ramp($weather, @myPalette), @myOpacity)
             strokeWidth: 0.2
             strokeColor: black
         `);
