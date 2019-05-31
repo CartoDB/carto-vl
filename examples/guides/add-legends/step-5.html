@@ -46,12 +46,12 @@
 
         const source = new carto.source.Dataset("railroad_accidents");
         const viz = new carto.Viz(`
-            @myRamp: ramp($weather,[darkorange,darkviolet,darkturquoise])
+            @myPalette: [darkorange, darkviolet, darkturquoise]
             @myOpacity: 0.5
 
-            width: 5
-            color: opacity(@myRamp,@myOpacity)
-            strokeWidth: 1
+            width: 7
+            color: opacity(ramp($weather, @myPalette), @myOpacity)
+            strokeWidth: 0.2
             strokeColor: black
         `);
         const layer = new carto.Layer('layer', source, viz);
@@ -61,19 +61,13 @@
 
         // When layer loads, trigger legend event
         layer.on('loaded', () => {
-
-            // Request data for legend from the layer viz variables 'myRamp' and 'myOpacity'
-            const colorLegend = layer.viz.variables.myRamp.getLegendData();
-            const opacity = layer.viz.variables.myOpacity.value;
-
+            const colorLegend = layer.viz.color.getLegendData();
             let colorLegendList = '';
 
             // Create list elements for legend
             colorLegend.data.forEach((legend, index) => {
                 const color = legend.value;
-
-                // Add the predefined opacity to the ramp color components
-                const rgba = `rgba(${color.r}, ${color.g}, ${color.b}, ${opacity})`;
+                const rgba = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
 
                 // Style for legend items based on geometry type
                 colorLegendList +=
