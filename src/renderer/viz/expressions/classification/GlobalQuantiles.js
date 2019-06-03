@@ -57,7 +57,7 @@ export default class GlobalQuantiles extends Classifier {
 
         this.breakpoints.map((breakpoint, index) => {
             const p = (index + 1) / this.numCategories;
-            breakpoint.expr = copy[Math.floor(p * copy.length)];
+            breakpoint.value = copy[Math.floor(p * copy.length)];
         });
     }
 }

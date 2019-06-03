@@ -103,11 +103,12 @@ describe('sources/GeoJSON', () => {
             }]);
         });
 
-        it('should compute the center of the coordintates', () => {
+        it('should compute the center of the coordinates', () => {
             const source = new GeoJSON(createData());
-            expect(source._dataframeCenter).toBeDefined();
-            expect(source._dataframeCenter.x).toBeCloseTo(0.0555);
-            expect(source._dataframeCenter.x).toBeCloseTo(0.0567);
+            const dataframeCenter = source._getDataframeCenter();
+            expect(dataframeCenter).toBeDefined();
+            expect(dataframeCenter.x).toBeCloseTo(0.0555);
+            expect(dataframeCenter.y).toBeCloseTo(0.0567);
         });
 
         it('should compute metadata for numeric and category properties', done => {

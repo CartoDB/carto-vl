@@ -28,8 +28,13 @@ export default class ClusterAggregation extends BaseExpression {
     get numCategories () {
         return this.property.numCategories;
     }
+
     get categories () {
         return this.property.categories;
+    }
+
+    get value () {
+        return this.propertyName;
     }
 
     eval (feature) {
@@ -38,6 +43,7 @@ export default class ClusterAggregation extends BaseExpression {
 
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
+        this._metadata = metadata;
         checkInstance(this._expressionName, 'property', 0, PropertyExpression, this.property);
         checkType(this._expressionName, 'property', 0, this.type, this.property);
     }

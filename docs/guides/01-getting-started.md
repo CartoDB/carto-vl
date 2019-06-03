@@ -24,8 +24,8 @@ The most straight-forward way to use CARTO VL is to include the required files f
   <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js"></script>
 
   <!-- Include Mapbox GL from the Mapbox CDN-->
-  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
-  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.css" rel="stylesheet" />
 </head>
 ```
 **Note:**
@@ -171,8 +171,8 @@ For more information about styling, check out the guide [Style with Expressions]
 <head>
     <meta charset="utf-8">
     <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js"></script>
-    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
-    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
 <body>

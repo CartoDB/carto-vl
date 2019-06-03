@@ -51,8 +51,12 @@ export default class Translate extends BaseExpression {
         };
     }
 
-    eval (value) {
-        return [this.x.eval(value), this.y.eval(value)];
+    get value () {
+        return [this.x.value, this.y.value];
+    }
+
+    eval (feature) {
+        return [this.x.eval(feature), this.y.eval(feature)];
     }
 
     _bindMetadata (meta) {

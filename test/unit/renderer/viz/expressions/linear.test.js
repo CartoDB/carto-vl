@@ -13,7 +13,8 @@ describe('src/renderer/viz/expressions/linear', () => {
         validateTypeErrors('linear', ['number', 'color', 'number']);
         validateTypeErrors('linear', ['category', 'number', 'number']);
         validateTypeErrors('linear', ['number', 'number', 'category']);
-        validateMaxArgumentsError('linear', ['number', 'number', 'number', 'number', 'number']);
+        validateTypeErrors('linear', ['number', 'number', 'number', null, 'category']);
+        validateMaxArgumentsError('linear', ['number', 'number', 'number', 'number', 'number', 'number']);
     });
 
     describe('type', () => {

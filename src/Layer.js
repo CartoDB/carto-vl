@@ -127,7 +127,7 @@ export default class Layer {
     /**
      * Register an event handler for the given event name.
      *
-     * @param {String} eventName - Type of event to listen for. Valid names are: `loaded`, `updated`.
+     * @param {String} eventName - Type of event to listen for. Valid names are: `loaded`, `updated`, and `removed`.
      * @param {function} callback - Function to call in response to given event
      * @memberof carto.Layer
      * @instance
@@ -140,7 +140,7 @@ export default class Layer {
     /**
      * Remove an event handler for the given type.
      *
-     * @param {String} eventName - Type of event to unregister. Valid names are: `loaded`, `updated`.
+     * @param {String} eventName - Type of event to unregister. Valid names are: `loaded`, `updated`, and `removed`.
      * @param {function} callback - Handler function to unregister
      * @memberof carto.Layer
      * @instance
@@ -161,12 +161,6 @@ export default class Layer {
      */
     async addTo (map, beforeLayerID) {
         // Manage errors, whether they are an Evented Error or a common Error
-        // try {
-        //     await this.init();
-        // } catch (err) {
-        //     throw err;
-        // }
-
         try {
             map.once('error', (data) => {
                 console.warn(data.error.message);
@@ -441,6 +435,7 @@ export default class Layer {
      * Custom Layer API: `onRemove` function
      */
     onRemove (map, gl) {
+        this._fire('removed', this);
     }
 
     /**
@@ -599,7 +594,7 @@ export default class Layer {
         }
 
         if (viz._boundLayer && viz._boundLayer !== this) {
-            // Not the required 1 on 1 relationship between layer & viz
+            // Note the required 1 on 1 relationship between layer & viz
             throw new CartoValidationError(
                 'The given Viz object is already bound to another layer. Vizs cannot be shared between different layers.',
                 CartoValidationErrorTypes.INCORRECT_VALUE

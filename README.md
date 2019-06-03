@@ -121,6 +121,7 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 - [Mamata Akella](https://github.com/makella)
 - [Víctor Velarde](https://github.com/VictorVelarde)
 - [Ariana Escobar](https://github.com/arianaescobar)
+- [Jesús Botella](https://github.com/jesusbotella)
 
 ## License
 

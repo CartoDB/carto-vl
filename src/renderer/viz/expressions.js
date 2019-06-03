@@ -582,6 +582,11 @@ import Rotate from './expressions/transformation/Rotate';
 
 /* Expose classes as constructor functions */
 
+export const number = (...args) => new BaseNumber(...args);
+export const category = (...args) => new BaseCategory(...args);
+export const list = (...args) => new List(...args);
+export const rgb = (...args) => new RGB(...args);
+export const rgba = (...args) => new RGBA(...args);
 export const transition = (...args) => new Transition(...args);
 
 const in_ = (...args) => new In(...args);
@@ -644,13 +649,10 @@ export const cubic = (...args) => new Cubic(...args);
 export const ilinear = (...args) => new ILinear(...args);
 
 export const linear = (...args) => new Linear(...args);
-export const list = (...args) => new List(...args);
 
 export const namedColor = (...args) => new NamedColor(...args);
 
 export const now = (...args) => new Now(...args);
-
-export const number = (...args) => new BaseNumber(...args);
 
 export const opacity = (...args) => new Opacity(...args);
 
@@ -674,11 +676,6 @@ export const globalStandardDev = (...args) => new GlobalStandardDev(...args);
 export const viewportStandardDev = (...args) => new ViewportStandardDev(...args);
 
 export const ramp = (...args) => new Ramp(...args);
-
-export const rgb = (...args) => new RGB(...args);
-export const rgba = (...args) => new RGBA(...args);
-
-export const category = (...args) => new BaseCategory(...args);
 
 export const time = (...args) => new Time(...args);
 export { time as date };

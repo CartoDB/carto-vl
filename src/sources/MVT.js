@@ -1,5 +1,5 @@
 
-import Dataframe from '../renderer/Dataframe';
+import Dataframe from '../renderer/dataframe/Dataframe';
 import Metadata from '../renderer/Metadata';
 import MVTMetadata from './MVTMetadata';
 import Base from './Base';
@@ -35,42 +35,68 @@ export default class MVT extends Base {
      * @name MVT
      * @api
      */
-    constructor (templateURL, metadata = new MVTMetadata(), options = { layerID: undefined, viewportZoomToSourceZoom: Math.ceil, maxZoom: undefined }) {
+    constructor (templateURL, metadata = new MVTMetadata(), options) {
         super();
+
         this._templateURL = templateURL;
-        if (!(metadata instanceof Metadata)) {
-            metadata = new MVTMetadata(metadata);
-        }
-        this._metadata = metadata;
-        this._metadata.setCodecs();
         this._tileClient = new TileClient(templateURL);
-        this._options = options;
-        this._options.viewportZoomToSourceZoom = this._options.viewportZoomToSourceZoom || Math.ceil;
+
+        this._initMetadata(metadata);
+        this._initOptions(options);
 
         this._workerDispatch = {};
         this._mID = 0;
         this._workerName = 'MVT';
     }
 
+    _initMetadata (metadata) {
+        if (!(metadata instanceof Metadata)) {
+            metadata = new MVTMetadata(metadata);
+        }
+
+        metadata.setCodecs();
+        this._metadata = metadata;
+    }
+
+    _initOptions (options) {
+        if (options === undefined) {
+            options = {
+                layerID: undefined,
+                viewportZoomToSourceZoom: Math.ceil,
+                maxZoom: undefined
+            };
+        }
+
+        options.viewportZoomToSourceZoom = options.viewportZoomToSourceZoom || Math.ceil;
+        this._options = options;
+    }
+
     get _worker () {
         if (!this._workerInstance) {
             this._workerInstance = new Worker();
-            this._workerInstance.onmessage = event => {
-                const mID = event.data.mID;
-                const dataframe = event.data.dataframe;
-                const metadata = dataframe.metadata;
-                if (!dataframe.empty) {
-                    Object.setPrototypeOf(dataframe, Dataframe.prototype);
-                    this._metadata.numCategories = metadata.numCategories;
-                    this._metadata.categoryToID = metadata.categoryToID;
-                    this._metadata.IDToCategory = metadata.IDToCategory;
-                    this._metadata.geomType = metadata.geomType;
-                    dataframe.metadata = this._metadata;
-                }
-                this._workerDispatch[mID](dataframe);
-            };
+            this._workerInstance.onmessage = this._receiveMessageFromWorker.bind(this);
         }
         return this._workerInstance;
+    }
+
+    _receiveMessageFromWorker (event) {
+        const { mID, dataframe } = event.data;
+        if (!dataframe.empty) {
+            this._updateMetadataWith(dataframe);
+        }
+        this._workerDispatch[mID](dataframe);
+    }
+
+    _updateMetadataWith (dataframe) {
+        Object.setPrototypeOf(dataframe, Dataframe.prototype);
+        const metadata = dataframe.metadata;
+
+        this._metadata.numCategories = metadata.numCategories;
+        this._metadata.categoryToID = metadata.categoryToID;
+        this._metadata.IDToCategory = metadata.IDToCategory;
+        this._metadata.geomType = metadata.geomType;
+
+        dataframe.metadata = this._metadata;
     }
 
     _clone () {
@@ -86,36 +112,61 @@ export default class MVT extends Base {
     }
 
     requestData (zoom, viewport) {
-        return this._tileClient.requestData(zoom, viewport, (x, y, z, url) => {
-            return new Promise(resolve => {
-                // Relative URLs don't work inside the Web Worker
-                if (url[0] === '.') {
-                    let parts = window.location.pathname.split('/');
-                    parts.pop();
-                    const path = parts.join('/');
-                    url = `${window.location.protocol}//${window.location.host}/${path}/${url}`;
-                } else if (url[0] === '/') {
-                    url = `${window.location.protocol}//${window.location.host}${url}`;
-                }
-                this._worker.postMessage({
-                    x,
-                    y,
-                    z,
-                    url,
-                    layerID: this._options.layerID,
-                    metadata: this._metadataSent ? undefined : this._metadata,
-                    mID: this._mID,
-                    workerName: this._workerName
-                });
-                this._metadataSent = true;
-                this._workerDispatch[this._mID] = resolve;
-                this._mID++;
-            });
-        },
-        zoom => this._options.maxZoom === undefined
-            ? this._options.viewportZoomToSourceZoom(zoom)
-            : Math.min(this._options.viewportZoomToSourceZoom(zoom), this._options.maxZoom)
+        const urlToDataframeTransformer = this._urlToDataframeTransformer.bind(this);
+        const viewportZoomToSourceZoom = this._viewportZoomToSourceZoom.bind(this);
+
+        return this._tileClient.requestData(zoom, viewport,
+            urlToDataframeTransformer, viewportZoomToSourceZoom
         );
+    }
+
+    _urlToDataframeTransformer (x, y, z, url) {
+        return new Promise(resolve => {
+            const validUrl = this._validUrlForWorker(url);
+            this._postMessageToWorker({ x, y, z }, validUrl);
+
+            this._metadataSent = true;
+            this._workerDispatch[this._mID] = resolve;
+            this._mID++;
+        });
+    }
+
+    _postMessageToWorker ({ x, y, z }, url) {
+        this._worker.postMessage({
+            x,
+            y,
+            z,
+            url,
+            layerID: this._options.layerID,
+            metadata: this._metadataSent ? undefined : this._metadata,
+            mID: this._mID,
+            workerName: this._workerName
+        });
+    }
+
+    _viewportZoomToSourceZoom (zoom) {
+        const maxZoom = this._options.maxZoom;
+        const sourceZoom = this._options.viewportZoomToSourceZoom(zoom);
+
+        if (maxZoom === undefined) {
+            return sourceZoom;
+        }
+
+        return Math.min(sourceZoom, maxZoom);
+    }
+
+    _validUrlForWorker (url) {
+        // Relative URLs don't work inside the Web Worker
+        if (url[0] === '.') {
+            let parts = window.location.pathname.split('/');
+            parts.pop();
+            const path = parts.join('/');
+            return `${window.location.protocol}//${window.location.host}/${path}/${url}`;
+        } else if (url[0] === '/') {
+            return `${window.location.protocol}//${window.location.host}${url}`;
+        }
+
+        return url;
     }
 
     free () {
