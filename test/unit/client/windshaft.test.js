@@ -105,9 +105,15 @@ describe('src/client/windshaft', () => {
     });
 
     describe('_needToInstantiateMap', () => {
-        it('should detect that it requires instantiation', () => {
+        it('should detect that it requires instantiation at the beginning', () => {
             const _needToInst = client._needToInstantiateMap(vizInfoMock);
             expect(_needToInst).toEqual(true);
+        });
+
+        it('should detect that it does not require instantiation after an update', () => {
+            client._updateStateAfterInstantiating({ ...instantiationDataMock });
+            const _needToInst = client._needToInstantiateMap(vizInfoMock);
+            expect(_needToInst).toEqual(false);
         });
     });
 
