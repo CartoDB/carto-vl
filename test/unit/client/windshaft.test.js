@@ -69,6 +69,7 @@ const vizInfoMock = {
 
 const metadataMock = {
     'properties': [],
+    'featureCount': 3000000,
     'backendFiltersApplied': true
 };
 
@@ -105,15 +106,43 @@ describe('src/client/windshaft', () => {
     });
 
     describe('_needToInstantiateMap', () => {
-        it('should detect that it requires instantiation at the beginning', () => {
-            const _needToInst = client._needToInstantiateMap(vizInfoMock);
-            expect(_needToInst).toEqual(true);
+        describe('at the beginning', () => {
+            it('should detect that it requires instantiation', () => {
+                const _needToInst = client._needToInstantiateMap(vizInfoMock);
+                expect(_needToInst).toEqual(true);
+            });
         });
 
-        it('should detect that it does not require instantiation after an update', () => {
-            client._updateStateAfterInstantiating({ ...instantiationDataMock });
-            const _needToInst = client._needToInstantiateMap(vizInfoMock);
-            expect(_needToInst).toEqual(false);
+        describe('after an update', () => {
+            beforeEach(() => {
+                client._updateStateAfterInstantiating({ ...instantiationDataMock });
+            });
+
+            it('should detect that it does not require instantiation', () => {
+                const _needToInst = client._needToInstantiateMap(vizInfoMock);
+                expect(_needToInst).toEqual(false);
+            });
+
+            it('should detect that it requires instantiation when MNS has changed', () => {
+                const _vizInfoMock = { ...vizInfoMock };
+                _vizInfoMock.MNS = {};
+                const _needToInst = client._needToInstantiateMap(_vizInfoMock);
+                expect(_needToInst).toEqual(true);
+            });
+
+            it('should detect that it requires instantiation when resolution has changed', () => {
+                const _vizInfoMock = { ...vizInfoMock };
+                _vizInfoMock.resolution = 2;
+                const _needToInst = client._needToInstantiateMap(_vizInfoMock);
+                expect(_needToInst).toEqual(true);
+            });
+
+            it('should detect that it requires instantiation when filtering has changed', () => {
+                const _vizInfoMock = { ...vizInfoMock };
+                _vizInfoMock.filtering = {};
+                const _needToInst = client._needToInstantiateMap(_vizInfoMock);
+                expect(_needToInst).toEqual(true);
+            });
         });
     });
 
