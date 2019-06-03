@@ -1227,7 +1227,7 @@ This class is instanced automatically by using the `animation` function. It is d
     
 
     
-    <h4 class="name" id=".asc"><span class="type-signature">(static) </span>asc<span class="signature">(by)</span><span class="type-signature"> &rarr; {Order}</span></h4>
+    <h4 class="name" id=".asc"><span class="type-signature">(static) </span>asc<span class="signature">(input)</span><span class="type-signature"> &rarr; {Order}</span></h4>
     
 
     
@@ -1235,7 +1235,7 @@ This class is instanced automatically by using the `animation` function. It is d
 
 
 <div class="description">
-    <p>Order ascending by a provided expression. NOTE: only works with <code>width()</code>.</p>
+    <p>Order ascending input a provided expression. NOTE: only works with <code>width()</code>.</p>
 <p>Note: ordering expressions won't assure a perfect ordering.
 Features will be distributed in different buckets with the original order, and those buckets will be ordered.
 This guarantees a maximum error, but not a perfect order.
@@ -1276,7 +1276,7 @@ may result in artifacts.</p>
 
         <tr>
             
-                <td class="name"><code>by</code></td>
+                <td class="name"><code>input</code></td>
             
 
             <td class="type">
@@ -1840,7 +1840,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".buckets"><span class="type-signature">(static) </span>buckets<span class="signature">(property, breakpoints)</span><span class="type-signature"> &rarr; {Number|Category}</span></h4>
+    <h4 class="name" id=".buckets"><span class="type-signature">(static) </span>buckets<span class="signature">(property, breakpoints, othersLabel)</span><span class="type-signature"> &rarr; {Number|Category}</span></h4>
     
 
     
@@ -1849,7 +1849,8 @@ const viz = new carto.Viz({
 
 <div class="description">
     <p>Given a property create &quot;sub-groups&quot; based on the given breakpoints.</p>
-<p>This returns a number or category expression depending on the input values.</p>
+<p>This returns a number or category expression depending on the input values. The &quot;others&quot; label is by default CARTO_VL_OTHERS.
+This can be overwriten by setting the &quot;others&quot; label as the third parameter.</p>
 </div>
 
 
@@ -1931,6 +1932,29 @@ const viz = new carto.Viz({
             
 
             <td class="description last"><p>Expression containing the different breakpoints.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>othersLabel</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Custom label for &quot;others&quot;</p></td>
         </tr>
 
     
@@ -2058,6 +2082,23 @@ const viz = new carto.Viz({
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
    color: ramp(buckets($procesedSpeed, ['slow', 'medium', 'high']), PRISM)
+`);</code></pre>
+
+        <p class="code-caption">Set custom "others" label.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  color: s.ramp(
+    s.buckets(s.prop('procesedSpeed'), ['slow', 'medium', 'high'], 'Others'),
+    s.palettes.PRISM)
+  )
+});</code></pre>
+
+        <p class="code-caption">Set custom "others" label. (String)</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz(`
+   color: ramp(buckets($procesedSpeed, ['slow', 'medium', 'high'], 'Others'), PRISM)
 `);</code></pre>
 
 
@@ -4191,7 +4232,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".desc"><span class="type-signature">(static) </span>desc<span class="signature">(by)</span><span class="type-signature"> &rarr; {Order}</span></h4>
+    <h4 class="name" id=".desc"><span class="type-signature">(static) </span>desc<span class="signature">(input)</span><span class="type-signature"> &rarr; {Order}</span></h4>
     
 
     
@@ -4199,7 +4240,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Order descending by a provided expression. NOTE: only works with <code>width()</code>.</p>
+    <p>Order descending input a provided expression. NOTE: only works with <code>width()</code>.</p>
 <p>Note: ordering expressions won't assure a perfect ordering.
 Features will be distributed in different buckets with the original order, and those buckets will be ordered.
 This guarantees a maximum error, but not a perfect order.
@@ -4240,7 +4281,7 @@ may result in artifacts.</p>
 
         <tr>
             
-                <td class="name"><code>by</code></td>
+                <td class="name"><code>input</code></td>
             
 
             <td class="type">
@@ -8917,7 +8958,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".linear"><span class="type-signature">(static) </span>linear<span class="signature">(input, min<span class="signature-attributes">opt</span>, max<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Number|Date}</span></h4>
+    <h4 class="name" id=".linear"><span class="type-signature">(static) </span>linear<span class="signature">(input, min<span class="signature-attributes">opt</span>, max<span class="signature-attributes">opt</span>, max<span class="signature-attributes">opt</span>, samples)</span><span class="type-signature"> &rarr; {Number|Date}</span></h4>
     
 
     
@@ -9085,6 +9126,83 @@ default to <code>globalMin(input)</code> and <code>globalMax(input)</code>.</p>
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>max</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+|
+
+<span class="param-type">Date</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    globalMax(input)
+                
+                </td>
+            
+
+            <td class="description last"><p>Numeric or date expression to set a timerange</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>samples</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>Number of samples, which is 10 by default</p></td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -9178,6 +9296,20 @@ const viz = new carto.Viz({
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
   color: ramp(linear($speed, 10, 100), PRISM)
+`);</code></pre>
+
+        <p class="code-caption"> Set custom number of samples.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  color: s.ramp(s.linear(s.prop('speed'), 10, 100, null, 10), s.palettes.PRISM)
+});</code></pre>
+
+        <p class="code-caption"> Set custom number of samples. (String)</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz(`
+  color: ramp(linear($speed, 10, 100, null, 10), PRISM)
 `);</code></pre>
 
 
@@ -14774,7 +14906,7 @@ the month of March, 2018 (i.e. the interval 2018-03-01T00:00:00/2018-04-01T00:00
     
 
     
-    <h4 class="name" id=".top"><span class="type-signature">(static) </span>top<span class="signature">(property, n)</span><span class="type-signature"> &rarr; {Category}</span></h4>
+    <h4 class="name" id=".top"><span class="type-signature">(static) </span>top<span class="signature">(property, n, othersLabel)</span><span class="type-signature"> &rarr; {Category}</span></h4>
     
 
     
@@ -14782,7 +14914,8 @@ the month of March, 2018 (i.e. the interval 2018-03-01T00:00:00/2018-04-01T00:00
 
 
 <div class="description">
-    <p>Get the top <code>n</code> properties, aggregating the rest into an &quot;others&quot; bucket category.</p>
+    <p>Get the top <code>n</code> properties, aggregating the rest into an &quot;others&quot; bucket category. The &quot;others&quot; label is by default CARTO_VL_OTHERS.
+This can be overwriten by setting the &quot;others&quot; label as the third parameter.</p>
 </div>
 
 
@@ -14858,6 +14991,29 @@ the month of March, 2018 (i.e. the interval 2018-03-01T00:00:00/2018-04-01T00:00
             
 
             <td class="description last"><p>Number of top properties to be returned, the maximum value is 16, values higher than that will result in an error</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>othersLabel</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Custom label for &quot;others&quot;</p></td>
         </tr>
 
     
@@ -14951,6 +15107,20 @@ const viz = new carto.Viz({
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
   color: ramp(top($category, 3), VIVID)
+`);</code></pre>
+
+        <p class="code-caption">Set custom "others" label.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  color: s.ramp(s.top(s.prop('category'), 3, 'Others'), s.palettes.VIVID)
+});</code></pre>
+
+        <p class="code-caption">Set custom "others" label. (String)</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz(`
+  color: ramp(top($category, 3, 'Others'), VIVID)
 `);</code></pre>
 
 
@@ -17870,7 +18040,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".zoomrange"><span class="type-signature">(static) </span>zoomrange<span class="signature">(zoomBreakpointList)</span><span class="type-signature"> &rarr; {Number}</span></h4>
+    <h4 class="name" id=".zoomrange"><span class="type-signature">(static) </span>zoomrange<span class="signature">(_zoomBreakpointList)</span><span class="type-signature"> &rarr; {Number}</span></h4>
     
 
     
@@ -17914,7 +18084,7 @@ const viz = new carto.Viz({
 
         <tr>
             
-                <td class="name"><code>zoomBreakpointList</code></td>
+                <td class="name"><code>_zoomBreakpointList</code></td>
             
 
             <td class="type">
@@ -18044,13 +18214,13 @@ const viz = new carto.Viz({
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.TimeRange.html">carto.TimeRange</a></li><li><a href="carto.Viz.html">carto.Viz</a></li><li><a href="Expression.html">Expression</a></li><li><a href="expressions.Animation.html">expressions.Animation</a></li><li><a href="expressions.GlobalHistogram.html">expressions.GlobalHistogram</a></li><li><a href="expressions.Ramp.html">expressions.Ramp</a></li><li><a href="expressions.ViewportHistogram.html">expressions.ViewportHistogram</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.basemaps.html">carto.basemaps</a></li><li><a href="carto.expressions.html">carto.expressions</a></li><li><a href="carto.source.html">carto.source</a></li><li><a href="CartoErrors.html">CartoErrors</a></li><li><a href="Constants.html">Constants</a></li><li><a href="Features.html">Features</a></li><li><a href="Icons.html">Icons</a></li><li><a href="Types.html">Types</a></li></ul><h3>Global</h3><ul><li><a href="global.html#fromStartEndValues">fromStartEndValues</a></li><li><a href="global.html#fromText">fromText</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.TimeRange.html">carto.TimeRange</a></li><li><a href="carto.Viz.html">carto.Viz</a></li><li><a href="Expression.html">Expression</a></li><li><a href="expressions.Animation.html">expressions.Animation</a></li><li><a href="expressions.GlobalHistogram.html">expressions.GlobalHistogram</a></li><li><a href="expressions.Ramp.html">expressions.Ramp</a></li><li><a href="expressions.ViewportHistogram.html">expressions.ViewportHistogram</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.basemaps.html">carto.basemaps</a></li><li><a href="carto.expressions.html">carto.expressions</a></li><li><a href="carto.source.html">carto.source</a></li><li><a href="CartoErrors.html">CartoErrors</a></li><li><a href="Constants.html">Constants</a></li><li><a href="Features.html">Features</a></li><li><a href="Icons.html">Icons</a></li><li><a href="Types.html">Types</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon May 27 2019 12:40:13 GMT+0200 (Central European Summer Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Jun 03 2019 12:37:31 GMT+0200 (Central European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>
