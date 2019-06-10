@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## UNRELEASED
 
+### Fixed
+- Change `numBuckets` getter to a method in `top` expression
+
 ## [1.3.0] 2019-06-03
 
 ## Added
