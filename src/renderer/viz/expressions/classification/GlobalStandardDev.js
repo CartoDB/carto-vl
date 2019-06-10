@@ -5,6 +5,7 @@ import CartoRuntimeError, { CartoRuntimeErrorTypes } from '../../../../errors/ca
 
 import { average, standardDeviation } from '../stats';
 import { CLUSTER_FEATURE_COUNT } from '../../../../constants/metadata';
+import { globalMin, globalMax } from '../../expressions';
 
 /**
  * Classify `input` by using the Mean-Standard Deviation method with `n` buckets.
@@ -61,6 +62,14 @@ export default class GlobalStandardDev extends Classifier {
         super._resolveAliases(aliases);
 
         this._validateClassSizeIsProperNumber();
+        this._minMaxInitialization();
+    }
+
+    _minMaxInitialization () {
+        const input = this.input;
+        const children = { min: globalMin(input), max: globalMax(input) };
+
+        this._initializeChildren(children);
     }
 
     _validateClassSizeIsProperNumber () {

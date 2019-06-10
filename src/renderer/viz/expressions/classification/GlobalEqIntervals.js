@@ -2,6 +2,7 @@ import Classifier from './Classifier';
 import { checkExactNumberOfArguments } from '../utils';
 import { CLUSTER_FEATURE_COUNT } from '../../../../constants/metadata';
 import CartoValidationError, { CartoValidationErrorTypes } from '../../../../errors/carto-validation-error';
+import { globalMin, globalMax } from '../../expressions';
 
 /**
  * Classify `input` by using the equal intervals method with `n` buckets.
@@ -31,6 +32,7 @@ import CartoValidationError, { CartoValidationErrorTypes } from '../../../../err
 export default class GlobalEqIntervals extends Classifier {
     constructor (input, buckets) {
         checkExactNumberOfArguments(arguments, 2, 'globalEqIntervals');
+
         super({ input, buckets });
     }
 
@@ -38,6 +40,19 @@ export default class GlobalEqIntervals extends Classifier {
         super._bindMetadata(metadata);
 
         this._updateBreakpointsWith(metadata);
+    }
+
+    _resolveAliases (aliases) {
+        super._resolveAliases(aliases);
+
+        this._minMaxInitialization();
+    }
+
+    _minMaxInitialization () {
+        const input = this.input;
+        const children = { min: globalMin(input), max: globalMax(input) };
+
+        this._initializeChildren(children);
     }
 
     _updateBreakpointsWith (metadata) {

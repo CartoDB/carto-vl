@@ -2,6 +2,7 @@ import Classifier from './Classifier';
 import { checkExactNumberOfArguments, checkType } from '../utils';
 import { CLUSTER_FEATURE_COUNT } from '../../../../constants/metadata';
 import CartoValidationError, { CartoValidationErrorTypes } from '../../../../errors/carto-validation-error';
+import { globalMin, globalMax } from '../../expressions';
 
 /**
  * Classify `input` by using the quantiles method with `n` buckets.
@@ -31,6 +32,7 @@ import CartoValidationError, { CartoValidationErrorTypes } from '../../../../err
 export default class GlobalQuantiles extends Classifier {
     constructor (input, buckets) {
         checkExactNumberOfArguments(arguments, 2, 'globalQuantiles');
+
         super({ input, buckets });
     }
 
@@ -42,6 +44,19 @@ export default class GlobalQuantiles extends Classifier {
     }
 
     _validateInputIsNumericProperty () { /* noop */ }
+
+    _resolveAliases (aliases) {
+        super._resolveAliases(aliases);
+
+        this._minMaxInitialization();
+    }
+
+    _minMaxInitialization () {
+        const input = this.input;
+        const children = { min: globalMin(input), max: globalMax(input) };
+
+        this._initializeChildren(children);
+    }
 
     _updateBreakpointsWith (metadata) {
         if (this.input.propertyName === CLUSTER_FEATURE_COUNT) {
@@ -55,9 +70,10 @@ export default class GlobalQuantiles extends Classifier {
         const copy = metadata.sample.map(s => s[name]);
         copy.sort((x, y) => x - y);
 
-        this.breakpoints.map((breakpoint, index) => {
+        this.breakpoints = this.breakpoints.map((breakpoint, index) => {
             const p = (index + 1) / this.numCategories;
             breakpoint.value = copy[Math.floor(p * copy.length)];
+            return breakpoint;
         });
     }
 }

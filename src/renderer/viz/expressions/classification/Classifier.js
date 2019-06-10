@@ -113,9 +113,13 @@ export default class Classifier extends BaseExpression {
         const breakpointsLength = breakpoints.length;
         const data = [];
 
+        const legendMin = this.min ? this.min.value : Number.NEGATIVE_INFINITY;
+        const legendMax = this.max ? this.max.value : Number.POSITIVE_INFINITY;
+
         for (let i = 0; i <= breakpointsLength; i++) {
-            const min = breakpoints[i - 1] || Number.NEGATIVE_INFINITY;
-            const max = breakpoints[i] || Number.POSITIVE_INFINITY;
+            const min = breakpoints[i - 1] === 0 ? 0 : breakpoints[i - 1] || legendMin;
+            const max = breakpoints[i] === 0 ? 0 : breakpoints[i] || legendMax;
+
             const key = [min, max];
             const value = i / breakpointsLength;
             data.push({ key, value });
