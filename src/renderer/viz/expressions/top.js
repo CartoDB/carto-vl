@@ -53,10 +53,13 @@ export default class Top extends BaseExpression {
         othersLabel = implicitCast(othersLabel);
 
         const children = { property, buckets, othersLabel };
+
         for (let i = 0; i < MAX_TOP_BUCKETS; i++) {
             children[`_top${i}`] = number(0);
         }
         super(children);
+
+        this.numBuckets = this.getNumBuckets();
         this.type = 'category';
     }
 
@@ -100,7 +103,7 @@ export default class Top extends BaseExpression {
         return this.numCategories - 1;
     }
 
-    get numBuckets () {
+    getNumBuckets () {
         let buckets = Math.round(this.buckets.value);
 
         if (buckets > this.property.numCategories) {
@@ -108,16 +111,12 @@ export default class Top extends BaseExpression {
         }
 
         if (buckets > MAX_TOP_BUCKETS) {
-            // setTimeout is used here because throwing within the renderer stack leaves the state in an invalid state,
-            // making this error an unrecoverable error, within the setTimeout the error is recoverable
             const prev = this.buckets.value;
-            setTimeout(() => {
-                throw new CartoValidationError(
-                    `top() function has a limit of ${MAX_TOP_BUCKETS} buckets but '${prev}' buckets were specified.`,
-                    CartoValidationErrorTypes.INCORRECT_VALUE
-                );
-            });
             buckets = 0;
+            throw new CartoValidationError(
+                `top() function has a limit of ${MAX_TOP_BUCKETS} buckets but '${prev}' buckets were specified.`,
+                CartoValidationErrorTypes.INCORRECT_VALUE
+            );
         }
 
         return buckets;
