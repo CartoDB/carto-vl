@@ -59,7 +59,7 @@ export default class Top extends BaseExpression {
         }
         super(children);
 
-        this.numBuckets = this.getNumBuckets();
+        this.numBuckets = this.getNumBuckets(buckets);
         this.type = 'category';
     }
 
@@ -103,23 +103,23 @@ export default class Top extends BaseExpression {
         return this.numCategories - 1;
     }
 
-    getNumBuckets () {
-        let buckets = Math.round(this.buckets.value);
+    getNumBuckets (buckets) {
+        let numBuckets = Math.round(buckets);
 
-        if (buckets > this.property.numCategories) {
-            buckets = this.property.numCategories;
+        if (numBuckets > this.property.numCategories) {
+            numBuckets = this.property.numCategories;
         }
 
-        if (buckets > MAX_TOP_BUCKETS) {
-            const prev = this.buckets.value;
-            buckets = 0;
+        if (numBuckets > MAX_TOP_BUCKETS) {
+            const prev = buckets;
+
             throw new CartoValidationError(
                 `top() function has a limit of ${MAX_TOP_BUCKETS} buckets but '${prev}' buckets were specified.`,
                 CartoValidationErrorTypes.INCORRECT_VALUE
             );
         }
 
-        return buckets;
+        return numBuckets;
     }
 
     _applyToShaderSource (getGLSLforProperty) {
