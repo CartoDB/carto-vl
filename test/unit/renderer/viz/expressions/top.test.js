@@ -26,21 +26,9 @@ describe('src/renderer/viz/expressions/top', () => {
             expect(actual).toEqual(expected);
         });
 
-        it('should return 0 when it is outside the bounds', () => {
-            // Mock setTimeout
-            window.setTimeout = (fn) => {};
-            const top = s.top(s.property('numericProperty'), 17);
-            const actual = top.numBuckets;
-            const expected = 0;
-            expect(actual).toEqual(expected);
-        });
-
         it('should throw an async exception when it is outside the bounds', () => {
-            // Mock setTimeout
-            window.setTimeout = (fn) => fn();
-            const top = s.top(s.property('numericProperty'), 17);
             expect(() => {
-                top.numBuckets();
+                s.top(s.property('numericProperty'), 17);
             }).toThrowError(CartoValidationError, CartoValidationErrorTypes.INCORRECT_VALUE + ' top() function has a limit of 16 buckets but \'17\' buckets were specified.');
         });
 
