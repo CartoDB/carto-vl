@@ -2,7 +2,7 @@ import Classifier from './Classifier';
 import { checkExactNumberOfArguments, checkType } from '../utils';
 import { CLUSTER_FEATURE_COUNT } from '../../../../constants/metadata';
 import CartoValidationError, { CartoValidationErrorTypes } from '../../../../errors/carto-validation-error';
-import { globalMin, globalMax } from '../../expressions';
+import { number } from '../../expressions';
 
 /**
  * Classify `input` by using the quantiles method with `n` buckets.
@@ -45,19 +45,6 @@ export default class GlobalQuantiles extends Classifier {
 
     _validateInputIsNumericProperty () { /* noop */ }
 
-    _resolveAliases (aliases) {
-        super._resolveAliases(aliases);
-
-        this._minMaxInitialization();
-    }
-
-    _minMaxInitialization () {
-        const input = this.input;
-        const children = { min: globalMin(input), max: globalMax(input) };
-
-        this._initializeChildren(children);
-    }
-
     _updateBreakpointsWith (metadata) {
         if (this.input.propertyName === CLUSTER_FEATURE_COUNT) {
             throw new CartoValidationError(
@@ -67,7 +54,12 @@ export default class GlobalQuantiles extends Classifier {
         }
 
         const name = this.input.name;
+        const { min, max } = metadata.stats(name);
         const copy = metadata.sample.map(s => s[name]);
+
+        this.min = number(min);
+        this.max = number(max);
+
         copy.sort((x, y) => x - y);
 
         this.breakpoints = this.breakpoints.map((breakpoint, index) => {

@@ -43,6 +43,7 @@ export default class ViewportEqIntervals extends Classifier {
     _minMaxInitialization () {
         const input = this.input;
         const children = { min: viewportMin(input), max: viewportMax(input) };
+
         this._initializeChildren(children);
     }
 

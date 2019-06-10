@@ -2,7 +2,7 @@ import Classifier from './Classifier';
 import { checkExactNumberOfArguments } from '../utils';
 import { CLUSTER_FEATURE_COUNT } from '../../../../constants/metadata';
 import CartoValidationError, { CartoValidationErrorTypes } from '../../../../errors/carto-validation-error';
-import { globalMin, globalMax } from '../../expressions';
+import { number } from '../../expressions';
 
 /**
  * Classify `input` by using the equal intervals method with `n` buckets.
@@ -32,27 +32,12 @@ import { globalMin, globalMax } from '../../expressions';
 export default class GlobalEqIntervals extends Classifier {
     constructor (input, buckets) {
         checkExactNumberOfArguments(arguments, 2, 'globalEqIntervals');
-
         super({ input, buckets });
     }
 
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
-
         this._updateBreakpointsWith(metadata);
-    }
-
-    _resolveAliases (aliases) {
-        super._resolveAliases(aliases);
-
-        this._minMaxInitialization();
-    }
-
-    _minMaxInitialization () {
-        const input = this.input;
-        const children = { min: globalMin(input), max: globalMax(input) };
-
-        this._initializeChildren(children);
     }
 
     _updateBreakpointsWith (metadata) {
@@ -65,8 +50,8 @@ export default class GlobalEqIntervals extends Classifier {
 
         const name = this.input.name;
         const { min, max } = metadata.stats(name);
-        this.min = min;
-        this.max = max;
+        this.min = number(min);
+        this.max = number(max);
 
         this.breakpoints.map((breakpoint, index) => {
             const p = (index + 1) / this.numCategories;

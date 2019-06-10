@@ -63,6 +63,7 @@ export default class ViewportStandardDev extends Classifier {
     _resolveAliases (aliases) {
         super._resolveAliases(aliases);
 
+        this._validateClassSizeIsProperNumber();
         this._histogramInitialization();
     }
 
