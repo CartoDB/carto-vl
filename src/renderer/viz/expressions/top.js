@@ -58,8 +58,7 @@ export default class Top extends BaseExpression {
             children[`_top${i}`] = number(0);
         }
         super(children);
-
-        this.numBuckets = this.getNumBuckets(buckets);
+        this.numBuckets = 0;
         this.type = 'category';
     }
 
@@ -93,6 +92,7 @@ export default class Top extends BaseExpression {
 
         this._metadata = metadata;
         this._textureBuckets = null;
+        this.numBuckets = this.getNumBuckets(this.buckets);
     }
 
     get numCategories () {
