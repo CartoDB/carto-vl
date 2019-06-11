@@ -1039,11 +1039,11 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     actual = r.getLegendData().data;
                     expected = [
                         {
-                            key: [Number.NEGATIVE_INFINITY, 2.5],
+                            key: [1, 2.5],
                             value: red.value
                         },
                         {
-                            key: [2.5, Number.POSITIVE_INFINITY],
+                            key: [2.5, 4],
                             value: blue.value
                         }
                     ];
