@@ -2,7 +2,7 @@ import Classifier from './Classifier';
 import { checkNumber, checkType, checkMaxArguments, checkMinArguments } from '../utils';
 import CartoValidationError, { CartoValidationErrorTypes } from '../../../../errors/carto-validation-error';
 
-import { viewportHistogram } from '../../expressions';
+import { viewportHistogram, viewportMin, viewportMax } from '../../expressions';
 import { calculateBreakpoints } from './GlobalStandardDev';
 import { DEFAULT_HISTOGRAM_SIZE } from './Classifier';
 
@@ -72,7 +72,11 @@ export default class ViewportStandardDev extends Classifier {
 
         const input = this.input;
         const histogramSize = this._histogramSize.value;
-        const children = { _histogram: viewportHistogram(input, histogramSize) };
+        const min = viewportMin(input);
+        const max = viewportMax(input);
+        const _histogram = viewportHistogram(input, histogramSize);
+
+        const children = { min, max, _histogram };
         this._initializeChildren(children);
     }
 

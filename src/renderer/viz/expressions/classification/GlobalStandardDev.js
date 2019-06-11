@@ -5,6 +5,7 @@ import CartoRuntimeError, { CartoRuntimeErrorTypes } from '../../../../errors/ca
 
 import { average, standardDeviation } from '../stats';
 import { CLUSTER_FEATURE_COUNT } from '../../../../constants/metadata';
+import { number } from '../../expressions';
 
 /**
  * Classify `input` by using the Mean-Standard Deviation method with `n` buckets.
@@ -91,6 +92,9 @@ export default class GlobalStandardDev extends Classifier {
         const sample = metadata.sample.map(s => s[name]);
         const avg = average(sample);
         const standardDev = standardDeviation(sample);
+        const { min, max } = metadata.stats(name);
+        this.min = number(min);
+        this.max = number(max);
 
         const breaks = calculateBreakpoints(avg, standardDev, this.numCategories, this._classSize.value);
         this.breakpoints.forEach((breakpoint, index) => {
