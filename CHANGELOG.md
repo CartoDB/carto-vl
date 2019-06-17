@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## UNRELEASED
 
+## [1.3.1] 2019-06-17
+
+### Fixed
+- Remove Infinity numbers from Classifiers `getLegendData()` method
+- Change `numBuckets` getter to a method in `top` expression
+
 ## [1.3.0] 2019-06-03
 
 ## Added
