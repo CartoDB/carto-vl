@@ -127,7 +127,7 @@ export default class Layer {
     /**
      * Register an event handler for the given event name.
      *
-     * @param {String} eventName - Type of event to listen for. Valid names are: `loaded`, `updated`.
+     * @param {String} eventName - Type of event to listen for. Valid names are: `loaded`, `updated`, and `removed`.
      * @param {function} callback - Function to call in response to given event
      * @memberof carto.Layer
      * @instance
@@ -140,7 +140,7 @@ export default class Layer {
     /**
      * Remove an event handler for the given type.
      *
-     * @param {String} eventName - Type of event to unregister. Valid names are: `loaded`, `updated`.
+     * @param {String} eventName - Type of event to unregister. Valid names are: `loaded`, `updated`, and `removed`.
      * @param {function} callback - Handler function to unregister
      * @memberof carto.Layer
      * @instance
@@ -435,6 +435,7 @@ export default class Layer {
      * Custom Layer API: `onRemove` function
      */
     onRemove (map, gl) {
+        this._fire('removed', this);
     }
 
     /**

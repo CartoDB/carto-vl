@@ -145,7 +145,7 @@ export default class Renderer {
             const textureId = metashader.textureIds;
 
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, dataframeTexture, 0);
-            gl.viewport(0, 0, RTT_WIDTH, dataframe.height);
+            gl.viewport(0, 0, RTT_WIDTH, dataframe.getSize().height);
             gl.clear(gl.COLOR_BUFFER_BIT);
 
             gl.useProgram(shader.program);

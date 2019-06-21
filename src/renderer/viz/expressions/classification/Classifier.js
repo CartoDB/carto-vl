@@ -111,11 +111,13 @@ export default class Classifier extends BaseExpression {
     getLegendData () {
         const breakpoints = this._getBreakpointList();
         const breakpointsLength = breakpoints.length;
+        const legendMin = this.min.value;
+        const legendMax = this.max.value;
         const data = [];
 
         for (let i = 0; i <= breakpointsLength; i++) {
-            const min = breakpoints[i - 1] || Number.NEGATIVE_INFINITY;
-            const max = breakpoints[i] || Number.POSITIVE_INFINITY;
+            const min = breakpoints[i - 1] === 0 ? 0 : breakpoints[i - 1] || legendMin;
+            const max = breakpoints[i] === 0 ? 0 : breakpoints[i] || legendMax;
             const key = [min, max];
             const value = i / breakpointsLength;
             data.push({ key, value });

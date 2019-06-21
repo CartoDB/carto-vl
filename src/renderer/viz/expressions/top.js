@@ -53,10 +53,12 @@ export default class Top extends BaseExpression {
         othersLabel = implicitCast(othersLabel);
 
         const children = { property, buckets, othersLabel };
+
         for (let i = 0; i < MAX_TOP_BUCKETS; i++) {
             children[`_top${i}`] = number(0);
         }
         super(children);
+        this.numBuckets = 0;
         this.type = 'category';
     }
 
@@ -90,6 +92,7 @@ export default class Top extends BaseExpression {
 
         this._metadata = metadata;
         this._textureBuckets = null;
+        this.numBuckets = this.getNumBuckets(this.buckets);
     }
 
     get numCategories () {
@@ -100,27 +103,23 @@ export default class Top extends BaseExpression {
         return this.numCategories - 1;
     }
 
-    get numBuckets () {
-        let buckets = Math.round(this.buckets.eval());
+    getNumBuckets (buckets) {
+        let numBuckets = Math.round(buckets);
 
-        if (buckets > this.property.numCategories) {
-            buckets = this.property.numCategories;
+        if (numBuckets > this.property.numCategories) {
+            numBuckets = this.property.numCategories;
         }
 
-        if (buckets > MAX_TOP_BUCKETS) {
-            // setTimeout is used here because throwing within the renderer stack leaves the state in an invalid state,
-            // making this error an unrecoverable error, within the setTimeout the error is recoverable
-            const prev = this.buckets.eval();
-            setTimeout(() => {
-                throw new CartoValidationError(
-                    `top() function has a limit of ${MAX_TOP_BUCKETS} buckets but '${prev}' buckets were specified.`,
-                    CartoValidationErrorTypes.INCORRECT_VALUE
-                );
-            });
-            buckets = 0;
+        if (numBuckets > MAX_TOP_BUCKETS) {
+            const prev = buckets;
+
+            throw new CartoValidationError(
+                `top() function has a limit of ${MAX_TOP_BUCKETS} buckets but '${prev}' buckets were specified.`,
+                CartoValidationErrorTypes.INCORRECT_VALUE
+            );
         }
 
-        return buckets;
+        return numBuckets;
     }
 
     _applyToShaderSource (getGLSLforProperty) {
@@ -205,23 +204,24 @@ export default class Top extends BaseExpression {
         const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
             b.frequency - a.frequency
         );
-        const buckets = this.numBuckets;
+        const numBuckets = this.numBuckets;
         const data = [];
         const name = this.toString();
         const divisor = this.numCategoriesWithoutOthers - 1 || 1;
-        const othersLabel = options && options.othersLabel
-            ? options.othersLabel
-            : this.othersLabel.value;
 
         orderedCategoryNames.forEach((category, i) => {
-            if (i < buckets) {
+            if (i < numBuckets) {
                 const key = category.name;
                 const value = i / divisor;
                 data.push({ key, value });
             }
         });
 
-        if (othersLabel) {
+        if (orderedCategoryNames.length > this.buckets) {
+            const othersLabel = options && options.othersLabel
+                ? options.othersLabel
+                : this.othersLabel.value;
+
             data.push({
                 key: othersLabel,
                 value: OTHERS_INDEX

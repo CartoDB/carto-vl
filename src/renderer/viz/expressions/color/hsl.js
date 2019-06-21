@@ -93,6 +93,14 @@ function genHSL (name, alpha = null) {
             return hslToRgb(h, s, l, a, alpha, feature);
         }
 
+        getLegendData () {
+            const name = 'color';
+            const value = this.value;
+            const key = 'color';
+            const data = [{ key, value }];
+
+            return { name, data };
+        }
         _bindMetadata (meta) {
             super._bindMetadata(meta);
             hslCheckType('h', 0, this.h);

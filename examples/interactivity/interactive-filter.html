@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <script src="../../dist/carto-vl.js"></script>
-    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
-    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="../style.css">
 
     <style>
@@ -59,6 +59,7 @@
         });
 
         map.addControl(nav, 'top-left');
+        map.addControl(new mapboxgl.FullscreenControl(), 'top-left');
 
         carto.setDefaultAuth({
             username: 'cartovl',
@@ -106,7 +107,7 @@
                 // Use "data-weather-category" attribute to set the category for each checkbox
                 return `
                     <li>
-                        <input 
+                        <input
                             id="js-checkbox-${key}"
                             class="js-checkbox"
                             type="checkbox"
@@ -148,12 +149,12 @@
 
         //** Helper Methods **//
 
-        // A function to convert map colors to HEX values for legend    
+        // A function to convert map colors to HEX values for legend
         function rgbToHex(color) {
             return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
         }
 
-        // A function to toggle an element in an array  
+        // A function to toggle an element in an array
         function _toggle(arr, item) {
             return arr.includes(item) ? arr.filter(i => i !== item) : [...arr, item];
         }

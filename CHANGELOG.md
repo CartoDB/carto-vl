@@ -5,11 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## Next
+## UNRELEASED
+
+## [1.3.1] 2019-06-17
+
+### Fixed
+- Remove Infinity numbers from Classifiers `getLegendData()` method
+- Change `numBuckets` getter to a method in `top` expression
+
+## [1.3.0] 2019-06-03
+
+## Added
+- `removed` event for Layer instances
 
 ### Changed
-- Internal refactor regarding data sources (GeoJSON and Windshaft)
+- Internal refactoring regarding data sources (GeoJSON and Windshaft) and Dataframe
 - Unify `.value`, `.eval()` and `.getLegendData()` methods to get expression values
+- Upgrade to use Mapbox GL version 1.0.0
+
+### Fixed
+- Deregister removed layers in interactivity
+- Remove map listeners when there are no layers remaining in interactivity
+- Do not always add CARTO_VL_OTHERS when getting legend data from the buckets expression
+- Fix memory exhausted error using `buckets` with a long list
+
+## [1.2.6] 2019-05-27
+
+### Changed
+- Add fullscreen control to all public examples
 
 ## [1.2.5] - 2019-04-25
 

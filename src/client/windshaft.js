@@ -160,7 +160,7 @@ export default class Windshaft {
     }
 
     async _instantiateUncached (vizInfo, choices = { backendFilters: true }, overrideMetadata = null) {
-        const { MNS, resolution, filters } = vizInfo;
+        const { MNS, resolution, filtering } = vizInfo;
 
         const agg = await this._generateAggregation(MNS, resolution);
         let select = this._buildSelectClause(MNS);
@@ -168,7 +168,7 @@ export default class Windshaft {
 
         const query = `(${aggSQL}) AS tmp`;
 
-        let backendFilters = choices.backendFilters ? filters : null;
+        let backendFilters = choices.backendFilters ? filtering : null;
         let backendFiltersApplied = false;
         if (backendFilters && this._requiresAggregation(MNS)) {
             agg.filters = windshaftFiltering.getAggregationFilters(backendFilters);
@@ -189,10 +189,10 @@ export default class Windshaft {
         let { urlTemplates, metadata } = await this._getInstantiationPromise(query, conf, agg, aggSQL, select, overrideMetadata, MNS);
         metadata.backendFiltersApplied = backendFiltersApplied;
 
-        return { MNS, resolution, filters, metadata, urlTemplates };
+        return { MNS, resolution, filtering, metadata, urlTemplates };
     }
 
-    _updateStateAfterInstantiating ({ MNS, resolution, filters, metadata, urlTemplates }) {
+    _updateStateAfterInstantiating ({ MNS, resolution, filtering, metadata, urlTemplates }) {
         if (this._mvtClient) {
             this._mvtClient.free();
         }
@@ -203,7 +203,7 @@ export default class Windshaft {
         this.urlTemplates = urlTemplates;
         this.metadata = metadata;
         this._MNS = MNS;
-        this.filtering = filters;
+        this.filtering = filtering;
         this.resolution = resolution;
         this._checkLayerMeta(MNS);
     }

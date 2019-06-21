@@ -42,7 +42,8 @@ export default class ViewportEqIntervals extends Classifier {
 
     _minMaxInitialization () {
         const input = this.input;
-        const children = { _min: viewportMin(input), _max: viewportMax(input) };
+        const children = { min: viewportMin(input), max: viewportMax(input) };
+
         this._initializeChildren(children);
     }
 
@@ -55,8 +56,8 @@ export default class ViewportEqIntervals extends Classifier {
     _validateInputIsNumericProperty () { /* noop */ }
 
     _genBreakpoints () {
-        const min = this._min.eval();
-        const max = this._max.eval();
+        const min = this.min.value;
+        const max = this.max.value;
 
         this.breakpoints.map((breakpoint, index) => {
             const p = (index + 1) / this.numCategories;

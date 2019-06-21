@@ -1,9 +1,9 @@
-import Dataframe from '../../../src/renderer/Dataframe';
+import Dataframe from '../../../src/renderer/dataframe/Dataframe';
 import Metadata from '../../../src/renderer/Metadata';
 import { pointInTriangle, GEOMETRY_TYPE } from '../../../src/utils/geometry';
 import { mat4 } from 'gl-matrix';
 
-describe('src/renderer/Dataframe', () => {
+describe('src/renderer/dataframe/Dataframe', () => {
     const m = [];
     mat4.identity(m);
     mat4.scale(m, m, [2, 1, 1]);

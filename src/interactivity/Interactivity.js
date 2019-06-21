@@ -128,39 +128,52 @@ export default class Interactivity {
         this._prevHoverFeatures = [];
         this._prevClickFeatures = [];
         this._numListeners = {};
+        this._isAutoChangePointerEnabled = options.autoChangePointer;
 
         const allLayersReadyPromises = layerList.map(layer => layer._context);
         return Promise.all(allLayersReadyPromises)
             .then(() => {
                 postCheckLayerList(layerList);
+                this._map = layerList[0].map;
+
                 this._subscribeToLayerEvents(layerList);
-                this._subscribeToMapEvents(layerList[0].map);
-            }).then(() => {
-                if (options.autoChangePointer) {
+                this._subscribeToMapEvents(this._map);
+
+                if (this._isAutoChangePointerEnabled) {
                     this._setInteractiveCursor();
                 }
             });
     }
 
     _setInteractiveCursor () {
-        const map = this._layerList[0].map; // All layers belong to the same map
-        if (!map.__carto_interactivities) {
-            map.__carto_interactivities = new Set();
+        if (!this._map.__carto_interactivities) {
+            this._map.__carto_interactivities = new Set();
         }
-        this.on('featureHover', event => {
-            if (event.features.length) {
-                map.__carto_interactivities.add(this);
-            } else {
-                map.__carto_interactivities.delete(this);
-            }
-            map.getCanvas().style.cursor = (map.__carto_interactivities.size > 0) ? 'pointer' : '';
-        });
+        this.on('featureHover', event => this._onFeatureHover(event, this._map));
+    }
+
+    _onFeatureHover (event, map) {
+        if (event.features.length) {
+            map.__carto_interactivities.add(this);
+        } else {
+            map.__carto_interactivities.delete(this);
+        }
+        map.getCanvas().style.cursor = (map.__carto_interactivities.size > 0) ? 'pointer' : '';
     }
 
     _subscribeToMapEvents (map) {
-        map.on('mousemove', this._onMouseMove.bind(this));
-        map.on('click', this._onClick.bind(this));
+        this._onMouseMoveBound = this._onMouseMove.bind(this);
+        map.on('mousemove', this._onMouseMoveBound);
+
+        this._onClickBound = this._onClick.bind(this);
+        map.on('click', this._onClickBound);
+
         this._disableWhileMovingMap(map);
+    }
+
+    _unsubscribeToMapEvents (map) {
+        map.off('mousemove', this._onMouseMoveBound);
+        map.off('click', this._onClickBound);
     }
 
     _disableWhileMovingMap (map) {
@@ -180,11 +193,34 @@ export default class Interactivity {
     _subscribeToLayerEvents (layers) {
         layers.forEach(layer => {
             layer.on('updated', this._onLayerUpdated.bind(this));
+            layer.on('removed', this._onLayerRemoved.bind(this));
         });
     }
 
     _onLayerUpdated () {
         this._onMouseMove(this._mouseEvent, true);
+    }
+
+    _onLayerRemoved (layer) {
+        this._removeLayerFromInteractivity(layer);
+
+        if (this._isAutoChangePointerEnabled) {
+            this._onFeatureHover({ features: [] }, this._map);
+        }
+
+        if (!this._layerList.length) {
+            this._unsubscribeToMapEvents(this._map);
+        }
+    }
+
+    _removeLayerFromInteractivity (layer) {
+        const layerIndex = this._layerList.indexOf(layer);
+
+        if (layerIndex === -1) {
+            return;
+        }
+
+        this._layerList.splice(layerIndex, 1);
     }
 
     _onMouseMove (event, emulated) {

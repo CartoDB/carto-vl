@@ -4,7 +4,7 @@ Maps that symbolize data without the necessary information to decode the symbols
 
 ### Overview
 
-CARTO VL itself doesn't provide the functionality to _draw_ legends. Instead, it provides the functionality necessary to _build_ them. What this means is that CARTO VL provides the data you need to create a legend, but drawing that data on the screen (in the form of a legend), is the responsibility of the application developer. The benefit of this is that you have more control over customizing legends for the needs of your specific application.
+CARTO VL itself doesn't provide the functionality to _draw_ legends. Instead, it provides the functionality necessary to _build_ them. What this means is that CARTO VL provides the data you need to create a legend, but drawing that data on the screen (in the form of a legend), is the responsibility of the application developer. The benefit of this is that you have more control over customizing legends for the needs of your specific application. Moreover, to build those visual components (and much more) you can use the power of our complementary library [Airship](https://carto.com/developers/airship/).
 
 If you completed the data-driven visualization guide, the map below will look familiar. In that guide, you learned how to symbolize feature properties with a `ramp`. In this guide, you will learn how to reference that `ramp` to access data for the legend, and then place the returned content on your map. At the end of this guide, we also provide a series of examples, that are meant to serve as the legend "building blocks" that you can take and begin to customize on top of for a variety of map types.
 
@@ -45,10 +45,10 @@ To get started, copy and paste the code for this map and save it as `accidents.h
     <title>Rail accident weather | CARTO</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
-    <script src="../../../dist/carto-vl.js"></script>
+    <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js"></script>
 
-    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
-    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.css" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
@@ -121,10 +121,6 @@ In the map above, the `ramp` expression is the root expression of the styling pr
 Add the following code to your map right under `layer.addTo(map)` and before the closing `</script>` tag. Take a look through the inline comments describing the different steps to place the legend content when a map is loaded.
 
 ```js
-// A function to convert map colors to HEX values for legend
-function rgbToHex(color) {
-    return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
-}
 
 // When layer loads, trigger legend event
 layer.on('loaded', () => {
@@ -135,11 +131,12 @@ layer.on('loaded', () => {
 
     // Create list elements for legend
     colorLegend.data.forEach((legend, index) => {
-        const color = rgbToHex(legend.value);
+        const color = legend.value;
+        const rgba = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
 
         // Style for legend items
         colorLegendList +=
-            `<li><span class="point-mark" style="background-color:${color};border: 1px solid black;"></span> <span>${legend.key}</span></li>\n`;
+            `<li><span class="point-mark" style="background-color:${rgba};border: 1px solid black;"></span> <span>${legend.key}</span></li>\n`;
     });
 
     // Place list items in the content section of the title/legend box
@@ -171,6 +168,7 @@ To define where the content should be placed on the map, add a `<section>` in th
     </div>
 </aside>
 ```
+
 Now, when you load the map, you will see the complete legend. You will also notice that the CARTO VL interpolated `ramp` colors (we only provided three colors for six categories) are also brought into the legend with the associated category name.
 
 <div class="example-map">
@@ -223,69 +221,41 @@ With that change, the map labels other categories as "Other weather" in the lege
 </div>
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-legends/step-4.html)
 
-### Assign opacity with variables
+### Working with opacity
 
-If you want to assign opacity to mapped features, you will construct your `ramp` using [variables](/developers/carto-vl/guides/Glossary/#variables).
+To assign opacity to your mapped features, you will usually work with the `opacity` and `ramp` expressions.
+
+The styling below assigns a global `0.5` opacity to features, using some variables:
+
+* `@myPalette: [darkorange, darkviolet, darkturquoise]` for the colors assigned to each category
+* `@myOpacity: 0.5`
 
 **Note:**
 The use of [variables](/developers/carto-vl/guides/Glossary/#variables) is explored in greater detail in the [Add Widgets](/developers/carto-vl/guides/add-widgets/) guide.
-
-The styling below assigns a global `0.5` opacity to features, using two variables:
-* `@myRamp: ramp($weather, [darkorange, darkviolet, darkturquoise])` for the colors assigned to each category
-* `@myOpacity: 0.5` for the amount of opacity to assign to features
 
 The variables are then used in the `color` property inside of an `opacity` expression:
 
 ```CARTO_VL_Viz
 const viz = new carto.Viz(`
-    @myRamp: ramp($weather, [darkorange, darkviolet, darkturquoise])
+    @myPalette: [darkorange, darkviolet, darkturquoise]
     @myOpacity: 0.5
 
     width: 7
-    color: opacity(@myRamp, @myOpacity)
+    color: opacity(ramp($weather, @myPalette), @myOpacity)
     strokeWidth: 0.2
     strokeColor: black
 `);
 ```
 
-Next, you need to modify where the legend gets the data to draw (`getLegendData()`). In the previous examples, you set the data to come from the `color` property but in this case, the symbology is assigned through variables so you need to modify it to read from the variable `@myRamp`:
+Next, you just need to use again the `getLegendData()` method, from the `color` property:
 
 ```js
 // Request data for legend from the layer variable myRamp
-    const colorLegend = layer.viz.variables.myRamp.getLegendData();
+    const colorLegend = layer.viz.color.getLegendData();
     let colorLegendList = '';
 ```
-At this point, if you refresh your map, you will see that the features on the map have the set opacity, but the features in the legend do not.
 
-To add opacity to the legend items, you need to remove the function `rgbToHex(color)` (that works only with the RGB color components of each entry) and instead, use another approach, that includes the alpha component. In the code below, the alpha component is defined previously as a variable (`@myOpacity`) which is read in when building the visual legend entries (thus using RGBA colors).
-
-```js
-// When layer loads, trigger legend event
-layer.on('loaded', () => {
-
-    // Request data for legend from the layer viz variables 'myRamp' and 'myOpacity'
-    const colorLegend = layer.viz.variables.myRamp.getLegendData();
-    const opacity = layer.viz.variables.myOpacity.value;
-
-    let colorLegendList = '';
-
-    // Create list elements for legend
-    colorLegend.data.forEach((legend, index) => {
-        const color = legend.value;
-
-        // Add the predefined opacity to the ramp color components
-        const rgba = `rgba(${color.r}, ${color.g}, ${color.b}, ${opacity})`;
-
-        // Style for legend items based on geometry type
-        colorLegendList +=
-            `<li><span class="point-mark" style="background-color:${rgba}; border: 0px solid black;"></span><span>${legend.key}</span></li>\n`;
-    });
-
-    // Place list items in the content section of the title/legend box
-    document.getElementById('content').innerHTML = colorLegendList;
-});
-```
-Now when you load the map, you will see that both the features on the map and the legend have the assigned opacity:
+At this point, if you refresh your map, you will see that not only the features on the map have the set opacity, but also the features in the legend:
 
 <div class="example-map">
     <iframe

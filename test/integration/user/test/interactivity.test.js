@@ -455,6 +455,101 @@ describe('Interactivity', () => {
     });
 });
 
+describe('Interactivity with multiple layers', () => {
+    let map, div, source1, viz1, layer1, source2, viz2, layer2, interactivity;
+
+    beforeEach(() => {
+        const setup = util.createMap('map');
+        map = setup.map;
+        div = setup.div;
+
+        map.addLayer = layer => { layer.onAdd(map); };
+        map.removeLayer = layerId => {
+            interactivity && interactivity._layerList
+                .find(layer => layer.id === layerId)
+                .onRemove(map);
+        };
+
+        source1 = new carto.source.GeoJSON(feature1);
+        viz1 = new carto.Viz(`
+            color: red
+            @wadus: 123
+        `);
+        layer1 = new carto.Layer('layer1', source1, viz1);
+        layer1.onAdd = map => { layer1.map = map; };
+
+        source2 = new carto.source.GeoJSON(feature2);
+        viz2 = new carto.Viz(`
+            color: opacity(green, 0.7)
+        `);
+        layer2 = new carto.Layer('layer2', source2, viz2);
+        layer2.onAdd = map => { layer2.map = map; };
+
+        layer1.addTo(map);
+        layer2.addTo(map);
+
+        interactivity = new carto.Interactivity([layer1, layer2]);
+    });
+
+    describe('when a layer is removed', () => {
+        it('should be removed from layer list', done => {
+            const waitForLayersInitialization = Promise.all([
+                layer1._context,
+                layer2._context
+            ]);
+
+            layer1._contextInitialize();
+            layer2._contextInitialize();
+
+            waitForLayersInitialization
+                .then(() => {
+                    const layerListLength = interactivity._layerList.length;
+
+                    layer1.remove();
+
+                    expect(interactivity._layerList.length).toBe(layerListLength - 1);
+                    expect(interactivity._layerList.indexOf(layer1)).toBe(-1);
+                    done();
+                });
+        });
+
+        describe('and it is the last layer with interactivity', () => {
+            it('should unsubscribe from map events', done => {
+                const waitForLayersInitialization = Promise.all([
+                    layer1._context,
+                    layer2._context
+                ]);
+
+                spyOn(interactivity, '_unsubscribeToMapEvents').and.callThrough();
+                spyOn(map, 'off');
+
+                layer1._contextInitialize();
+                layer2._contextInitialize();
+
+                waitForLayersInitialization
+                    .then(() => {
+                        layer1.remove();
+                        layer2.remove();
+
+                        expect(interactivity._layerList.length).toBe(0);
+                        expect(interactivity._unsubscribeToMapEvents).toHaveBeenCalledWith(map);
+
+                        expect(map.off).toHaveBeenCalledTimes(2);
+                        expect(map.off).toHaveBeenCalledWith('mousemove', interactivity._onMouseMoveBound);
+                        expect(map.off).toHaveBeenCalledWith('click', interactivity._onClickBound);
+
+                        done();
+                    });
+            });
+        });
+    });
+
+    afterEach(() => {
+        map.remove();
+        document.body.removeChild(div);
+    });
+});
+
 describe('Cursor', () => {
     let map, source1, viz1, layer1, setup;
 

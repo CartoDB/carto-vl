@@ -167,6 +167,25 @@ describe('api/layer', () => {
             layer.remove();
             expect(mapMock.removeLayer).toHaveBeenCalledWith(layer.id);
         });
+
+        it('should fire removed event', () => {
+            const layer = new Layer('layer1', source, viz);
+            layer.onAdd = map => { layer.map = map; };
+
+            const mapMock = {
+                addLayer: layer => { layer.onAdd(mapMock); },
+                removeLayer: () => { layer.onRemove(mapMock); },
+                once: () => { }
+            };
+            layer.addTo(mapMock);
+
+            const removedSpy = jasmine.createSpy();
+            layer.on('removed', removedSpy);
+
+            layer.remove();
+
+            expect(removedSpy).toHaveBeenCalledWith(layer);
+        });
     });
 
     describe('.getFeaturesAtPosition', () => {

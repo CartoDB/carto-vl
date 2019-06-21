@@ -5,8 +5,8 @@
     <title>Label clusters by count | CARTO VL</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="../../dist/carto-vl.js"></script>
-    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
-    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
 
@@ -37,6 +37,7 @@
             showCompass: false
         });
         map.addControl(nav, 'top-left');
+        map.addControl(new mapboxgl.FullscreenControl(), 'top-left');
 
 
         carto.setDefaultConfig({
@@ -53,7 +54,7 @@
         const viz = new carto.Viz(`
             @count: clusterCount()
             @v_features: viewportFeatures(@count)
-            
+
             width: ramp(linear(@count, viewportMIN(@count), viewportMAX(@count)), [5,50])
             color: opacity(#C91329,0.9)
             strokeWidth: 0

@@ -558,6 +558,8 @@ body {
   min-width: 20px;
   min-height: 20px;
   box-sizing: border-box;
+  mask-size: cover;
+  -webkit-mask-size: cover;
 }
 
 .polygon-mark {

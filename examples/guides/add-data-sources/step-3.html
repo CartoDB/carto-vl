@@ -5,8 +5,8 @@
     <meta charset="utf-8">
 
     <script src="../../../dist/carto-vl.js"></script>
-    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
-    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.css" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
@@ -24,6 +24,7 @@
 
         const nav = new mapboxgl.NavigationControl();
         map.addControl(nav, 'top-left');
+        map.addControl(new mapboxgl.FullscreenControl(), 'top-left');
 
 
         //** CARTO VL functionality begins here **//
