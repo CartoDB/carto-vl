@@ -13,13 +13,14 @@
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>Images</h1>
+        <h1>Bivariate</h1>
       </header>
       <section>
-        <p class="description open-sans">Assign images to categories</p>
+        <p class="description open-sans">Legends</p>
       </section>
       <section>
         <div id="controls">
+          <ul id="legend-content"></ul>
           <ul id="content"></ul>
         </div>
       </section>
@@ -49,49 +50,46 @@
 
     const source = new carto.source.Dataset('dallas_mkt');
 
-    // @colorList1: [#e8e8e8, #dfb0d6, #be64ac]
-    //     @colorList2: [#e8e8e8, #ace4e4, #5ac8c8]
-
-    //     @population: ramp(
-    //         globalQuantiles($pop_sqkm, 3),
-    //         @colorList1
-    //     )
-
-    //     @percent: ramp(
-    //         globalQuantiles($percent_25_29, 3),
-    //         @colorList2
-    //     )
-
-
     const viz = new carto.Viz(`
         strokeColor: rgba(255,255,255,0.2)
-        color: ramp(globalQuantiles($pop_sqkm, 3), [#e8e8e8, #dfb0d6, #be64ac]) * ramp(globalQuantiles($percent_25_29, 3), [#e8e8e8, #ace4e4, #5ac8c8])
-
+        @pop: $pop_sqkm
+        @percent: $percent_25_29
+        color: ramp(globalQuantiles($pop_sqkm, 3), [#e8e8e8, #dfb0d6, #be64ac]) *
+        ramp(globalQuantiles($percent_25_29, 3), [#e8e8e8, #ace4e4, #5ac8c8])
     `);
-
-    
 
     const layer = new carto.Layer('layer', source, viz);
     const interactivity = new carto.Interactivity(layer);
     interactivity.on('featureHover', addInteractivity);
-    
+
     layer.addTo(map);
 
     layer.on('loaded', () => {
-          hideLoader();
+      hideLoader();
 
-          const color = layer.viz.color;
-        });
+      const legends = layer.viz.color.getLegendData();
+      let content = '';
+
+      legends.data.forEach((legend) => {
+        const colorHex = rgbToHex(legend.value);
+        content +=
+          `<li><span class="polygon-mark" style="background-color:${colorHex};"></span> <span>${colorHex}</span></li>`
+      });
+
+      document.getElementById('legend-content').innerHTML = content;
+    });
 
     function addInteractivity(event) {
       let content = '';
       for (let feature of event.features) {
+        const color = feature.color.eval('pop_sqkm', 'percent_25_29');
+        const colorHex = rgbToHex(color);
+
         content += `
-          <div class="container">
-            <p class="open-sans">${rgbToHex(feature.color)}</p>
-          </div>
+            <li><span class="polygon-mark" style="background-color:${colorHex};"></span> <span>${colorHex}</span></li>
         `;
       }
+
       document.getElementById('content').innerHTML = content;
     }
 
@@ -102,7 +100,6 @@
     function rgbToHex(color) {
       return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
     }
-
   </script>
 </body>
 
