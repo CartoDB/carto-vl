@@ -74,10 +74,6 @@ export default class List extends Base {
         return this.elems.map(elem => elem.eval(feature));
     }
 
-    inlineMaker () {
-        return f => 'hellow';
-    }
-
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
         this._setTypes();

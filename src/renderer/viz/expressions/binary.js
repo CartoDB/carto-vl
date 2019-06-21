@@ -1,5 +1,5 @@
 import { number } from '../expressions';
-import { implicitCast, checkMaxArguments } from './utils';
+import { implicitCast, checkMaxArguments, mix } from './utils';
 import BaseExpression from './base';
 import CartoValidationError, { CartoValidationErrorTypes } from '../../../errors/carto-validation-error';
 
@@ -40,25 +40,40 @@ export const Mul = genBinaryOp('mul',
     (x, y) => `(${x} * ${y})`
 );
 
-Mul.prototype.eval = function (featureA, featureB) {
+Mul.prototype.eval = function (features) {
+    const featureA = features[0];
+    const featureB = features[1];
+
     const valueA = this.a.eval(featureA);
     const valueB = this.b.eval(featureB);
 
-    if (this.a.type === 'color' && this.b.type === 'color') {
-        return _evalColors(valueA, valueB);
+    switch (this._signature) {
+        case NUMBERS_TO_NUMBER:
+            return valueA * valueB;
+        case NUMBER_AND_COLOR_TO_COLOR:
+            return mix(valueA, valueB);
+        case COLORS_TO_COLOR:
+            return multiplyColors(valueA, valueB);
+        default:
+            return valueA * valueB;
     }
-
-    return valueA * valueB;
 };
 
-function _evalColors (colorA, colorB) {
-    return {
-        r: colorA.r * colorB.r / 255,
-        g: colorA.g * colorB.g / 255,
-        b: colorA.b * colorB.b / 255,
-        a: colorA.a * colorB.a
-    };
-}
+Mul.prototype.getLegendData = function (options) {
+    const legendDataA = this.a.getLegendData(options);
+    const legendDataB = this.b.getLegendData(options);
+    const SIZE = legendDataA.data.length;
+    const data = [];
+
+    for (let i = 0; i < SIZE; i++) {
+        for (let j = 0; j < SIZE; j++) {
+            const value = multiplyColors(legendDataA.data[i].value, legendDataB.data[j].value);
+            data.push({ value });
+        }
+    }
+
+    return { data };
+};
 
 /**
  * Divide two numeric expressions.
@@ -490,18 +505,25 @@ function genBinaryOp (name, allowedSignature, jsFn, glsl) {
             return jsFn(valueA, valueB);
         }
 
+        getLegendData (options) {
+            const legendDataA = this.a.getLegendData(options);
+            const legendDataB = this.b.getLegendData(options);
+
+            return { a: legendDataA, b: legendDataB };
+        }
+
         _bindMetadata (meta) {
             super._bindMetadata(meta);
             const [a, b] = [this.a, this.b];
 
-            const signature = getSignature(a, b);
-            if (signature === UNSUPPORTED_SIGNATURE || !(signature & allowedSignature)) {
+            this._signature = getSignature(a, b);
+            if (this._signature === UNSUPPORTED_SIGNATURE || !(this._signature & allowedSignature)) {
                 throw new CartoValidationError(
                     `${name}(): invalid parameter types\n'x' type was ${a.type}, 'y' type was ${b.type}`,
                     CartoValidationErrorTypes.INCORRECT_TYPE
                 );
             }
-            this.type = getReturnTypeFromSignature(signature);
+            this.type = getReturnTypeFromSignature(this._signature);
         }
     };
 }
@@ -544,4 +566,13 @@ function getReturnTypeFromSignature (signature) {
         default:
             return undefined;
     }
+}
+
+function multiplyColors (colorA, colorB) {
+    return {
+        r: Math.round(colorA.r * colorB.r / 255),
+        g: Math.round(colorA.g * colorB.g / 255),
+        b: Math.round(colorA.b * colorB.b / 255),
+        a: colorA.a
+    };
 }

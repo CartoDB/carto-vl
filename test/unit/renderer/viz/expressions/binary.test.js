@@ -75,134 +75,215 @@ describe('src/renderer/viz/expressions/binary', () => {
         });
     });
 
-    describe('eval', () => {
-        describe('and', () => {
-            test('and', s.TRUE, s.TRUE, 1);
-            test('and', s.TRUE, s.FALSE, 0);
-            test('and', s.FALSE, s.FALSE, 0);
-            test('and', 0.5, s.TRUE, 0.5);
-            test('and', 0.5, 0.5, 0.25);
-        });
-
-        describe('or', () => {
-            test('or', 0, 0, 0);
-            test('or', 0, 1, 1);
-            test('or', 1, 1, 1);
-            test('or', 0.5, 1, 1);
-        });
-
+    describe('.eval', () => {
         describe('mul', () => {
-            test('mul', 0, 0, 0);
-            test('mul', 1, 0, 0);
-            test('mul', 1, 1, 1);
-            test('mul', 1, 2, 2);
-            test('mul', -1, 2, -2);
+            describe('NUMBERS_TO_NUMBER', () => {
+                testValue('mul', 0, 0, 0);
+                testValue('mul', 1, 0, 0);
+                testValue('mul', 1, 1, 1);
+                testValue('mul', 1, 2, 2);
+                testValue('mul', -1, 2, -2);
+            });
+
+            describe('NUMBER_AND_COLOR_TO_COLOR', () => {
+
+            });
+
+            describe('COLORS_TO_COLOR', () => {
+
+            });
+
+            describe('IMAGES_TO_IMAGE', () => {
+
+            });
         });
 
         describe('div', () => {
-            test('div', 1, 0, Infinity);
-            test('div', -1, 0, -Infinity);
-            test('div', 0, 0, NaN);
-            test('div', 0, 1, 0);
-            test('div', 4, 2, 2);
-            test('div', -4, 2, -2);
+            describe('NUMBERS_TO_NUMBER', () => {
+                testValue('div', 1, 0, Infinity);
+                testValue('div', -1, 0, -Infinity);
+                testValue('div', 0, 0, NaN);
+                testValue('div', 0, 1, 0);
+                testValue('div', 4, 2, 2);
+                testValue('div', -4, 2, -2);
+            });
+
+            describe('NUMBER_AND_COLOR_TO_COLOR', () => {
+
+            });
+
+            describe('COLORS_TO_COLOR', () => {
+
+            });
+
+            describe('IMAGES_TO_IMAGE', () => {
+
+            });
         });
 
         describe('add', () => {
-            test('add', 0, 0, 0);
-            test('add', 0, 1, 1);
-            test('add', 2, 2, 4);
-            test('add', -2, 2, 0);
-            test('add', -2, -3, -5);
+            describe('NUMBERS_TO_NUMBER', () => {
+                testValue('add', 0, 0, 0);
+                testValue('add', 0, 1, 1);
+                testValue('add', 2, 2, 4);
+                testValue('add', -2, 2, 0);
+                testValue('add', -2, -3, -5);
+            });
+
+            describe('COLORS_TO_COLOR', () => {
+
+            });
+
+            describe('IMAGES_TO_IMAGE', () => {
+
+            });
         });
 
         describe('sub', () => {
-            test('sub', 0, 0, 0);
-            test('sub', 0, 1, -1);
-            test('sub', 2, 2, 0);
-            test('sub', -2, 2, -4);
-            test('sub', -2, -3, 1);
+            describe('NUMBERS_TO_NUMBER', () => {
+                testValue('sub', 0, 0, 0);
+                testValue('sub', 0, 1, -1);
+                testValue('sub', 2, 2, 0);
+                testValue('sub', -2, 2, -4);
+                testValue('sub', -2, -3, 1);
+            });
+
+            describe('COLORS_TO_COLOR', () => {
+
+            });
+
+            describe('IMAGES_TO_IMAGE', () => {
+
+            });
         });
 
         describe('mod', () => {
-            test('mod', 0, 1, 0);
-            test('mod', 2, 1, 0);
-            test('mod', 2, 2, 0);
-            test('mod', 6, 4, 2);
-            test('mod', -6, 4, -2);
+            describe('NUMBERS_TO_NUMBER', () => {
+                testValue('mod', 0, 1, 0);
+                testValue('mod', 2, 1, 0);
+                testValue('mod', 2, 2, 0);
+                testValue('mod', 6, 4, 2);
+                testValue('mod', -6, 4, -2);
+            });
         });
 
         describe('pow', () => {
-            test('pow', 0, 0, 1);
-            test('pow', 0, 1, 0);
-            test('pow', 2, 2, 4);
-            test('pow', -2, 2, 4);
-            test('pow', -2, -3, -0.125);
-        });
-
-        describe('gt', () => {
-            test('gt', 0, 0, 0);
-            test('gt', 0, 1, 0);
-            test('gt', 1, 0, 1);
-            test('gt', 2, 2, 0);
-            test('gt', 2, 3, 0);
-            test('gt', 3, 2, 1);
-            test('gt', -3, 2, 0);
-        });
-
-        describe('gte', () => {
-            test('gte', 0, 0, 1);
-            test('gte', 0, 1, 0);
-            test('gte', 1, 0, 1);
-            test('gte', 2, 2, 1);
-            test('gte', 2, 3, 0);
-            test('gte', 3, 2, 1);
-            test('gte', -3, 2, 0);
-        });
-
-        describe('lt', () => {
-            test('lt', 0, 0, 0);
-            test('lt', 0, 1, 1);
-            test('lt', 1, 0, 0);
-            test('lt', 2, 2, 0);
-            test('lt', 2, 3, 1);
-            test('lt', 3, 2, 0);
-            test('lt', -3, 2, 1);
-        });
-
-        describe('lte', () => {
-            test('lte', 0, 0, 1);
-            test('lte', 0, 1, 1);
-            test('lte', 1, 0, 0);
-            test('lte', 2, 2, 1);
-            test('lte', 2, 3, 1);
-            test('lte', 3, 2, 0);
-            test('lte', -3, 2, 1);
-        });
-
-        describe('eq', () => {
-            test('eq', 0, 0, 1);
-            test('eq', 0, 1, 0);
-            test('eq', 1, 0, 0);
-            test('eq', 2, 2, 1);
-            test('eq', 2, 3, 0);
-        });
-
-        describe('neq', () => {
-            test('neq', 0, 0, 0);
-            test('neq', 0, 1, 1);
-            test('neq', 1, 0, 1);
-            test('neq', 2, 2, 0);
-            test('neq', 2, 3, 1);
-        });
-
-        function test (fn, param1, param2, expected) {
-            it(`${fn}(${param1}, ${param2}) should return ${expected}`, () => {
-                let actual = s[fn](param1, param2).value;
-                expect(actual).toEqual(expected);
-                actual = s[fn](param1, param2).value;
-                expect(actual).toEqual(expected);
+            describe('NUMBERS_TO_NUMBER', () => {
+                testValue('pow', 0, 0, 1);
+                testValue('pow', 0, 1, 0);
+                testValue('pow', 2, 2, 4);
+                testValue('pow', -2, 2, 4);
+                testValue('pow', -2, -3, -0.125);
             });
-        }
+        });
+
+        describe('or', () => {
+            describe('NUMBERS_TO_NUMBER', () => {
+                testValue('or', 0, 0, 0);
+                testValue('or', 0, 1, 1);
+                testValue('or', 1, 1, 1);
+                testValue('or', 0.5, 1, 1);
+            });
+        });
+
+        describe('and', () => {
+            describe('NUMBERS_TO_NUMBER', () => {
+                testValue('and', s.TRUE, s.TRUE, 1);
+                testValue('and', s.TRUE, s.FALSE, 0);
+                testValue('and', s.FALSE, s.FALSE, 0);
+                testValue('and', 0.5, s.TRUE, 0.5);
+                testValue('and', 0.5, 0.5, 0.25);
+            });
+        });
+
+        describe('greaterThan', () => {
+            describe('NUMBERS_TO_NUMBER', () => {
+                testValue('gt', 0, 0, 0);
+                testValue('gt', 0, 1, 0);
+                testValue('gt', 1, 0, 1);
+                testValue('gt', 2, 2, 0);
+                testValue('gt', 2, 3, 0);
+                testValue('gt', 3, 2, 1);
+                testValue('gt', -3, 2, 0);
+            });
+        });
+
+        describe('greaterThanOrEqualTo', () => {
+            describe('NUMBERS_TO_NUMBER', () => {
+                testValue('gte', 0, 0, 1);
+                testValue('gte', 0, 1, 0);
+                testValue('gte', 1, 0, 1);
+                testValue('gte', 2, 2, 1);
+                testValue('gte', 2, 3, 0);
+                testValue('gte', 3, 2, 1);
+                testValue('gte', -3, 2, 0);
+            });
+        });
+
+        describe('lessThan', () => {
+            describe('NUMBERS_TO_NUMBER', () => {
+                testValue('lt', 0, 0, 0);
+                testValue('lt', 0, 1, 1);
+                testValue('lt', 1, 0, 0);
+                testValue('lt', 2, 2, 0);
+                testValue('lt', 2, 3, 1);
+                testValue('lt', 3, 2, 0);
+                testValue('lt', -3, 2, 1);
+            });
+        });
+
+        describe('lessThanOrEqualTo', () => {
+            describe('NUMBERS_TO_NUMBER', () => {
+                testValue('lte', 0, 0, 1);
+                testValue('lte', 0, 1, 1);
+                testValue('lte', 1, 0, 0);
+                testValue('lte', 2, 2, 1);
+                testValue('lte', 2, 3, 1);
+                testValue('lte', 3, 2, 0);
+                testValue('lte', -3, 2, 1);
+            });
+        });
+
+        describe('equals', () => {
+            describe('NUMBERS_TO_NUMBER', () => {
+                testValue('eq', 0, 0, 1);
+                testValue('eq', 0, 1, 0);
+                testValue('eq', 1, 0, 0);
+                testValue('eq', 2, 2, 1);
+                testValue('eq', 2, 3, 0);
+            });
+
+            describe('CATEGORIES_TO_NUMBER', () => {
+
+            });
+        });
+
+        describe('notEquals', () => {
+            describe('NUMBERS_TO_NUMBER', () => {
+                testValue('neq', 0, 0, 0);
+                testValue('neq', 0, 1, 1);
+                testValue('neq', 1, 0, 1);
+                testValue('neq', 2, 2, 0);
+                testValue('neq', 2, 3, 1);
+            });
+
+            describe('CATEGORIES_TO_NUMBER', () => {
+
+            });
+        });
     });
+
+    function testValue (fn, param1, param2, expected) {
+        it(`${fn}(${param1}, ${param2}) should return ${expected}`, () => {
+            const actual = s[fn](param1, param2).value;
+            expect(actual).toEqual(expected);
+        });
+    }
+
+    function testEval (fn, param1, param2, expected, featureA, featureB) {
+        it(`${fn}(${param1}, ${param2}).eval(featureA, featureB) should return ${expected}`, () => {
+            const actual = s[fn](param1, param2).eval(featureA, featureB);
+            expect(actual).toEqual(expected);
+        });
+    }
 });

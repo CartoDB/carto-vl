@@ -43,16 +43,25 @@ export class Mul extends BinaryOperation {
     getLegendData (options) {
         const legendDataA = this.a.getLegendData(options);
         const legendDataB = this.b.getLegendData(options);
+        const SIZE = legendDataA.data.length;
+        const data = [];
 
-        return { a: legendDataA, b: legendDataB };
+        for (let i = 0; i < SIZE; i++) {
+            for (let j = 0; j < SIZE; j++) {
+                const value = this._evalColors(legendDataA.data[i].value, legendDataB.data[j].value);
+                data.push({ value });
+            }
+        }
+
+        return { data };
     }
 
     _evalColors (colorA, colorB) {
         return {
-            r: colorA.r * colorB.r / 255,
-            g: colorA.g * colorB.g / 255,
-            b: colorA.b * colorB.b / 255,
-            a: colorA.a * colorB.a
+            r: Math.round(colorA.r * colorB.r / 255),
+            g: Math.round(colorA.g * colorB.g / 255),
+            b: Math.round(colorA.b * colorB.b / 255),
+            a: colorA.a
         };
     }
 
