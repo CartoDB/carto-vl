@@ -59,8 +59,8 @@ function _mulColors (colorA, colorB) {
 
 function _mulNumberColor (valueA, valueB) {
     const { n, color } = typeof valueA === 'number'
-        ? { valueA, valueB }
-        : { valueB, valueA };
+        ? { n: valueA, color: valueB }
+        : { n: valueB, color: valueA };
 
     return {
         r: Math.round(n * color.r / 255),

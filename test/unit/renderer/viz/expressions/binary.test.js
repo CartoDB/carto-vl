@@ -1,5 +1,6 @@
 import * as s from '../../../../../src/renderer/viz/expressions';
 import { validateDynamicType, validateMaxArgumentsError, validateTypeErrors } from './utils';
+import Metadata from '../../../../../src/renderer/Metadata';
 
 // Add custom toString function to improve test output.
 s.TRUE.toString = () => 's.TRUE';
@@ -75,7 +76,14 @@ describe('src/renderer/viz/expressions/binary', () => {
         });
     });
 
-    describe('.eval', () => {
+    describe('.value', () => {
+        function testValue (fn, param1, param2, expected) {
+            it(`${fn}(${param1}, ${param2}) should return ${expected}`, () => {
+                const actual = s[fn](param1, param2).value;
+                expect(actual).toEqual(expected);
+            });
+        }
+
         describe('mul', () => {
             describe('NUMBERS_TO_NUMBER', () => {
                 testValue('mul', 0, 0, 0);
@@ -86,15 +94,12 @@ describe('src/renderer/viz/expressions/binary', () => {
             });
 
             describe('NUMBER_AND_COLOR_TO_COLOR', () => {
-
+                testValue('mul', 10, s.rgba(255, 15, 12, 1), { r: 10, g: 1, b: 0, a: 1 });
+                testValue('mul', s.rgba(255, 15, 12, 1), 10, { r: 10, g: 1, b: 0, a: 1 });
             });
 
             describe('COLORS_TO_COLOR', () => {
-
-            });
-
-            describe('IMAGES_TO_IMAGE', () => {
-
+                testValue('mul', s.rgba(255, 15, 12, 1), s.rgba(35, 20, 240, 1), { r: 35, g: 1, b: 11, a: 1 });
             });
         });
 
@@ -115,10 +120,6 @@ describe('src/renderer/viz/expressions/binary', () => {
             describe('COLORS_TO_COLOR', () => {
 
             });
-
-            describe('IMAGES_TO_IMAGE', () => {
-
-            });
         });
 
         describe('add', () => {
@@ -131,11 +132,7 @@ describe('src/renderer/viz/expressions/binary', () => {
             });
 
             describe('COLORS_TO_COLOR', () => {
-
-            });
-
-            describe('IMAGES_TO_IMAGE', () => {
-
+                testValue('add', s.rgba(255, 15, 12, 1), s.rgba(35, 20, 240, 1), { r: 255, g: 35, b: 252, a: 1 });
             });
         });
 
@@ -149,11 +146,7 @@ describe('src/renderer/viz/expressions/binary', () => {
             });
 
             describe('COLORS_TO_COLOR', () => {
-
-            });
-
-            describe('IMAGES_TO_IMAGE', () => {
-
+                testValue('sub', s.rgba(255, 15, 12, 1), s.rgba(35, 20, 240, 1), { r: 220, g: 0, b: 0, a: 1 });
             });
         });
 
@@ -254,7 +247,11 @@ describe('src/renderer/viz/expressions/binary', () => {
             });
 
             describe('CATEGORIES_TO_NUMBER', () => {
-
+                testValue('eq', '0', '0', 1);
+                testValue('eq', '0', '1', 0);
+                testValue('eq', '1', '0', 0);
+                testValue('eq', '2', '2', 1);
+                testValue('eq', '2', '3', 0);
             });
         });
 
@@ -268,22 +265,238 @@ describe('src/renderer/viz/expressions/binary', () => {
             });
 
             describe('CATEGORIES_TO_NUMBER', () => {
-
+                testValue('neq', '0', '0', 0);
+                testValue('neq', '0', '1', 1);
+                testValue('neq', '1', '0', 1);
+                testValue('neq', '2', '2', 0);
+                testValue('neq', '2', '3', 1);
             });
         });
     });
 
-    function testValue (fn, param1, param2, expected) {
-        it(`${fn}(${param1}, ${param2}) should return ${expected}`, () => {
-            const actual = s[fn](param1, param2).value;
-            expect(actual).toEqual(expected);
+    describe('.eval', () => {
+        const METADATA = new Metadata({
+            properties: {
+                color: {
+                    type: 'category',
+                    categories: [
+                        { name: 'red' },
+                        { name: 'blue' }
+                    ]
+                }
+            }
         });
-    }
 
-    function testEval (fn, param1, param2, expected, featureA, featureB) {
-        it(`${fn}(${param1}, ${param2}).eval(featureA, featureB) should return ${expected}`, () => {
-            const actual = s[fn](param1, param2).eval(featureA, featureB);
-            expect(actual).toEqual(expected);
+        function testEval (fn, param1, param2, features, expected) {
+            it(`${fn}(${param1}, ${param2}).eval(featureA, featureB) should return ${expected}`, () => {
+                const actual = s[fn](param1, param2).eval(...features);
+                expect(actual).toEqual(expected);
+            });
+        }
+
+        describe('mul', () => {
+            describe('NUMBERS_TO_NUMBER', () => {
+                const featureA = { a: 1 };
+                const featureB = { b: 2 };
+                const featureC = { a: 2, c: 5 };
+
+                testEval('mul', s.prop('a'), s.prop('b'), [featureA, featureB], 2);
+                testEval('mul', 2, s.prop('b'), [featureB], 4);
+                testEval('mul', s.prop('b'), 2, [featureB], 4);
+                testEval('mul', s.prop('a'), s.prop('c'), [featureC], 10);
+            });
+
+            describe('NUMBER_AND_COLOR_TO_COLOR', () => {
+                const featureA = { color: 'red' };
+                const ramp = s.ramp(s.buckets(s.prop('color'), ['red']), [s.rgba(255, 15, 12, 1)]);
+
+                ramp._bindMetadata(METADATA);
+
+                testEval('mul', 10, ramp, [featureA], { r: 10, g: 1, b: 0, a: 1 });
+                testEval('mul', ramp, 10, [featureA], { r: 10, g: 1, b: 0, a: 1 });
+            });
+
+            describe('COLORS_TO_COLOR', () => {
+                const featureA = { color: 'red' };
+                const featureB = { color: 'blue' };
+                const rampA = s.ramp(s.buckets(s.prop('color'), ['red']), [s.rgba(255, 15, 12, 1)]);
+                const rampB = s.ramp(s.buckets(s.prop('color'), ['blue']), [s.rgba(35, 20, 240, 1)]);
+
+                rampA._bindMetadata(METADATA);
+                rampB._bindMetadata(METADATA);
+
+                testEval('mul', rampA, rampB, [featureA, featureB], { r: 35, g: 1, b: 11, a: 1 });
+            });
         });
-    }
+
+        describe('div', () => {
+            describe('NUMBERS_TO_NUMBER', () => {
+                testEval('div', 1, 0, Infinity);
+                testEval('div', -1, 0, -Infinity);
+                testEval('div', 0, 0, NaN);
+                testEval('div', 0, 1, 0);
+                testEval('div', 4, 2, 2);
+                testEval('div', -4, 2, -2);
+            });
+
+            describe('NUMBER_AND_COLOR_TO_COLOR', () => {
+
+            });
+
+            describe('COLORS_TO_COLOR', () => {
+
+            });
+        });
+
+        describe('add', () => {
+            describe('NUMBERS_TO_NUMBER', () => {
+                testEval('add', 0, 0, 0);
+                testEval('add', 0, 1, 1);
+                testEval('add', 2, 2, 4);
+                testEval('add', -2, 2, 0);
+                testEval('add', -2, -3, -5);
+            });
+
+            describe('COLORS_TO_COLOR', () => {
+                testEval('add', s.rgba(255, 15, 12, 1), s.rgba(35, 20, 240, 1), { r: 255, g: 35, b: 252, a: 1 });
+            });
+        });
+
+        describe('sub', () => {
+            describe('NUMBERS_TO_NUMBER', () => {
+                testEval('sub', 0, 0, 0);
+                testEval('sub', 0, 1, -1);
+                testEval('sub', 2, 2, 0);
+                testEval('sub', -2, 2, -4);
+                testEval('sub', -2, -3, 1);
+            });
+
+            describe('COLORS_TO_COLOR', () => {
+                testEval('sub', s.rgba(255, 15, 12, 1), s.rgba(35, 20, 240, 1), { r: 220, g: 0, b: 0, a: 1 });
+            });
+        });
+
+        describe('mod', () => {
+            describe('NUMBERS_TO_NUMBER', () => {
+                testEval('mod', 0, 1, 0);
+                testEval('mod', 2, 1, 0);
+                testEval('mod', 2, 2, 0);
+                testEval('mod', 6, 4, 2);
+                testEval('mod', -6, 4, -2);
+            });
+        });
+
+        describe('pow', () => {
+            describe('NUMBERS_TO_NUMBER', () => {
+                testEval('pow', 0, 0, 1);
+                testEval('pow', 0, 1, 0);
+                testEval('pow', 2, 2, 4);
+                testEval('pow', -2, 2, 4);
+                testEval('pow', -2, -3, -0.125);
+            });
+        });
+
+        describe('or', () => {
+            describe('NUMBERS_TO_NUMBER', () => {
+                testEval('or', 0, 0, 0);
+                testEval('or', 0, 1, 1);
+                testEval('or', 1, 1, 1);
+                testEval('or', 0.5, 1, 1);
+            });
+        });
+
+        describe('and', () => {
+            describe('NUMBERS_TO_NUMBER', () => {
+                testEval('and', s.TRUE, s.TRUE, 1);
+                testEval('and', s.TRUE, s.FALSE, 0);
+                testEval('and', s.FALSE, s.FALSE, 0);
+                testEval('and', 0.5, s.TRUE, 0.5);
+                testEval('and', 0.5, 0.5, 0.25);
+            });
+        });
+
+        describe('greaterThan', () => {
+            describe('NUMBERS_TO_NUMBER', () => {
+                testEval('gt', 0, 0, 0);
+                testEval('gt', 0, 1, 0);
+                testEval('gt', 1, 0, 1);
+                testEval('gt', 2, 2, 0);
+                testEval('gt', 2, 3, 0);
+                testEval('gt', 3, 2, 1);
+                testEval('gt', -3, 2, 0);
+            });
+        });
+
+        describe('greaterThanOrEqualTo', () => {
+            describe('NUMBERS_TO_NUMBER', () => {
+                testEval('gte', 0, 0, 1);
+                testEval('gte', 0, 1, 0);
+                testEval('gte', 1, 0, 1);
+                testEval('gte', 2, 2, 1);
+                testEval('gte', 2, 3, 0);
+                testEval('gte', 3, 2, 1);
+                testEval('gte', -3, 2, 0);
+            });
+        });
+
+        describe('lessThan', () => {
+            describe('NUMBERS_TO_NUMBER', () => {
+                testEval('lt', 0, 0, 0);
+                testEval('lt', 0, 1, 1);
+                testEval('lt', 1, 0, 0);
+                testEval('lt', 2, 2, 0);
+                testEval('lt', 2, 3, 1);
+                testEval('lt', 3, 2, 0);
+                testEval('lt', -3, 2, 1);
+            });
+        });
+
+        describe('lessThanOrEqualTo', () => {
+            describe('NUMBERS_TO_NUMBER', () => {
+                testEval('lte', 0, 0, 1);
+                testEval('lte', 0, 1, 1);
+                testEval('lte', 1, 0, 0);
+                testEval('lte', 2, 2, 1);
+                testEval('lte', 2, 3, 1);
+                testEval('lte', 3, 2, 0);
+                testEval('lte', -3, 2, 1);
+            });
+        });
+
+        describe('equals', () => {
+            describe('NUMBERS_TO_NUMBER', () => {
+                testEval('eq', 0, 0, 1);
+                testEval('eq', 0, 1, 0);
+                testEval('eq', 1, 0, 0);
+                testEval('eq', 2, 2, 1);
+                testEval('eq', 2, 3, 0);
+            });
+
+            describe('CATEGORIES_TO_NUMBER', () => {
+                testEval('eq', '0', '0', 1);
+                testEval('eq', '0', '1', 0);
+                testEval('eq', '1', '0', 0);
+                testEval('eq', '2', '2', 1);
+                testEval('eq', '2', '3', 0);
+            });
+        });
+
+        describe('notEquals', () => {
+            describe('NUMBERS_TO_NUMBER', () => {
+                testEval('neq', 0, 0, 0);
+                testEval('neq', 0, 1, 1);
+                testEval('neq', 1, 0, 1);
+                testEval('neq', 2, 2, 0);
+                testEval('neq', 2, 3, 1);
+            });
+
+            describe('CATEGORIES_TO_NUMBER', () => {
+                testEval('neq', '0', '0', 0);
+                testEval('neq', '0', '1', 1);
+                testEval('neq', '1', '0', 1);
+                testEval('neq', '2', '2', 0);
+                testEval('neq', '2', '3', 1);
+            });
+        });
+    });
 });

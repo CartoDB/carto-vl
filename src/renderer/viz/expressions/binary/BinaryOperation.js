@@ -24,6 +24,7 @@ export class BinaryOperation extends BaseExpression {
         super({ a, b });
 
         this.signatureMethods = signatureMethods;
+        this._signature = getSignature(a, b);
         this.glsl = glsl;
         this.allowedSignature = UNSUPPORTED_SIGNATURE;
 
@@ -38,16 +39,24 @@ export class BinaryOperation extends BaseExpression {
         return this.signatureMethods[this._signature] || this.signatureMethods[NUMBERS_TO_NUMBER];
     }
 
-    eval (feature) {
-        if (feature) {
-            const { featureA, featureB } = this._getDependentFeatures(feature);
-            const valueA = this.a.eval(featureA);
-            const valueB = this.b.eval(featureB);
-
-            return this.operation(valueA, valueB);
+    eval (...features) {
+        if (Number.isFinite(this.a) && Number.isFinite(this.b)) {
+            return this.operation(this.a.value, this.b.value);
         }
 
-        return this.operation(this.a.value, this.b.value);
+        if (Number.isFinite(this.a)) {
+            return this.operation(this.a.value, this.b.eval(features[0]));
+        }
+
+        if (Number.isFinite(this.b)) {
+            return this.operation(this.a.eval(features[0]), this.b.value);
+        }
+
+        const { featureA, featureB } = this._getDependentFeatures(features);
+        const valueA = this.a.eval(featureA);
+        const valueB = this.b.eval(featureB);
+
+        return this.operation(valueA, valueB);
     }
 
     getLegendData (options) {
@@ -66,10 +75,10 @@ export class BinaryOperation extends BaseExpression {
         return { data };
     }
 
-    _getDependentFeatures (feature) {
-        const { featureA, featureB } = feature.length
-            ? { featureA: feature[0], featureB: feature[1] }
-            : { featureA: feature, featureB: feature };
+    _getDependentFeatures (features) {
+        const { featureA, featureB } = features.length > 1
+            ? { featureA: features[0], featureB: features[1] }
+            : { featureA: features[0], featureB: features[0] };
 
         return { featureA, featureB };
     }
