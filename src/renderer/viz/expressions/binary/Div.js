@@ -58,22 +58,22 @@ export default class Div extends BinaryOperation {
 
 function _divColors (colorA, colorB) {
     return {
-        r: Math.round(colorA.r / colorB.r * 255),
-        g: Math.round(colorA.g / colorB.g * 255),
-        b: Math.round(colorA.b / colorB.b * 255),
+        r: Math.round(colorA.r / colorB.r),
+        g: Math.round(colorA.g / colorB.g),
+        b: Math.round(colorA.b / colorB.b),
         a: colorA.a
     };
 }
 
 function _divNumberColor (valueA, valueB) {
     const { n, color } = typeof valueA === 'number'
-        ? { valueA, valueB }
-        : { valueB, valueA };
+        ? { n: valueA, color: valueB }
+        : { n: valueB, color: valueA };
 
     return {
-        r: Math.round(n / color.r * 255),
-        g: Math.round(n / color.g * 255),
-        b: Math.round(n / color.b * 255),
+        r: Math.round(color.r / n),
+        g: Math.round(color.g / n),
+        b: Math.round(color.b / n),
         a: color.a
     };
 }

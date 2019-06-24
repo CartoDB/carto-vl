@@ -331,171 +331,240 @@ describe('src/renderer/viz/expressions/binary', () => {
 
         describe('div', () => {
             describe('NUMBERS_TO_NUMBER', () => {
-                testEval('div', 1, 0, Infinity);
-                testEval('div', -1, 0, -Infinity);
-                testEval('div', 0, 0, NaN);
-                testEval('div', 0, 1, 0);
-                testEval('div', 4, 2, 2);
-                testEval('div', -4, 2, -2);
+                const featureA = { a: 1 };
+                const featureB = { b: 2 };
+                const featureC = { a: 8, c: 4 };
+
+                testEval('div', s.prop('a'), s.prop('b'), [featureA, featureB], 0.5);
+                testEval('div', 2, s.prop('b'), [featureB], 1);
+                testEval('div', s.prop('b'), 2, [featureB], 1);
+                testEval('div', s.prop('a'), s.prop('c'), [featureC], 2);
             });
 
             describe('NUMBER_AND_COLOR_TO_COLOR', () => {
+                const featureA = { color: 'red' };
+                const ramp = s.ramp(s.buckets(s.prop('color'), ['red']), [s.rgba(255, 15, 12, 1)]);
 
+                ramp._bindMetadata(METADATA);
+
+                testEval('div', 10, ramp, [featureA], { r: 26, g: 2, b: 1, a: 1 });
+                testEval('div', ramp, 10, [featureA], { r: 26, g: 2, b: 1, a: 1 });
             });
 
             describe('COLORS_TO_COLOR', () => {
+                const featureA = { color: 'red' };
+                const featureB = { color: 'blue' };
+                const rampA = s.ramp(s.buckets(s.prop('color'), ['red']), [s.rgba(255, 15, 12, 1)]);
+                const rampB = s.ramp(s.buckets(s.prop('color'), ['blue']), [s.rgba(35, 20, 240, 1)]);
 
+                rampA._bindMetadata(METADATA);
+                rampB._bindMetadata(METADATA);
+
+                testEval('div', rampA, rampB, [featureA, featureB], { r: 7, g: 1, b: 0, a: 1 });
             });
         });
 
         describe('add', () => {
             describe('NUMBERS_TO_NUMBER', () => {
-                testEval('add', 0, 0, 0);
-                testEval('add', 0, 1, 1);
-                testEval('add', 2, 2, 4);
-                testEval('add', -2, 2, 0);
-                testEval('add', -2, -3, -5);
+                const featureA = { a: 1 };
+                const featureB = { b: 2 };
+                const featureC = { a: 8, c: 4 };
+
+                testEval('add', s.prop('a'), s.prop('b'), [featureA, featureB], 3);
+                testEval('add', 2, s.prop('b'), [featureB], 4);
+                testEval('add', s.prop('b'), 2, [featureB], 4);
+                testEval('add', s.prop('a'), s.prop('c'), [featureC], 12);
             });
 
             describe('COLORS_TO_COLOR', () => {
-                testEval('add', s.rgba(255, 15, 12, 1), s.rgba(35, 20, 240, 1), { r: 255, g: 35, b: 252, a: 1 });
+                const featureA = { color: 'red' };
+                const featureB = { color: 'blue' };
+
+                const rampA = s.ramp(s.buckets(s.prop('color'), ['red']), [s.rgba(255, 15, 12, 1)]);
+                const rampB = s.ramp(s.buckets(s.prop('color'), ['blue']), [s.rgba(35, 20, 240, 1)]);
+
+                rampA._bindMetadata(METADATA);
+                rampB._bindMetadata(METADATA);
+
+                testEval('add', rampA, rampB, [featureA, featureB], { r: 255, g: 35, b: 252, a: 1 });
             });
         });
 
         describe('sub', () => {
             describe('NUMBERS_TO_NUMBER', () => {
-                testEval('sub', 0, 0, 0);
-                testEval('sub', 0, 1, -1);
-                testEval('sub', 2, 2, 0);
-                testEval('sub', -2, 2, -4);
-                testEval('sub', -2, -3, 1);
+                const featureA = { a: 1 };
+                const featureB = { b: 2 };
+                const featureC = { a: 8, c: 4 };
+
+                testEval('sub', s.prop('a'), s.prop('b'), [featureA, featureB], -1);
+                testEval('sub', 2, s.prop('b'), [featureB], 0);
+                testEval('sub', s.prop('b'), 2, [featureB], 0);
+                testEval('sub', s.prop('a'), s.prop('c'), [featureC], 4);
             });
 
             describe('COLORS_TO_COLOR', () => {
-                testEval('sub', s.rgba(255, 15, 12, 1), s.rgba(35, 20, 240, 1), { r: 220, g: 0, b: 0, a: 1 });
+                const featureA = { color: 'red' };
+                const featureB = { color: 'blue' };
+
+                const rampA = s.ramp(s.buckets(s.prop('color'), ['red']), [s.rgba(255, 15, 12, 1)]);
+                const rampB = s.ramp(s.buckets(s.prop('color'), ['blue']), [s.rgba(35, 20, 240, 1)]);
+
+                rampA._bindMetadata(METADATA);
+                rampB._bindMetadata(METADATA);
+
+                testEval('sub', rampA, rampB, [featureA, featureB], { r: 220, g: 0, b: 0, a: 1 });
             });
         });
 
         describe('mod', () => {
             describe('NUMBERS_TO_NUMBER', () => {
-                testEval('mod', 0, 1, 0);
-                testEval('mod', 2, 1, 0);
-                testEval('mod', 2, 2, 0);
-                testEval('mod', 6, 4, 2);
-                testEval('mod', -6, 4, -2);
+                const featureA = { a: 1 };
+                const featureB = { b: 2 };
+                const featureC = { a: 8, c: 4 };
+
+                testEval('mod', s.prop('a'), s.prop('b'), [featureA, featureB], 1);
+                testEval('mod', 2, s.prop('b'), [featureB], 0);
+                testEval('mod', s.prop('b'), 2, [featureB], 0);
+                testEval('mod', s.prop('a'), s.prop('c'), [featureC], 0);
             });
         });
 
         describe('pow', () => {
             describe('NUMBERS_TO_NUMBER', () => {
-                testEval('pow', 0, 0, 1);
-                testEval('pow', 0, 1, 0);
-                testEval('pow', 2, 2, 4);
-                testEval('pow', -2, 2, 4);
-                testEval('pow', -2, -3, -0.125);
+                const featureA = { a: 1 };
+                const featureB = { b: 2 };
+                const featureC = { a: 8, c: 4 };
+
+                testEval('pow', s.prop('a'), s.prop('b'), [featureA, featureB], 1);
+                testEval('pow', 2, s.prop('b'), [featureB], 4);
+                testEval('pow', s.prop('b'), 2, [featureB], 4);
+                testEval('pow', s.prop('a'), s.prop('c'), [featureC], 4096);
             });
         });
 
         describe('or', () => {
             describe('NUMBERS_TO_NUMBER', () => {
-                testEval('or', 0, 0, 0);
-                testEval('or', 0, 1, 1);
-                testEval('or', 1, 1, 1);
-                testEval('or', 0.5, 1, 1);
+                const featureA = { a: 0 };
+                const featureB = { b: 1 };
+                const featureC = { a: 0.5, c: 4 };
+
+                testEval('or', s.prop('a'), s.prop('b'), [featureA, featureB], 1);
+                testEval('or', 2, s.prop('b'), [featureB], 1);
+                testEval('or', s.prop('b'), 2, [featureB], 1);
+                testEval('or', s.prop('a'), s.prop('c'), [featureC], 1);
             });
         });
 
         describe('and', () => {
             describe('NUMBERS_TO_NUMBER', () => {
-                testEval('and', s.TRUE, s.TRUE, 1);
-                testEval('and', s.TRUE, s.FALSE, 0);
-                testEval('and', s.FALSE, s.FALSE, 0);
-                testEval('and', 0.5, s.TRUE, 0.5);
-                testEval('and', 0.5, 0.5, 0.25);
+                const featureA = { a: true };
+                const featureB = { b: false };
+                const featureC = { a: true, c: true };
+
+                testEval('and', s.prop('a'), s.prop('b'), [featureA, featureB], 0);
+                testEval('and', s.FALSE, s.prop('b'), [featureB], 0);
+                testEval('and', s.prop('b'), s.TRUE, [featureB], 0);
+                testEval('and', s.prop('a'), s.prop('c'), [featureC], 1);
             });
         });
 
         describe('greaterThan', () => {
             describe('NUMBERS_TO_NUMBER', () => {
-                testEval('gt', 0, 0, 0);
-                testEval('gt', 0, 1, 0);
-                testEval('gt', 1, 0, 1);
-                testEval('gt', 2, 2, 0);
-                testEval('gt', 2, 3, 0);
-                testEval('gt', 3, 2, 1);
-                testEval('gt', -3, 2, 0);
+                const featureA = { a: 0 };
+                const featureB = { b: 10 };
+                const featureC = { a: 5, c: 20 };
+
+                testEval('gt', s.prop('a'), s.prop('b'), [featureA, featureB], 0);
+                testEval('gt', 15, s.prop('b'), [featureB], 1);
+                testEval('gt', s.prop('b'), 10, [featureB], 0);
+                testEval('gt', s.prop('c'), s.prop('a'), [featureC], 1);
             });
         });
 
         describe('greaterThanOrEqualTo', () => {
             describe('NUMBERS_TO_NUMBER', () => {
-                testEval('gte', 0, 0, 1);
-                testEval('gte', 0, 1, 0);
-                testEval('gte', 1, 0, 1);
-                testEval('gte', 2, 2, 1);
-                testEval('gte', 2, 3, 0);
-                testEval('gte', 3, 2, 1);
-                testEval('gte', -3, 2, 0);
+                const featureA = { a: 0 };
+                const featureB = { b: 10 };
+                const featureC = { a: 5, c: 5 };
+
+                testEval('gte', s.prop('a'), s.prop('b'), [featureA, featureB], 0);
+                testEval('gte', 15, s.prop('b'), [featureB], 1);
+                testEval('gte', s.prop('b'), 10, [featureB], 1);
+                testEval('gte', s.prop('c'), s.prop('a'), [featureC], 1);
             });
         });
 
         describe('lessThan', () => {
             describe('NUMBERS_TO_NUMBER', () => {
-                testEval('lt', 0, 0, 0);
-                testEval('lt', 0, 1, 1);
-                testEval('lt', 1, 0, 0);
-                testEval('lt', 2, 2, 0);
-                testEval('lt', 2, 3, 1);
-                testEval('lt', 3, 2, 0);
-                testEval('lt', -3, 2, 1);
+                const featureA = { a: 0 };
+                const featureB = { b: 10 };
+                const featureC = { a: 5, c: 20 };
+
+                testEval('lt', s.prop('a'), s.prop('b'), [featureA, featureB], 1);
+                testEval('lt', 15, s.prop('b'), [featureB], 0);
+                testEval('lt', s.prop('b'), 10, [featureB], 0);
+                testEval('lt', s.prop('c'), s.prop('a'), [featureC], 0);
             });
         });
 
         describe('lessThanOrEqualTo', () => {
             describe('NUMBERS_TO_NUMBER', () => {
-                testEval('lte', 0, 0, 1);
-                testEval('lte', 0, 1, 1);
-                testEval('lte', 1, 0, 0);
-                testEval('lte', 2, 2, 1);
-                testEval('lte', 2, 3, 1);
-                testEval('lte', 3, 2, 0);
-                testEval('lte', -3, 2, 1);
+                const featureA = { a: 0 };
+                const featureB = { b: 10 };
+                const featureC = { a: 5, c: 20 };
+
+                testEval('lte', s.prop('a'), s.prop('b'), [featureA, featureB], 1);
+                testEval('lte', 15, s.prop('b'), [featureB], 0);
+                testEval('lte', s.prop('b'), 10, [featureB], 1);
+                testEval('lte', s.prop('c'), s.prop('a'), [featureC], 0);
             });
         });
 
         describe('equals', () => {
             describe('NUMBERS_TO_NUMBER', () => {
-                testEval('eq', 0, 0, 1);
-                testEval('eq', 0, 1, 0);
-                testEval('eq', 1, 0, 0);
-                testEval('eq', 2, 2, 1);
-                testEval('eq', 2, 3, 0);
+                const featureA = { a: 0 };
+                const featureB = { b: 10 };
+                const featureC = { a: 5, c: 5 };
+
+                testEval('eq', s.prop('a'), s.prop('b'), [featureA, featureB], 0);
+                testEval('eq', 15, s.prop('b'), [featureB], 0);
+                testEval('eq', s.prop('b'), 10, [featureB], 1);
+                testEval('eq', s.prop('c'), s.prop('a'), [featureC], 1);
             });
 
             describe('CATEGORIES_TO_NUMBER', () => {
-                testEval('eq', '0', '0', 1);
-                testEval('eq', '0', '1', 0);
-                testEval('eq', '1', '0', 0);
-                testEval('eq', '2', '2', 1);
-                testEval('eq', '2', '3', 0);
+                const featureA = { a: 'a' };
+                const featureB = { b: 'b' };
+                const featureC = { a: 'a', c: 'c' };
+
+                testEval('eq', s.prop('a'), s.prop('b'), [featureA, featureB], 0);
+                testEval('eq', 'c', s.prop('b'), [featureB], 0);
+                testEval('eq', s.prop('b'), 'b', [featureB], 1);
+                testEval('eq', s.prop('c'), s.prop('a'), [featureC], 0);
             });
         });
 
         describe('notEquals', () => {
             describe('NUMBERS_TO_NUMBER', () => {
-                testEval('neq', 0, 0, 0);
-                testEval('neq', 0, 1, 1);
-                testEval('neq', 1, 0, 1);
-                testEval('neq', 2, 2, 0);
-                testEval('neq', 2, 3, 1);
+                const featureA = { a: 0 };
+                const featureB = { b: 10 };
+                const featureC = { a: 5, c: 5 };
+
+                testEval('neq', s.prop('a'), s.prop('b'), [featureA, featureB], 1);
+                testEval('neq', 15, s.prop('b'), [featureB], 1);
+                testEval('neq', s.prop('b'), 10, [featureB], 0);
+                testEval('neq', s.prop('c'), s.prop('a'), [featureC], 0);
             });
 
             describe('CATEGORIES_TO_NUMBER', () => {
-                testEval('neq', '0', '0', 0);
-                testEval('neq', '0', '1', 1);
-                testEval('neq', '1', '0', 1);
-                testEval('neq', '2', '2', 0);
-                testEval('neq', '2', '3', 1);
+                const featureA = { a: 'a' };
+                const featureB = { b: 'b' };
+                const featureC = { a: 'a', c: 'c' };
+
+                testEval('neq', s.prop('a'), s.prop('b'), [featureA, featureB], 1);
+                testEval('neq', 'c', s.prop('b'), [featureB], 1);
+                testEval('neq', s.prop('b'), 'b', [featureB], 0);
+                testEval('neq', s.prop('c'), s.prop('a'), [featureC], 1);
             });
         });
     });
