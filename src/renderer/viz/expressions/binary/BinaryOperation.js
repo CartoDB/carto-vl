@@ -62,17 +62,18 @@ export class BinaryOperation extends BaseExpression {
     getLegendData (options) {
         const legendDataA = this.a.getLegendData(options);
         const legendDataB = this.b.getLegendData(options);
-        const SIZE = legendDataA.data.length;
+        const SIZE_A = legendDataA.data.length;
+        const SIZE_B = legendDataB.data.length;
         const data = [];
 
-        for (let i = 0; i < SIZE; i++) {
-            for (let j = 0; j < SIZE; j++) {
+        for (let i = 0; i < SIZE_A; i++) {
+            for (let j = 0; j < SIZE_B; j++) {
                 const value = this.operation(legendDataA.data[i].value, legendDataB.data[j].value);
                 data.push({ value });
             }
         }
 
-        return { data };
+        return { n: SIZE_A, m: SIZE_B, data };
     }
 
     _getDependentFeatures (features) {

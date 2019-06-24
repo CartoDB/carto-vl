@@ -6,6 +6,25 @@
   <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../../examples/style.css">
+  <style>
+    ul.legend {
+      display: grid;
+      list-style: none;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
+      grid-gap: 1px;
+      width: 100%;
+      height: 100%;
+      background: white;
+      box-sizing: border-box;
+      margin: 12px 0 0;
+      padding: 0;
+    }
+
+    ul.legend > li {
+      height: 70px;
+    }
+  </style>
 </head>
 
 <body>
@@ -13,14 +32,13 @@
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>Bivariate</h1>
+        <h1>Bivariate Legends</h1>
       </header>
       <section>
-        <p class="description open-sans">Legends</p>
-      </section>
-      <section>
+        <div id="legend" class="bivariate-legend">
+          <ul id="legend-content" class="legend"></ul>
+        </div>
         <div id="controls">
-          <ul id="legend-content"></ul>
           <ul id="content"></ul>
         </div>
       </section>
@@ -59,9 +77,6 @@
     `);
 
     const layer = new carto.Layer('layer', source, viz);
-    const interactivity = new carto.Interactivity(layer);
-    interactivity.on('featureHover', addInteractivity);
-
     layer.addTo(map);
 
     layer.on('loaded', () => {
@@ -73,25 +88,11 @@
       legends.data.forEach((legend) => {
         const colorHex = rgbToHex(legend.value);
         content +=
-          `<li><span class="polygon-mark" style="background-color:${colorHex};"></span> <span>${colorHex}</span></li>`
+          `<li style="background-color:${colorHex};"></li>`
       });
 
       document.getElementById('legend-content').innerHTML = content;
     });
-
-    function addInteractivity(event) {
-      let content = '';
-      for (let feature of event.features) {
-        const color = feature.color.eval('pop_sqkm', 'percent_25_29');
-        const colorHex = rgbToHex(color);
-
-        content += `
-            <li><span class="polygon-mark" style="background-color:${colorHex};"></span> <span>${colorHex}</span></li>
-        `;
-      }
-
-      document.getElementById('content').innerHTML = content;
-    }
 
     function hideLoader() {
       document.getElementById('loader').style.opacity = '0';
