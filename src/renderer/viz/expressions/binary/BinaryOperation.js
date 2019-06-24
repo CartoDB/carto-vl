@@ -1,6 +1,7 @@
 import BaseExpression from '../base';
-
+import { implicitCast, checkMaxArguments } from '../utils';
 import CartoValidationError, { CartoValidationErrorTypes } from '../../../../errors/carto-validation-error';
+import { number } from '../../expressions';
 
 export const UNSUPPORTED_SIGNATURE = 0;
 export const NUMBERS_TO_NUMBER = 1;
@@ -10,37 +11,81 @@ export const CATEGORIES_TO_NUMBER = 8;
 export const IMAGES_TO_IMAGE = 16;
 
 export class BinaryOperation extends BaseExpression {
-    constructor (a, b, allowedSignature) {
+    constructor (a, b, signatureMethods, glsl) {
+        checkMaxArguments(arguments, 4);
+
+        if (Number.isFinite(a) && Number.isFinite(b)) {
+            return number(signatureMethods[NUMBERS_TO_NUMBER](a, b));
+        }
+
+        a = implicitCast(a);
+        b = implicitCast(b);
+
         super({ a, b });
-        this._allowedSignature = allowedSignature;
+
+        this.signatureMethods = signatureMethods;
+        this.glsl = glsl;
+        this.allowedSignature = UNSUPPORTED_SIGNATURE;
+
+        this.inlineMaker = inline => glsl(inline.a, inline.b);
     }
 
-    _resolveAliases () {
+    get value () {
+        return this.operation(this.a.value, this.b.value);
     }
 
-    _getMinimumNeededSchema () {
-        return {};
+    get operation () {
+        return this.signatureMethods[this._signature] || this.signatureMethods[NUMBERS_TO_NUMBER];
     }
 
-    loadImages () {}
+    eval (feature) {
+        if (feature) {
+            const { featureA, featureB } = this._getDependentFeatures(feature);
+            const valueA = this.a.eval(featureA);
+            const valueB = this.b.eval(featureB);
 
-    _getDependencies () {
-        return [ this.a, this.b ];
+            return this.operation(valueA, valueB);
+        }
+
+        return this.operation(this.a.value, this.b.value);
     }
 
-    _bindMetadata (metadata) {
-        // super._bindMetadata(metadata);
+    getLegendData (options) {
+        const legendDataA = this.a.getLegendData(options);
+        const legendDataB = this.b.getLegendData(options);
+        const SIZE = legendDataA.data.length;
+        const data = [];
+
+        for (let i = 0; i < SIZE; i++) {
+            for (let j = 0; j < SIZE; j++) {
+                const value = this.operation(legendDataA.data[i].value, legendDataB.data[j].value);
+                data.push({ value });
+            }
+        }
+
+        return { data };
+    }
+
+    _getDependentFeatures (feature) {
+        const { featureA, featureB } = feature.length
+            ? { featureA: feature[0], featureB: feature[1] }
+            : { featureA: feature, featureB: feature };
+
+        return { featureA, featureB };
+    }
+
+    _bindMetadata (meta) {
+        super._bindMetadata(meta);
         const [a, b] = [this.a, this.b];
 
-        const signature = getSignature(a, b);
-        if (signature === UNSUPPORTED_SIGNATURE || !(signature && this._allowedSignature)) {
+        this._signature = getSignature(a, b);
+        if (this._signature === UNSUPPORTED_SIGNATURE || !(this._signature & this.allowedSignature)) {
             throw new CartoValidationError(
-                `${this.expressionName}(): invalid parameter types\n'a' type was ${a.type}, 'b' type was ${b.type}`,
+                `${this.expressionName}(): invalid parameter types\n'x' type was ${a.type}, 'y' type was ${b.type}`,
                 CartoValidationErrorTypes.INCORRECT_TYPE
             );
         }
-
-        this.type = getReturnTypeFromSignature(signature);
+        this.type = getReturnTypeFromSignature(this._signature);
     }
 }
 

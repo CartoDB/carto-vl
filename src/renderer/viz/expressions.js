@@ -451,21 +451,21 @@ import { Nin } from './expressions/belongs';
 
 import Between from './expressions/between';
 
-import { Mul } from './expressions/binary';
-// import { Mul } from './expressions/binary/Mul';
-import { Div } from './expressions/binary';
-import { Add } from './expressions/binary';
-import { Sub } from './expressions/binary';
-import { Mod } from './expressions/binary';
-import { Pow } from './expressions/binary';
-import { GreaterThan } from './expressions/binary';
-import { GreaterThanOrEqualTo } from './expressions/binary';
-import { LessThan } from './expressions/binary';
-import { LessThanOrEqualTo } from './expressions/binary';
-import { Equals } from './expressions/binary';
-import { NotEquals } from './expressions/binary';
-import { Or } from './expressions/binary';
-import { And } from './expressions/binary';
+// Binary Operations
+import Add from './expressions/binary/Add';
+import And from './expressions/binary/And';
+import Div from './expressions/binary/Div';
+import Equals from './expressions/binary/Equals';
+import GreaterThan from './expressions/binary/GreaterThan';
+import GreaterThanOrEqualTo from './expressions/binary/GreaterThanOrEqualTo';
+import LessThan from './expressions/binary/LessThan';
+import LessThanOrEqualTo from './expressions/binary/LessThanOrEqualTo';
+import Mod from './expressions/binary/Mod';
+import Mul from './expressions/binary/Mul';
+import NotEquals from './expressions/binary/NotEquals';
+import Or from './expressions/binary/Or';
+import Pow from './expressions/binary/Pow';
+import Sub from './expressions/binary/Sub';
 
 import Blend from './expressions/blend';
 
