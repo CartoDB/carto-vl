@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## UNRELEASED
 
+### Fixed
+- Fix `value`, `eval()` and `getLegendData()` for binary operations
+
 ## [1.3.1] 2019-06-17
 
 ### Fixed
