@@ -179,7 +179,7 @@ export default class GeoJSON extends Base {
         });
 
         this._boundColumns = new Set(Object.keys(dataframe.properties));
-        this._addDataframe(dataframe);
+        this._addDataframe && this._addDataframe(dataframe);
 
         return dataframe;
     }
@@ -272,7 +272,7 @@ export default class GeoJSON extends Base {
             const prevGeomType = dataframeGeometryType(this._geomType);
             if (newGeomType !== prevGeomType) {
                 throw new CartoValidationError(
-                    `multiple geometry types not supported: found '${newGeomType}' instead of '${this.prevGeomType}'.`,
+                    `multiple geometry types not supported: found '${newGeomType}' instead of '${prevGeomType}'.`,
                     CartoValidationErrorTypes.INCORRECT_TYPE
                 );
             }
