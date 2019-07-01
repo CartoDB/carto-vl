@@ -268,9 +268,11 @@ export default class GeoJSON extends Base {
         this._fetchFeatureGeometry({}, (i, geometry) => {
             const type = geometry.type;
             const coordinates = geometry.coordinates;
-            if (this._geomType !== type) {
+            const newGeomType = dataframeGeometryType(type);
+            const prevGeomType = dataframeGeometryType(this._geomType);
+            if (newGeomType !== prevGeomType) {
                 throw new CartoValidationError(
-                    `multiple geometry types not supported: found '${type}' instead of '${this._geomType}'.`,
+                    `multiple geometry types not supported: found '${newGeomType}' instead of '${this.prevGeomType}'.`,
                     CartoValidationErrorTypes.INCORRECT_TYPE
                 );
             }
