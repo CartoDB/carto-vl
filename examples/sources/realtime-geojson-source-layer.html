@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Add GeoJSON layer | CARTO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <script src="https://libs.cartocdn.com/carto-vl/v1.3.1/carto-vl.min.js"></script>
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.css" rel="stylesheet" />
+    <link href="https://carto.com/developers/carto-vl/v1.3.1/examples/maps/style.css" rel="stylesheet">
+</head>
+
+<body>
+    <div id="map"></div>
+    <aside class="toolbox">
+        <div class="box">
+            <header>
+                <h1>Realtime GeoJSON</h1>
+            </header>
+            <section>
+                <p class="description open-sans">10.000 points rendered every 100ms</p>
+            </section>
+            <footer class="js-footer"></footer>
+        </div>
+    </aside>
+    <div id="loader">
+        <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+            <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+                <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+            </svg>
+        </div>
+    </div>
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.voyager,
+            center: [0, 30],
+            zoom: 2,
+            scrollZoom: false
+        });
+
+        const nav = new mapboxgl.NavigationControl({
+            showCompass: false
+        });
+        map.addControl(nav, 'top-left');
+        map.addControl(new mapboxgl.FullscreenControl(), 'top-left');
+
+        const getFeature = () => {
+            return {
+                "type": "Feature",
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": getCoords()
+                },
+                "properties": {
+                    "test": 5
+                }
+            }
+        }
+        const getCoords = () => [getCoord() * 2, getCoord()]
+        const getCoord = () => Math.floor(Math.random() * 178) - 89
+        const getGeojson = (featuresCount = 10) => {
+            const geojson = {
+                type: "FeatureCollection",
+                features: []
+            }
+
+            for (i=0; i < featuresCount; i++) {
+                geojson.features.push(getFeature())
+            }
+
+            return geojson;
+        };
+
+        map.on('load', function () {
+            let source = new carto.source.GeoJSON(getGeojson());
+            const viz = new carto.Viz(`width: 10`);
+            const layer = new carto.Layer('layer', source, viz);
+
+            layer.addTo(map, 'watername_ocean');
+            layer.on('loaded', hideLoader);
+
+            window.setInterval(function () {
+                layer.update(new carto.source.GeoJSON(getGeojson(10000)))
+            }, 100);
+        });
+
+        function hideLoader() {
+            document.getElementById('loader').style.opacity = '0';
+        }
+    </script>
+</body>
+
+</html>
