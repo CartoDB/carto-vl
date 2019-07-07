@@ -16,10 +16,10 @@
     <aside class="toolbox">
         <div class="box">
             <header>
-                <h1>Realtime GeoJSON</h1>
+                <h1>Realtime GeoJSON 2</h1>
             </header>
             <section>
-                <p class="description open-sans">10.000 points rendered every 100ms</p>
+                <p class="description open-sans">Points movement</p>
             </section>
             <footer class="js-footer"></footer>
         </div>
@@ -36,7 +36,7 @@
             container: 'map',
             style: carto.basemaps.voyager,
             center: [0, 30],
-            zoom: 2,
+            zoom: 1,
             scrollZoom: false
         });
 
@@ -46,44 +46,64 @@
         map.addControl(nav, 'top-left');
         map.addControl(new mapboxgl.FullscreenControl(), 'top-left');
 
-        const getFeature = () => {
-            return {
-                "type": "Feature",
-                "geometry": {
-                    "type": "Point",
-                    "coordinates": getCoords()
-                },
-                "properties": {
-                    "test": 5
-                }
-            }
-        }
-        const getCoords = () => [getCoord() * 2, getCoord()]
-        const getCoord = () => Math.floor(Math.random() * 178) - 89
-        const getGeojson = (featuresCount = 10) => {
+
+        const points = [
+            { lon: 90, lat: 70, speed: 1 },
+            { lon: 0, lat: 60, speed: 2 },
+            { lon: 2, lat: 50, speed: 4 },
+            { lon: 80, lat: 40, speed: 2 },
+            { lon: -40, lat: 30, speed: 1 },
+            { lon: -20, lat: 20, speed: 3 },
+            { lon: -70, lat: 10, speed: 4 },
+            { lon: -90, lat: 0, speed: 3 },
+            { lon: 40, lat: -10, speed: 1 },
+            { lon: 60, lat: -20, speed: 2 }
+        ]
+
+        const getGeojson = () => {
             const geojson = {
                 type: "FeatureCollection",
                 features: []
             }
 
-            for (i=0; i < featuresCount; i++) {
-                geojson.features.push(getFeature())
-            }
+            points.forEach(point => {
+                if (point.lon > 90)
+                    point.lon = -90
+
+                point.lon += point.speed
+
+                geojson.features.push({
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [point.lon, point.lat]
+                    },
+                    "properties": {
+                        "speed": point.speed
+                    }
+                })
+            })
 
             return geojson;
         };
 
-        let source = new carto.source.GeoJSON(getGeojson());
-        const viz = new carto.Viz(`width: 10`);
-        const layer = new carto.Layer('layer', source, viz);
+        // Define styles
+        const rampAutoViz = new carto.Viz(`
+            color: ramp($speed, vivid)
+            width: 5 * $speed
+            strokeColor: black
+            strokeWidth: 0.5
+        `);
 
+        let source = new carto.source.GeoJSON(getGeojson());
+        const layer = new carto.Layer('layer', source, rampAutoViz);
         layer.addTo(map, 'watername_ocean');
         layer.on('loaded', hideLoader);
 
         map.on('load', function () {
             window.setInterval(function () {
-                layer.update(new carto.source.GeoJSON(getGeojson(10000)))
-            }, 100);
+                layer.update(new carto.source.GeoJSON(getGeojson()))
+            }, 30);
         });
 
         function hideLoader() {
