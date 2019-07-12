@@ -30,7 +30,7 @@ export default class Histogram extends BaseExpression {
         this._metadata = metadata;
         const name = this.propertyName;
         this._categories = this._metadata.properties[name]
-            ? this._metadata.properties[name].categories.sort(this._sortNumerically)
+            ? this._metadata.properties[name].categories.sort(this._sortByFrequency)
             : [];
     }
 
@@ -39,7 +39,7 @@ export default class Histogram extends BaseExpression {
             .map(([x, y]) => {
                 return { x, y };
             })
-            .sort(this._sortNumerically)
+            .sort(this._sortByFrequency)
             .map((category, index) => {
                 const x = typeof category.x === 'number' && this._categories[index]
                     ? this._categories[index].name
@@ -82,7 +82,7 @@ export default class Histogram extends BaseExpression {
     }
 
     _getBucketsValue ([...histogram], buckets) {
-        buckets = buckets.length === undefined ? this._genBreakpoints(buckets) : buckets;
+        buckets = !!buckets.length ? this._genBreakpoints(buckets) : buckets;
         const nBuckets = buckets.length;
         const hist = Array(nBuckets).fill(0);
 
@@ -171,7 +171,7 @@ export default class Histogram extends BaseExpression {
         return [min, max];
     }
 
-    _sortNumerically (a, b) {
+    _sortByFrequency (a, b) {
         const frequencyDifference = (b.y - a.y);
 
         if (frequencyDifference === 0) {
