@@ -82,7 +82,7 @@ export default class Histogram extends BaseExpression {
     }
 
     _getBucketsValue ([...histogram], buckets) {
-        buckets = buckets.length && buckets.length !== 0 ? this._genBreakpoints(buckets) : buckets;
+        buckets = buckets.length && buckets.length === 0 ? this._genBreakpoints(buckets) : buckets;
         const nBuckets = buckets.length;
         const hist = Array(nBuckets).fill(0);
 
