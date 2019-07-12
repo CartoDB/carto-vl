@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script src="../../dist/carto-vl.js"></script>
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../../examples/style.css">
+  <style>
+    ul.legend {
+      display: grid;
+      list-style: none;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
+      grid-gap: 1px;
+      width: 100%;
+      height: 100%;
+      background: white;
+      box-sizing: border-box;
+      margin: 12px 0 0;
+      padding: 0;
+    }
+
+    ul.legend > li {
+      height: 70px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Bivariate Legends</h1>
+      </header>
+      <section>
+        <div id="legend" class="bivariate-legend">
+          <ul id="legend-content" class="legend"></ul>
+        </div>
+        <div id="controls">
+          <ul id="content"></ul>
+        </div>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+  <div id="loader">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
+
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: carto.basemaps.positron,
+      center: [-96.72033740507385, 32.84383032617839],
+      zoom: 10.2
+    });
+
+    carto.setDefaultAuth({
+      username: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    const source = new carto.source.Dataset('dallas_mkt');
+
+    const viz = new carto.Viz(`
+        strokeColor: rgba(255,255,255,0.2)
+        @pop: $pop_sqkm
+        @percent: $percent_25_29
+        color: ramp(globalQuantiles($pop_sqkm, 3), [#e8e8e8, #dfb0d6, #be64ac]) *
+        ramp(globalQuantiles($percent_25_29, 3), [#e8e8e8, #ace4e4, #5ac8c8])
+    `);
+
+    const layer = new carto.Layer('layer', source, viz);
+    layer.addTo(map);
+
+    layer.on('loaded', () => {
+      hideLoader();
+
+      const legends = layer.viz.color.getLegendData();
+      let content = '';
+
+      legends.data.forEach((legend) => {
+        const colorHex = rgbToHex(legend.value);
+        content +=
+          `<li style="background-color:${colorHex};"></li>`
+      });
+
+      document.getElementById('legend-content').innerHTML = content;
+    });
+
+    function hideLoader() {
+      document.getElementById('loader').style.opacity = '0';
+    }
+
+    function rgbToHex(color) {
+      return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
+    }
+  </script>
+</body>
+
+</html>
