@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 - Support mixed multi geometries in GeoJSON: LineString & MultiLineString, Polygon & MultiPolygon
+- Support dates in Histogram expressions
 
 ## [1.3.1] 2019-06-17
 
