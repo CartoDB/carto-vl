@@ -7,9 +7,18 @@ export default class Histogram extends BaseExpression {
     }
 
     get value () {
-        return this.input.type === 'number'
-            ? (this._hasBuckets ? this._getBucketsValue(this._histogram, this._sizeOrBuckets) : this._getNumericValue(this._histogram, this._sizeOrBuckets))
-            : this._getCategoryValue(this._histogram);
+        switch (this.input.type) {
+            case 'number':
+                return this._hasBuckets
+                    ? this._getBucketsValue(this._histogram, this._sizeOrBuckets)
+                    : this._getNumericValue(this._histogram, this._sizeOrBuckets);
+            case 'date':
+                return this._hasBuckets
+                    ? this._getBucketsValue(this._histogram, this._sizeOrBuckets)
+                    : this._getDateValue(this._histogram, this._sizeOrBuckets);
+            default:
+                return this._getCategoryValue(this._histogram);
+        }
     }
 
     eval () {
@@ -39,23 +48,6 @@ export default class Histogram extends BaseExpression {
 
                 return { x, y };
             });
-    }
-
-    _sortNumerically (a, b) {
-        const frequencyDifference = (b.y - a.y);
-
-        if (frequencyDifference === 0) {
-            const categoryA = a.x;
-            const categoryB = b.x;
-
-            if (!categoryA && !categoryB) { return 0; } // both null or undefined
-            if (!categoryA) { return 1; } // categoryB first
-            if (!categoryB) { return -1; } // categoryA first
-
-            return categoryA.localeCompare(categoryB);
-        }
-
-        return frequencyDifference;
     }
 
     _getNumericValue (histogram, size) {
@@ -90,6 +82,7 @@ export default class Histogram extends BaseExpression {
     }
 
     _getBucketsValue ([...histogram], buckets) {
+        buckets = buckets.length === undefined ? this._genBreakpoints(buckets) : buckets;
         const nBuckets = buckets.length;
         const hist = Array(nBuckets).fill(0);
 
@@ -110,5 +103,94 @@ export default class Histogram extends BaseExpression {
                 y: count
             };
         });
+    }
+
+    _getDateValue (histogram, size) {
+        const array = [...histogram].map((value) => {
+            return { x: value[0].getTime(), y: value[1] };
+        });
+        const arrayLength = array.length;
+
+        let min = Number.POSITIVE_INFINITY;
+        let max = Number.NEGATIVE_INFINITY;
+
+        for (let i = 0; i < arrayLength; i++) {
+            const x = array[i].x;
+            min = Math.min(min, x);
+            max = Math.max(max, x);
+        }
+
+        const hist = Array(size).fill(0);
+        const range = max - min;
+        const sizeMinusOne = size - 1;
+
+        for (let i = 0; i < arrayLength; i++) {
+            const x = array[i].x;
+            const y = array[i].y;
+            const index = Math.min(Math.floor(size * (x - min) / range), sizeMinusOne);
+            hist[index] += y;
+        }
+
+        return hist.map((count, index) => {
+            const x0 = new Date(min + index / size * range);
+            const x1 = new Date(min + (index + 1) / size * range);
+
+            return {
+                x: [x0, x1],
+                y: count
+            };
+        });
+    }
+
+    _genBreakpoints () {
+        const histogram = this._histogram.value;
+
+        if (!histogram) {
+            return;
+        }
+
+        const accumHistogram = this._getAccumHistogramFrom(histogram);
+        const [min, max] = this._getMinMaxFrom(histogram);
+
+        this._updateBreakpointsWith({ accumHistogram, min, max });
+    }
+
+    _getAccumHistogramFrom (histogram) {
+        let prev = 0;
+        const accumHistogram = histogram.map(({ y }) => {
+            prev += y;
+            return prev;
+        });
+        return accumHistogram;
+    }
+
+    _getMinMaxFrom (histogram) {
+        const min = histogram[0].x[0];
+        const max = histogram[histogram.length - 1].x[1];
+
+        return [min, max];
+    }
+
+    _sortNumerically (a, b) {
+        const frequencyDifference = (b.y - a.y);
+
+        if (frequencyDifference === 0) {
+            const categoryA = a.x;
+            const categoryB = b.x;
+
+            if (!categoryA && !categoryB) { return 0; } // both null or undefined
+            if (!categoryA) { return 1; } // categoryB first
+            if (!categoryB) { return -1; } // categoryA first
+
+            if (typeof categoryA === 'string' && typeof categoryB === 'string') {
+                return categoryA.localeCompare(categoryB);
+            }
+
+            if (categoryA < categoryB) return -1; // categoryA first
+            if (categoryA > categoryB) return 1; // categoryB first
+            return 0;
+        }
+
+        return frequencyDifference;
     }
 }
