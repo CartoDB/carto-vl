@@ -32,7 +32,7 @@ import { implicitCast, checkMaxArguments } from '../utils';
  * @function
  * @api
  */
-export default class Or extends BinaryOperation {
+export default class And extends BinaryOperation {
     constructor (a, b) {
         checkMaxArguments(arguments, 2);
 
