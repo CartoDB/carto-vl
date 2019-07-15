@@ -2,6 +2,10 @@ import Renderer from '../../../src/renderer/Renderer';
 import { RTT_WIDTH, MIN_VERTEX_TEXTURE_IMAGE_UNITS_NEEDED, isBrowserSupported, unsupportedBrowserReasons } from '../../../src/renderer/Renderer';
 
 describe('src/renderer/Renderer', () => {
+    const getParameter = (parameter) => {
+        return parameter;
+    };
+
     describe('WebGL errors', () => {
         const webGLWithNoExtensions = {
             MAX_RENDERBUFFER_SIZE: RTT_WIDTH,
@@ -143,7 +147,3 @@ describe('src/renderer/Renderer', () => {
         });
     });
 });
-
-const getParameter = (parameter) => {
-    return parameter;
-};
