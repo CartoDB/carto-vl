@@ -36,6 +36,8 @@ export const FILTERING_THRESHOLD = 0.5;
  */
 export const RTT_WIDTH = 1024;
 
+export const VERTEX_TEXTURE_IMAGE_UNITS = 16;
+
 /**
  * @description Renderer constructor. Use it to create a new renderer bound to the provided canvas.
  * Initialization will be done synchronously.
@@ -454,6 +456,16 @@ export function unsupportedBrowserReasons (canvas, gl, early = false) {
         reasons.push(
             new CartoRuntimeError(
                 `WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`,
+                CartoRuntimeErrorTypes.WEB_GL
+            )
+        );
+    }
+
+    const vertexTextureImageUnits = gl.getParameter(gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS);
+    if (vertexTextureImageUnits < VERTEX_TEXTURE_IMAGE_UNITS) {
+        reasons.push(
+            new CartoRuntimeError(
+                `WebGL parameter 'gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS' is below the requirement: ${vertexTextureImageUnits} < ${VERTEX_TEXTURE_IMAGE_UNITS}`,
                 CartoRuntimeErrorTypes.WEB_GL
             )
         );
