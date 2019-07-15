@@ -1,25 +1,38 @@
 import Renderer from '../../../src/renderer/Renderer';
-import { RTT_WIDTH, isBrowserSupported, unsupportedBrowserReasons } from '../../../src/renderer/Renderer';
+import { RTT_WIDTH, MIN_VERTEX_TEXTURE_IMAGE_UNITS_NEEDED, isBrowserSupported, unsupportedBrowserReasons } from '../../../src/renderer/Renderer';
 
 describe('src/renderer/Renderer', () => {
     describe('WebGL errors', () => {
         const webGLWithNoExtensions = {
+            MAX_RENDERBUFFER_SIZE: RTT_WIDTH,
+            MAX_VERTEX_TEXTURE_IMAGE_UNITS: MIN_VERTEX_TEXTURE_IMAGE_UNITS_NEEDED,
             getExtension: () => null,
-            getParameter: () => RTT_WIDTH
+            getParameter
         };
         const webGLWithInvalidParameter = {
+            MAX_RENDERBUFFER_SIZE: RTT_WIDTH - 1,
+            MAX_VERTEX_TEXTURE_IMAGE_UNITS: MIN_VERTEX_TEXTURE_IMAGE_UNITS_NEEDED,
             getExtension: () => ({}),
-            getParameter: () => RTT_WIDTH - 1
+            getParameter
         };
         const webGLWithNoExtensionsAndInvalidParameter = {
+            MAX_RENDERBUFFER_SIZE: RTT_WIDTH - 1,
+            MAX_VERTEX_TEXTURE_IMAGE_UNITS: MIN_VERTEX_TEXTURE_IMAGE_UNITS_NEEDED,
             getExtension: () => null,
-            getParameter: () => RTT_WIDTH - 1
+            getParameter
         };
         const webGLValidContext = {
+            MAX_RENDERBUFFER_SIZE: RTT_WIDTH,
+            MAX_VERTEX_TEXTURE_IMAGE_UNITS: MIN_VERTEX_TEXTURE_IMAGE_UNITS_NEEDED,
             getExtension: () => ({}),
-            getParameter: () => RTT_WIDTH
+            getParameter
         };
-
+        const webGLInvalidImageTextureUnits = {
+            MAX_RENDERBUFFER_SIZE: RTT_WIDTH,
+            MAX_VERTEX_TEXTURE_IMAGE_UNITS: 8,
+            getExtension: () => ({}),
+            getParameter
+        };
         const canvasWithNoWebGL = { getContext: () => null };
         const canvasWithNoExtensions = {
             getContext: () => webGLWithNoExtensions
@@ -111,6 +124,11 @@ describe('src/renderer/Renderer', () => {
                         /WebGL extension 'OES_texture_float' is unsupported/,
                         /WebGL parameter 'gl\.MAX_RENDERBUFFER_SIZE' is below the requirement.*/
                     ]
+                }, {
+                    ctx: webGLInvalidImageTextureUnits,
+                    errors: [
+                        /WebGL parameter 'gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS' is below the requirement*/
+                    ]
                 }
             ];
             invalidWebGLContextScenarios.forEach((scenario, i) => {
@@ -125,3 +143,7 @@ describe('src/renderer/Renderer', () => {
         });
     });
 });
+
+const getParameter = (parameter) => {
+    return parameter;
+};
