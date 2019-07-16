@@ -63,6 +63,7 @@ export default class List extends Base {
 
         super(elems);
         this.elems = elems;
+        this.type = elems[0].type;
     }
 
     get value () {

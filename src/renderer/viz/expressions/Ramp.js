@@ -129,6 +129,7 @@ export default class Ramp extends BaseExpression {
         super({ input, palette });
         this.palette = palette;
         this.others = others;
+        this.type = palette.type;
         this._defaultOthers = others === DEFAULT_RAMP_OTHERS;
     }
 
