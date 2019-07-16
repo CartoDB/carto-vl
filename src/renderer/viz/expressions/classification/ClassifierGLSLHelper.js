@@ -18,7 +18,9 @@ export default class ClassifierGLSLHelper {
             `${index > 0 ? 'else' : ''} if (x<(${childInlines[`arg${index}`]})){
                 return ${(index / divisor).toFixed(20)};
             }`;
-        const funcBody = this.classifier.breakpoints.map(elif).join('');
+        const funcBody = this.classifier.breakpoints
+            ? this.classifier.breakpoints.map(elif).join('')
+            : '';
 
         const preface = `float ${funcName}(float x){
             ${funcBody}
