@@ -70,6 +70,7 @@ export default class Blend extends BaseExpression {
         const a = clamp(this.mix.eval(feature), 0, 1);
         const x = this.a.eval(feature);
         const y = this.b.eval(feature);
+
         return mix(x, y, a);
     }
 
@@ -97,7 +98,7 @@ export default class Blend extends BaseExpression {
 }
 
 function abTypeCheck (a, b) {
-    const validTypes = ['number', 'color', 'image', 'placement'];
+    const validTypes = ['number', 'color', 'image', 'placement', 'date'];
 
     if (a.type !== b.type || !(validTypes.includes(a.type))) {
         throw new CartoValidationError(

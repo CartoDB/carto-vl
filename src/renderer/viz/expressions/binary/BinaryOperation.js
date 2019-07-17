@@ -9,6 +9,17 @@ export const NUMBER_AND_COLOR_TO_COLOR = 2;
 export const COLORS_TO_COLOR = 4;
 export const CATEGORIES_TO_NUMBER = 8;
 export const IMAGES_TO_IMAGE = 16;
+export const DATES_TO_DATES = 32;
+
+const signature = {
+    0: null,
+    1: 'number',
+    2: 'color',
+    4: 'color',
+    8: 'number',
+    16: 'image',
+    32: 'date'
+};
 
 export class BinaryOperation extends BaseExpression {
     constructor (a, b, signatureMethods, glsl) {
@@ -27,7 +38,7 @@ export class BinaryOperation extends BaseExpression {
         this._signature = getSignature(a, b);
         this.glsl = glsl;
         this.allowedSignature = UNSUPPORTED_SIGNATURE;
-
+        this.type = signature[this._signature];
         this.inlineMaker = inline => glsl(inline.a, inline.b);
     }
 
@@ -102,6 +113,8 @@ export class BinaryOperation extends BaseExpression {
 function getSignature (a, b) {
     if (!a.type || !b.type) {
         return undefined;
+    } else if (a.type === 'date' && b.type === 'date') {
+        return DATES_TO_DATES;
     } else if (a.type === 'number' && b.type === 'number') {
         return NUMBERS_TO_NUMBER;
     } else if (a.type === 'number' && b.type === 'color') {

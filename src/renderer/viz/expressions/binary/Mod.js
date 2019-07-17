@@ -1,4 +1,4 @@
-import { BinaryOperation, NUMBERS_TO_NUMBER } from './BinaryOperation';
+import { BinaryOperation, NUMBERS_TO_NUMBER, DATES_TO_DATES } from './BinaryOperation';
 
 import { implicitCast, checkMaxArguments } from '../utils';
 
@@ -39,6 +39,6 @@ export default class Mod extends BinaryOperation {
         b = implicitCast(b);
 
         super(a, b, signatureMethods, glsl);
-        this.allowedSignature = NUMBERS_TO_NUMBER;
+        this.allowedSignature = NUMBERS_TO_NUMBER | DATES_TO_DATES;
     }
 }

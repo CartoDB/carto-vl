@@ -77,4 +77,8 @@ export default class AnimationRange extends BaseExpression {
         this._startAnim.stop();
         this._endAnim.stop();
     }
+
+    toString () {
+        return `${this.expressionName}(${this._input.toString()}, ${this.duration.toString()}, ${this.fade.toString()})`;
+    }
 }

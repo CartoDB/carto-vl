@@ -1,4 +1,4 @@
-import { BinaryOperation, NUMBERS_TO_NUMBER, CATEGORIES_TO_NUMBER } from './BinaryOperation';
+import { BinaryOperation, NUMBERS_TO_NUMBER, CATEGORIES_TO_NUMBER, DATES_TO_DATES } from './BinaryOperation';
 
 import { checkMaxArguments } from '../utils';
 
@@ -39,6 +39,6 @@ export default class NotEquals extends BinaryOperation {
         const glsl = (x, y) => `(${x}!=${y}? 1.:0.)`;
 
         super(a, b, signatureMethods, glsl);
-        this.allowedSignature = NUMBERS_TO_NUMBER | CATEGORIES_TO_NUMBER;
+        this.allowedSignature = NUMBERS_TO_NUMBER | CATEGORIES_TO_NUMBER | DATES_TO_DATES;
     }
 }

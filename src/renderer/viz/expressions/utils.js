@@ -247,13 +247,31 @@ export function clamp (x, min, max) {
 }
 
 export function mix (x, y, a) {
-    return typeof x === 'number'
-        ? x * (1 - a) + y * a
-        : interpolateRGBAinCieLAB(x, y, a);
+    if (typeof x === 'number') {
+        return _mixNumber(x, y, a);
+    }
+
+    if (x instanceof Date) {
+        return _mixDate(x, y, a);
+    }
+
+    return interpolateRGBAinCieLAB(x, y, a);
 }
 
 export function fract (x) {
     return x - Math.floor(x);
+}
+
+function _mixDate (x, y, a) {
+    const xTime = x.getTime();
+    const yTime = y.getTime();
+    const timeDiff = Math.abs(_mixNumber(xTime, yTime, a));
+
+    return new Date(timeDiff);
+}
+
+function _mixNumber (x, y, a) {
+    return x * (1 - a) + y * a;
 }
 
 function _isNumber (value) {

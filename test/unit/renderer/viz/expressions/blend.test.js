@@ -34,5 +34,23 @@ describe('src/renderer/viz/expressions/blend', () => {
             const actual = s.blend(0, 100, 1).eval();
             expect(actual).toEqual(100);
         });
+
+        it('should interpolate a date 0%', () => {
+            const actual = s.blend(s.date('1/1/2019'), s.date('3/2/2019'), 0).value;
+            const expected = new Date('1/1/2019');
+            expect(actual).toEqual(expected);
+        });
+
+        it('should interpolate a date 50%', () => {
+            const actual = s.blend(s.date('1/1/2019'), s.date('3/2/2019'), 0.5).value;
+            const expected = new Date('1/31/2019');
+            expect(actual).toEqual(expected);
+        });
+
+        it('should interpolate a date 100%', () => {
+            const actual = s.blend(s.date('1/1/2019'), s.date('3/2/2019'), 1).value;
+            const expected = new Date('3/2/2019');
+            expect(actual).toEqual(expected);
+        });
     });
 });
