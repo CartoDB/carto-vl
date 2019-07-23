@@ -64,6 +64,11 @@ export default class AnimationGeneral extends BaseExpression {
             this._paused = 'default';
         }
     }
+
+    toString () {
+        return `${this.expressionName}(${this._input.toString()}, ${this.duration.toString()}, ${this.fade.toString()})`;
+    }
+
     _bindMetadata (metadata) {
         this._input._bindMetadata(metadata);
         this.progress._bindMetadata(metadata);
