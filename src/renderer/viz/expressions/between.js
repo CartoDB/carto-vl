@@ -50,8 +50,8 @@ export default class Between extends BaseExpression {
     _bindMetadata (meta) {
         super._bindMetadata(meta);
 
-        checkType('between', 'input', 0, 'number', this.input);
-        checkType('between', 'lowerLimit', 1, 'number', this.lowerLimit);
-        checkType('between', 'upperLimit', 2, 'number', this.upperLimit);
+        checkType('between', 'input', 0, ['number', 'date'], this.input);
+        checkType('between', 'lowerLimit', 1, ['number', 'date'], this.lowerLimit);
+        checkType('between', 'upperLimit', 2, ['number', 'date'], this.upperLimit);
     }
 }

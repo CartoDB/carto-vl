@@ -12,6 +12,9 @@ The library currently requires:
 * WebGL 1.
 * WebGL 1 `OES_texture_float` extension.
 * WebGL parameter `gl.MAX_RENDERBUFFER_SIZE` >= 1024.
+* WebGL parameter `gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS` >= 16.
+
+For a good experience, >= 8GB or RAM is recommended and also having a dedicated GPU with updated drivers.
 
 Some browsers, specially in old mobile devices, only have experimental or partial WebGL support. We cannot guarantee that CARTO VL will work on those cases.
 

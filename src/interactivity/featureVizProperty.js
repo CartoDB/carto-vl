@@ -22,7 +22,7 @@ export default class FeatureVizProperty {
     }
 
     get value () {
-        return this._viz[this._propertyName].value;
+        return this._viz[this._propertyName].eval(this._properties);
     }
 
     eval (...properties) {

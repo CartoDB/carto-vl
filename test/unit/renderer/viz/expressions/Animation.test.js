@@ -153,4 +153,14 @@ describe('src/renderer/viz/expressions/Animation', () => {
             expect(t.getProgressPct()).toEqual(0.1);
         });
     });
+
+    describe('.toString', () => {
+        it('should return a valid animation expression', () => {
+            const t = anim(1, 10, s.fade(1));
+            const actual = t.toString();
+            const expected = 'animation(1, 10, fade(1, 1))';
+
+            expect(actual).toEqual(expected);
+        });
+    });
 });

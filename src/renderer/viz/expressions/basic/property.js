@@ -75,7 +75,7 @@ export default class Property extends BaseExpression {
     }
 
     toString () {
-        return `$${this.expressionName}`;
+        return `$${this.name}`;
     }
 
     get categories () {

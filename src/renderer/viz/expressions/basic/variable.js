@@ -79,14 +79,12 @@ export default function variable (name) {
 
         get: (obj, prop) => {
             switch (prop) {
-                case 'value':
-                    return alias.value;
-                case 'parent':
-                case 'notify':
                 case 'propertyName':
                     return alias.propertyName;
                 case 'name':
                     return alias._dimension ? alias.propertyName : alias.name;
+                case 'parent':
+                case 'notify':
                 case 'blendTo':
                     return obj[prop];
                 case '_resolveAliases':
