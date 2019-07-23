@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - Fix feature viz property value
 - Fix `toString` method in animation expression
+- Fix `carto.isBrowserSupported` adding a required check on MAX_VERTEX_TEXTURE_IMAGE_UNITS
 
 ### Added
 - Support dates in binary expressions
@@ -20,7 +21,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fix `value`, `eval()` and `getLegendData()` for binary operations
 - Support mixed multi geometries in GeoJSON: LineString & MultiLineString, Polygon & MultiPolygon
 - Support dates in Histogram expressions
-- Fix `carto.isBrowserSupported` adding a required check on MAX_VERTEX_TEXTURE_IMAGE_UNITS
 
 ## [1.3.1] 2019-06-17
 
