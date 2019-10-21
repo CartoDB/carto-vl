@@ -36,7 +36,7 @@ export const FILTERING_THRESHOLD = 0.5;
  */
 export const RTT_WIDTH = 1024;
 
-export const MIN_VERTEX_TEXTURE_IMAGE_UNITS_NEEDED = 16;
+export const MIN_VERTEX_TEXTURE_IMAGE_UNITS_NEEDED = 8;
 
 /**
  * @description Renderer constructor. Use it to create a new renderer bound to the provided canvas.
