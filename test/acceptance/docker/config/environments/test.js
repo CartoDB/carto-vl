@@ -25,7 +25,7 @@ let config = {
         api: [{
             paths: [
                 '/api/v1',
-                '/user/:user/api/v1',
+                '/user/:user/api/v1'
             ],
             // Optional: attach middlewares at the begining of the router
             // to perform custom operations.
@@ -34,7 +34,7 @@ let config = {
             // "/api/v1/map" is the new API,
             map: [{
                 paths: [
-                    '/map',
+                    '/map'
                 ],
                 middlewares: [] // Optional
             }],
