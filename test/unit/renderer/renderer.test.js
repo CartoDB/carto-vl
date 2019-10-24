@@ -33,7 +33,7 @@ describe('src/renderer/Renderer', () => {
         };
         const webGLInvalidImageTextureUnits = {
             MAX_RENDERBUFFER_SIZE: RTT_WIDTH,
-            MAX_VERTEX_TEXTURE_IMAGE_UNITS: 8,
+            MAX_VERTEX_TEXTURE_IMAGE_UNITS: 4,
             getExtension: () => ({}),
             getParameter
         };
