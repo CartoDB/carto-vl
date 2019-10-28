@@ -142,7 +142,7 @@ export default class Renderer {
 
         // To execute once per daframe and style property
         // (geometries, properties and ids have been already loaded to GPU)
-        const styleDataframe = (dataframe, dataframeTexture, metashader, vizExpr) => {
+        const styleDataframe = (dataframe, dataframeTexture, metashader, vizExpr, metadata) => {
             const shader = metashader.shader;
             const textureId = metashader.textureIds;
 
@@ -154,6 +154,7 @@ export default class Renderer {
             // Enforce that property texture TextureUnit don't clash with auxiliar ones
             drawMetadata.freeTexUnit = Object.keys(textureId).length;
             vizExpr._setTimestamp(timestamp);
+            vizExpr._bindMetadata(metadata);
             vizExpr._preDraw(shader.program, drawMetadata, gl);
 
             Object.keys(textureId).forEach((name, i) => {
@@ -171,15 +172,15 @@ export default class Renderer {
         };
 
         // Draw dataframe style textures
-        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texColor, viz.colorMetaShader, viz.color));
+        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texColor, viz.colorMetaShader, viz.color, viz.metadata));
         if (dataframes[0].type !== GEOMETRY_TYPE.POLYGON) {
-            dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texWidth, viz.widthMetaShader, viz.width));
+            dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texWidth, viz.widthMetaShader, viz.width, viz.metadata));
         }
         if (dataframes[0].type !== GEOMETRY_TYPE.LINE) {
-            dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texStrokeColor, viz.strokeColorMetaShader, viz.strokeColor));
-            dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texStrokeWidth, viz.strokeWidthMetaShader, viz.strokeWidth));
+            dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texStrokeColor, viz.strokeColorMetaShader, viz.strokeColor, viz.metadata));
+            dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texStrokeWidth, viz.strokeWidthMetaShader, viz.strokeWidth, viz.metadata));
         }
-        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texFilter, viz.filterMetaShader, viz.filter));
+        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texFilter, viz.filterMetaShader, viz.filter, viz.metadata));
 
         // Final drawing (to screen). In the case of lines / polygons, there is an extra step (for antialiasing)
         gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
