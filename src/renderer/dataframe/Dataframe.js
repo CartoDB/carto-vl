@@ -152,13 +152,13 @@ export default class Dataframe extends DummyDataframe {
     }
 
     getPropertyTexture (propertyName) {
-        const encodedPropertyName = `_${propertyName}`;
+        const encodedPropertyName = this._encodePropertyName(propertyName);
 
         if (this.propertyTex[encodedPropertyName]) {
             return this.propertyTex[encodedPropertyName];
         }
 
-        this._loadPropertyValuesToTexture(encodedPropertyName);
+        this._loadPropertyValuesToTexture(propertyName);
         return this.propertyTex[encodedPropertyName];
     }
 
@@ -169,12 +169,13 @@ export default class Dataframe extends DummyDataframe {
     _loadPropertyValuesToTexture (propertyName) {
         const gl = this._getGL(); // Dataframe is already bound to this context, "hot update" it
         const propertiesFloat32Array = this.properties[propertyName];
+        const encodedPropertyName = this._encodePropertyName(propertyName);
 
         const { width, height } = this.getSize();
 
         if (propertiesFloat32Array) {
-            this.propertyTex[propertyName] = gl.createTexture();
-            gl.bindTexture(gl.TEXTURE_2D, this.propertyTex[propertyName]);
+            this.propertyTex[encodedPropertyName] = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, this.propertyTex[encodedPropertyName]);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
                 width, height, 0, gl.ALPHA, gl.FLOAT,
                 propertiesFloat32Array);
@@ -183,6 +184,10 @@ export default class Dataframe extends DummyDataframe {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         }
+    }
+
+    _encodePropertyName (propertyName) {
+        return `_${propertyName}`;
     }
 
     free () {

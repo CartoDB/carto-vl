@@ -439,7 +439,7 @@ describe('src/renderer/dataframe/Dataframe', () => {
                 idProperty: 'cartodb_id'
             })
         });
-        dataframe._loadPropertyValuesToTexture = (propertyName) => (dataframe.propertyTex[propertyName] = 'texture');
+        dataframe._loadPropertyValuesToTexture = (propertyName) => (dataframe.propertyTex['_' + propertyName] = 'texture');
 
         it('should not throw an exception when passing any property name', () => {
             expect(() => dataframe.getPropertyTexture('cartodb_id')).not.toThrow();
