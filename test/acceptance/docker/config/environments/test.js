@@ -107,7 +107,7 @@ let config = {
         port: 8125,
         prefix: 'test.:host.', // could be hostname, better not containing dots
         cacheDns: true
-            // support all allowed node-statsd options
+        // support all allowed node-statsd options
     },
     renderer: {
         // Milliseconds since last access before renderer cache item expires
