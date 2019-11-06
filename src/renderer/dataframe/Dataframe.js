@@ -152,12 +152,14 @@ export default class Dataframe extends DummyDataframe {
     }
 
     getPropertyTexture (propertyName) {
-        if (this.propertyTex[propertyName]) {
-            return this.propertyTex[propertyName];
+        const encodedPropertyName = `_${propertyName}`;
+
+        if (this.propertyTex[encodedPropertyName]) {
+            return this.propertyTex[encodedPropertyName];
         }
 
-        this._loadPropertyValuesToTexture(propertyName);
-        return this.propertyTex[propertyName];
+        this._loadPropertyValuesToTexture(encodedPropertyName);
+        return this.propertyTex[encodedPropertyName];
     }
 
     /**
