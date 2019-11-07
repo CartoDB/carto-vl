@@ -91,8 +91,14 @@ function generateBelongsExpression (name, inlineMaker, jsEval) {
 
         _bindMetadata (meta) {
             super._bindMetadata(meta);
-            checkType(name, 'input', 0, 'category', this.input);
-            checkType(name, 'list', 1, 'category-list', this.list);
+            const validTypes = ['number', 'category', 'date'];
+
+            validTypes.forEach((type) => {
+                if (this.input.type === type) {
+                    checkType(name, 'input', 0, type, this.input);
+                    checkType(name, 'list', 1, `${type}-list`, this.list);
+                }
+            });
 
             this.inlineMaker = inlineMaker(this.list.elems);
         }
