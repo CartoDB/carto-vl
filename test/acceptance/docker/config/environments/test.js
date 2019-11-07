@@ -21,31 +21,33 @@ let config = {
     //
     // Note: each entry corresponds with an express' router.
     // You must define at least one path. However, middlewares are optional.
-    routes: [{
-        paths: [
-            '/api/v1',
-            '/user/:user/api/v1'
-        ],
-        // Optional: attach middlewares at the begining of the router
-        // to perform custom operations.
-        middlewares: [],
-        // Base url for the Detached Maps API
-        // "/api/v1/map" is the new API,
-        map: [{
+    routes: {
+        api: [{
             paths: [
-                '/map'
+                '/api/v1',
+                '/user/:user/api/v1'
             ],
-            middlewares: [] // Optional
-        }],
-        // Base url for the Templated Maps API
-        // "/api/v1/map/named" is the new API,
-        template: [{
-            paths: [
-                '/map/named'
-            ],
-            middlewares: [] // Optional
+            // Optional: attach middlewares at the begining of the router
+            // to perform custom operations.
+            middlewares: [],
+            // Base url for the Detached Maps API
+            // "/api/v1/map" is the new API,
+            map: [{
+                paths: [
+                    '/map'
+                ],
+                middlewares: [] // Optional
+            }],
+            // Base url for the Templated Maps API
+            // "/api/v1/map/named" is the new API,
+            template: [{
+                paths: [
+                    '/map/named'
+                ],
+                middlewares: [] // Optional
+            }]
         }]
-    }],
+    },
 
     // Resource URLs expose endpoints to request/retrieve metadata associated to Maps: dataviews, analysis node status.
     //
@@ -107,7 +109,7 @@ let config = {
         port: 8125,
         prefix: 'test.:host.', // could be hostname, better not containing dots
         cacheDns: true
-        // support all allowed node-statsd options
+            // support all allowed node-statsd options
     },
     renderer: {
         // Milliseconds since last access before renderer cache item expires
