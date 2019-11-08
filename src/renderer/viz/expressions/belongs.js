@@ -107,8 +107,6 @@ function generateBelongsExpression (name, inlineMaker, jsEval) {
             const funcName = `belongs${this._uid}`;
             const funcList = this._getFuncList();
             const funcBody = this.list.elems.map(funcList).join('');
-
-            // TODO: should work for categories too using the category uid
             const preface = `float ${funcName}(float x){
                 ${funcBody}
 
@@ -123,7 +121,7 @@ function generateBelongsExpression (name, inlineMaker, jsEval) {
 
         _getFuncList () {
             return (elem) => {
-                const x = isNumber(elem) ? `${elem}.0` : elem;
+                const x = isNumber(elem) ? `${elem}.0` : `cat${elem._uid}`;
                 return `if (x${this.compare}${x}) { return 1.; }`;
             }
         }
@@ -138,8 +136,6 @@ function generateBelongsExpression (name, inlineMaker, jsEval) {
                     checkType(name, 'list', 1, `${type}-list`, this.list);
                 }
             });
-
-            // this.inlineMaker = inlineMaker(this.list.elems);
         }
     };
 }
