@@ -22,7 +22,7 @@ let config = {
     // Note: each entry corresponds with an express' router.
     // You must define at least one path. However, middlewares are optional.
     routes: {
-        api: [{
+        v1: [{
             paths: [
                 '/api/v1',
                 '/user/:user/api/v1'
