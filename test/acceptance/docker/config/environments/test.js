@@ -22,7 +22,7 @@ let config = {
     // Note: each entry corresponds with an express' router.
     // You must define at least one path. However, middlewares are optional.
     routes: {
-        v1: [{
+        api: [{
             paths: [
                 '/api/v1',
                 '/user/:user/api/v1'
@@ -109,7 +109,7 @@ let config = {
         port: 8125,
         prefix: 'test.:host.', // could be hostname, better not containing dots
         cacheDns: true
-        // support all allowed node-statsd options
+            // support all allowed node-statsd options
     },
     renderer: {
         // Milliseconds since last access before renderer cache item expires

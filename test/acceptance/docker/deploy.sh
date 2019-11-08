@@ -1,5 +1,13 @@
 #!/bin/bash
 
+git clone https://github.com/CartoDB/cartodb-postgresql.git ;
+
+# Install cartodb extension
+cd ./cartodb-postgresql
+make all install
+
+cd -
+
 git clone https://github.com/CartoDB/Windshaft-cartodb.git ;
 
 cp /srv/config/environments/test.js Windshaft-cartodb/config/environments/development.js
