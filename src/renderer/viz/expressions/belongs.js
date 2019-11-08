@@ -1,6 +1,5 @@
 import { implicitCast, checkType, checkExpression, checkMaxArguments } from './utils';
 import BaseExpression from './base';
-import * as util from 'util';
 
 /**
  * Check if a categorical value belongs to a list of categories.
@@ -121,7 +120,7 @@ function generateBelongsExpression (name, inlineMaker, jsEval) {
 
         _getFuncList () {
             return (elem) => {
-                const x = util.isNumber(elem) ? `${elem}.0` : `cat${elem._uid}`;
+                const x = this.input.type === 'number' ? `${elem}.0` : `cat${elem._uid}`;
                 return `if (x${this.compare}${x}) { return 1.; }`;
             };
         }
