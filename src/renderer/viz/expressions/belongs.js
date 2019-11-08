@@ -1,5 +1,6 @@
 import { implicitCast, checkType, checkExpression, checkMaxArguments } from './utils';
 import BaseExpression from './base';
+import { isNumber } from 'util';
 
 /**
  * Check if a categorical value belongs to a list of categories.
@@ -26,7 +27,12 @@ import BaseExpression from './base';
  */
 export const In = generateBelongsExpression('in', IN_INLINE_MAKER, (input, list) => list.some(item => item === input) ? 1 : 0);
 
-function IN_INLINE_MAKER (list) {
+const OPERATORS = {
+    nin: '!=',
+    in: '=='
+}
+
+function IN_INLINE_MAKER(list) {
     if (!list || list.length === 0) {
         return () => '0.';
     }
@@ -79,6 +85,7 @@ function generateBelongsExpression (name, inlineMaker, jsEval) {
             super({ input, list });
 
             this.type = 'number';
+            this.compare = OPERATORS[name];
         }
 
         get value () {
@@ -87,6 +94,38 @@ function generateBelongsExpression (name, inlineMaker, jsEval) {
 
         eval (feature) {
             return jsEval(this.input.eval(feature), this.list.eval(feature));
+        }
+
+        _applyToShaderSource (getGLSLforProperty) {
+            const childSourcesArray = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));
+
+            let childSources = {};
+            childSourcesArray.map((source, index) => {
+                childSources[this.childrenNames[index]] = source;
+            });
+
+            const funcName = `belongs${this._uid}`;
+            const funcList = this._getFuncList();
+            const funcBody = this.list.elems.map(funcList).join('');
+
+            // TODO: should work for categories too using the category uid
+            const preface = `float ${funcName}(float x){
+                ${funcBody}
+
+                return 0.;
+            }`;
+
+            return {
+                preface: this._prefaceCode(childSources.input.preface + childSources.list.preface + preface),
+                inline: `${funcName}(${childSources.input.inline})`
+            };
+        }
+
+        _getFuncList () {
+            return (elem) => {
+                const x = isNumber(elem) ? `${elem}.0` : elem;
+                return `if (x${this.compare}${x}) { return 1.; }`;
+            }
         }
 
         _bindMetadata (meta) {
@@ -100,7 +139,7 @@ function generateBelongsExpression (name, inlineMaker, jsEval) {
                 }
             });
 
-            this.inlineMaker = inlineMaker(this.list.elems);
+            // this.inlineMaker = inlineMaker(this.list.elems);
         }
     };
 }
