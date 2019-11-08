@@ -1,6 +1,6 @@
 import { implicitCast, checkType, checkExpression, checkMaxArguments } from './utils';
 import BaseExpression from './base';
-import { isNumber } from 'util';
+import * as util from 'util';
 
 /**
  * Check if a categorical value belongs to a list of categories.
@@ -30,9 +30,9 @@ export const In = generateBelongsExpression('in', IN_INLINE_MAKER, (input, list)
 const OPERATORS = {
     nin: '!=',
     in: '=='
-}
+};
 
-function IN_INLINE_MAKER(list) {
+function IN_INLINE_MAKER (list) {
     if (!list || list.length === 0) {
         return () => '0.';
     }
@@ -121,9 +121,9 @@ function generateBelongsExpression (name, inlineMaker, jsEval) {
 
         _getFuncList () {
             return (elem) => {
-                const x = isNumber(elem) ? `${elem}.0` : `cat${elem._uid}`;
+                const x = util.isNumber(elem) ? `${elem}.0` : `cat${elem._uid}`;
                 return `if (x${this.compare}${x}) { return 1.; }`;
-            }
+            };
         }
 
         _bindMetadata (meta) {
