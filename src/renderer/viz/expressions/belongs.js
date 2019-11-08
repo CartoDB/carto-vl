@@ -127,7 +127,7 @@ function generateBelongsExpression (name, inlineMaker, jsEval) {
 
         _bindMetadata (meta) {
             super._bindMetadata(meta);
-            const validTypes = ['number', 'category', 'date'];
+            const validTypes = ['number', 'category'];
 
             validTypes.forEach((type) => {
                 if (this.input.type === type) {
