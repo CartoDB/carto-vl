@@ -20,7 +20,7 @@ export default class WindshaftRequestHelper {
         try {
             response = await fetch(this._makeHttpRequest());
         } catch (error) {
-            throw new CartoMapsAPIError(`Failed to connect to Maps API with your user('${this._source._username}')`);
+            throw new CartoMapsAPIError(`Failed to connect to Maps API with your user('${this._conf.username}')`);
         }
 
         const layergroup = await response.json();
@@ -44,12 +44,12 @@ export default class WindshaftRequestHelper {
     _dealWithWindshaftErrors (response, layergroup) {
         if (response.status === 401) {
             throw new CartoMapsAPIError(
-                `Unauthorized access to Maps API: invalid combination of user('${this._source._username}') and apiKey('${this._source._apiKey}')`,
+                `Unauthorized access to Maps API: invalid combination of user('${this._conf.username}') and apiKey('${this._conf.apiKey}')`,
                 CartoMapsAPIErrorTypes.SECURITY
             );
         } else if (response.status === 403) {
             throw new CartoMapsAPIError(
-                `Unauthorized access to dataset: the provided apiKey('${this._source._apiKey}') doesn't provide access to the requested data`,
+                `Unauthorized access to dataset: the provided apiKey('${this._conf.apiKey}') doesn't provide access to the requested data`,
                 CartoMapsAPIErrorTypes.SECURITY
             );
         }
