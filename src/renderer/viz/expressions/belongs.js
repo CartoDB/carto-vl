@@ -24,19 +24,12 @@ import BaseExpression from './base';
  * @function
  * @api
  */
-export const In = generateBelongsExpression('in', IN_INLINE_MAKER, (input, list) => list.some(item => item === input) ? 1 : 0);
+export const In = generateBelongsExpression('in', (input, list) => list.some(item => item === input) ? 1 : 0);
 
 const OPERATORS = {
     nin: '!=',
     in: '=='
 };
-
-function IN_INLINE_MAKER (list) {
-    if (!list || list.length === 0) {
-        return () => '0.';
-    }
-    return inline => `((${list.map((cat, index) => `(${inline.input} == ${inline.list[index]})`).join(' || ')})? 1.: 0.)`;
-}
 
 /**
  * Check if value does not belong to the list of elements.
@@ -61,16 +54,9 @@ function IN_INLINE_MAKER (list) {
  * @function
  * @api
  */
-export const Nin = generateBelongsExpression('nin', NIN_INLINE_MAKER, (input, list) => list.some(item => item === input) ? 0 : 1);
+export const Nin = generateBelongsExpression('nin', (input, list) => list.some(item => item === input) ? 0 : 1);
 
-function NIN_INLINE_MAKER (list) {
-    if (list.length === 0) {
-        return () => '1.';
-    }
-    return inline => `((${list.map((cat, index) => `(${inline.input} != ${inline.list[index]})`).join(' && ')})? 1.: 0.)`;
-}
-
-function generateBelongsExpression (name, inlineMaker, jsEval) {
+function generateBelongsExpression (name, jsEval) {
     return class BelongExpression extends BaseExpression {
         constructor (input, list) {
             checkMaxArguments(arguments, 2, name);
