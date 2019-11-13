@@ -31,11 +31,11 @@ const belongsReturn = {
         check: '1.',
         result: '0.'
     },
-    in:  {
+    in: {
         check: '0.',
-        result: '1.'  
+        result: '1.'
     }
-}
+};
 
 /**
  * Check if value does not belong to the list of elements.
