@@ -4,8 +4,8 @@ import BaseExpression from './base';
 /**
  * Check if a categorical value belongs to a list of categories.
  *
- * @param {Category} input - Categorical expression to be tested against the whitelist
- * @param {Category[]} list - Multiple expression parameters that will form the whitelist
+ * @param {Category|Number} input - Categorical or numeric expression to be tested against the whitelist
+ * @param {Category[]|Number[]} list - Multiple expression parameters that will form the whitelist
  * @return {Number} Numeric expression with the result of the check
  *
  * @example <caption>Display only cities where $type is 'metropolis' or 'capital'.</caption>
@@ -17,6 +17,17 @@ import BaseExpression from './base';
  * @example <caption>Display only cities where $type is 'metropolis' or 'capital'. (String)</caption>
  * const viz = new carto.Viz(`
  *   filter: $type in ['metropolis', 'capital']
+ * `);
+ *
+ * @example <caption>Display only products where $amount is 10, 15 or 20.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   filter: s.in(s.prop('amount'), [10, 15, 20])
+ * });
+ *
+ * @example <caption>Display only products where $amount is 10, 15 or 20. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: $amount in [10, 15, 20]
  * `);
  *
  * @memberof carto.expressions
@@ -40,8 +51,8 @@ const belongsReturn = {
 /**
  * Check if value does not belong to the list of elements.
  *
- * @param {Category} input - Categorical expression to be tested against the blacklist
- * @param {Category[]} list - Multiple expression parameters that will form the blacklist
+ * @param {Category|Number} input - Categorical or numeric expression to be tested against the blacklist
+ * @param {Category[]|Number[]} list - Multiple expression parameters that will form the blacklist
  * @return {Number} Numeric expression with the result of the check
  *
  * @example <caption>Display only cities where $type is not 'metropolis' or 'capital'.</caption>
@@ -53,6 +64,17 @@ const belongsReturn = {
  * @example <caption>Display only cities where $type is not 'metropolis' or 'capital'. (String)</caption>
  * const viz = new carto.Viz(`
  *   filter: $type nin ['metropolis', 'capital']
+ * `);
+ *
+ * @example <caption>Display only products where $amount is not 10, 15 or 20.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   filter: s.nin(s.prop('amount'), [10, 15, 20])
+ * });
+ *
+ * @example <caption>Display only products where $amount is not 10, 15 or 20. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: $amount nin [10, 15, 20]
  * `);
  *
  * @memberof carto.expressions
