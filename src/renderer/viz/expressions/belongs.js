@@ -26,10 +26,16 @@ import BaseExpression from './base';
  */
 export const In = generateBelongsExpression('in', (input, list) => list.some(item => item === input) ? 1 : 0);
 
-const OPERATORS = {
-    nin: '!=',
-    in: '=='
-};
+const belongsReturn = {
+    nin: {
+        check: '1.',
+        result: '0.'
+    },
+    in:  {
+        check: '0.',
+        result: '1.'  
+    }
+}
 
 /**
  * Check if value does not belong to the list of elements.
@@ -70,7 +76,7 @@ function generateBelongsExpression (name, jsEval) {
             super({ input, list });
 
             this.type = 'number';
-            this.compare = OPERATORS[name];
+            this.name = name;
         }
 
         get value () {
@@ -92,10 +98,12 @@ function generateBelongsExpression (name, jsEval) {
             const funcName = `belongs${this._uid}`;
             const funcList = this._getFuncList();
             const funcBody = this.list.elems.map(funcList).join('');
+            const checkValue = belongsReturn[this.name].check;
+
             const preface = `float ${funcName}(float x){
                 ${funcBody}
 
-                return 0.;
+                return ${checkValue};
             }`;
 
             return {
@@ -105,9 +113,11 @@ function generateBelongsExpression (name, jsEval) {
         }
 
         _getFuncList () {
+            const returnValue = belongsReturn[this.name].result;
+
             return (elem) => {
                 const x = this.input.type === 'number' ? `${elem}.0` : `cat${elem._uid}`;
-                return `if (x${this.compare}${x}) { return 1.; }`;
+                return `if (x==${x}) { return ${returnValue}; }`;
             };
         }
 
