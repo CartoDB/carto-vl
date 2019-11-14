@@ -58,7 +58,9 @@ export default class BaseCategory extends BaseExpression {
     }
 
     _preDraw (program, drawMetadata, gl) {
-        const id = this._metadata.categoryToID.get(this.value);
-        gl.uniform1f(this._getBinding(program).uniformLocation, id);
+        if (this._metadata) {
+            const id = this._metadata.categoryToID.get(this.value);
+            gl.uniform1f(this._getBinding(program).uniformLocation, id);
+        }
     }
 }
