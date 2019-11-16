@@ -10,6 +10,14 @@
 #        TODO: fix that
 #
 
+git clone https://github.com/CartoDB/cartodb-postgresql.git ;
+
+# Install cartodb extension
+cd cartodb-postgresql
+make all install
+
+cd -
+
 PREPARE_REDIS=yes
 PREPARE_PGSQL=yes
 
@@ -59,7 +67,7 @@ TESTPASS=`echo ${TESTPASS} | sed "s/<%= user_id %>/${TESTUSERID}/"`
 TEST_DB="${TESTUSER}_db"
 
 # NOTE: will be set by caller trough environment
-if test -z "$REDIS_PORT"; then REDIS_PORT=6333; fi
+if test -z "$REDIS_PORT"; then REDIS_PORT=6335; fi
 
 PUBLICUSER=`node -e "console.log(require('${TESTENV}').postgres.user || 'xxx')"`
 PUBLICPASS=`node -e "console.log(require('${TESTENV}').postgres.password || 'xxx')"`
@@ -96,14 +104,28 @@ if test x"$PREPARE_PGSQL" = xyes; then
   #   pg_dump --username postgres --dbname cartodb_user_de952f5f-6a86-467d-8c27-72cf6be3395e_db --table $TABLE --format plain --file /tmp/cartovl/$TABLE.sql
   # done
   # tar -cjf cartovl.tar.gz /tmp/cartovl
+  psql -c "CREATE USER tileuser;" ${TEST_DB}
+  psql -c "CREATE EXTENSION IF NOT EXISTS cartodb CASCADE;" ${TEST_DB}
+
   curl https://cartodb-libs.global.ssl.fastly.net/carto-vl/assets/mnmappluto.sql -o sql/mnmappluto.sql
   curl https://cartodb-libs.global.ssl.fastly.net/carto-vl/assets/monarch_migration_1.sql -o sql/monarch_migration_1.sql
   curl https://cartodb-libs.global.ssl.fastly.net/carto-vl/assets/pop_density_points.sql -o sql/pop_density_points.sql
   curl https://cartodb-libs.global.ssl.fastly.net/carto-vl/assets/sf_stclines.sql -o sql/sf_stclines.sql
 
-  psql -c "CREATE EXTENSION IF NOT EXISTS postgis CASCADE;" ${TEST_DB}
-  psql -c "CREATE EXTENSION IF NOT EXISTS cartodb CASCADE;" ${TEST_DB}
-  psql -c "CREATE EXTENSION IF NOT EXISTS plpythonu CASCADE;" ${TEST_DB}
+  LOCAL_SQL_SCRIPTS='analysis_catalog windshaft.test cdb_analysis_check cdb_invalidate_varnish mnmappluto monarch_migration_1 pop_density_points sf_stclines'
+  for i in ${LOCAL_SQL_SCRIPTS}
+  do
+    cat sql/${i}.sql |
+      sed -e "s/:PUBLICUSER/${PUBLICUSER}/" |
+      sed -e "s/:PUBLICPASS/${PUBLICPASS}/" |
+      sed -e "s/:TESTUSER/${TESTUSER}/" |
+      sed -e "s/:TESTPASS/${TESTPASS}/" |
+      sed -e "s/cartodb_user_de952f5f-6a86-467d-8c27-72cf6be3395e/${TESTUSER}/" |
+      sed -e "s/tileuser/${PUBLICUSER}/" |
+      sed -e "s/TO publicuser/TO ${PUBLICUSER}/" |
+      grep -v ".cdb_checkquota" |
+      PGOPTIONS='--client-min-messages=WARNING' psql -q -v ON_ERROR_STOP=1 ${TEST_DB} > /dev/null || exit 1
+  done
 fi
 
 if test x"$PREPARE_REDIS" = xyes; then
