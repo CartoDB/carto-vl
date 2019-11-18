@@ -1,6 +1,6 @@
 -- Table to register analysis nodes from https://github.com/cartodb/camshaft
 CREATE TABLE IF NOT EXISTS
-    cartodb.cdb_analysis_catalog (
+    cdb_analysis_catalog (
 -- useful for multi account deployments
     username text,
 -- md5 hex hash

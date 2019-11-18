@@ -18,47 +18,35 @@ let config = {
     // Base URLs for the APIs
     //
     // See https://github.com/CartoDB/Windshaft-cartodb/wiki/Unified-Map-API
+    //
+    // Note: each entry corresponds with an express' router.
+    // You must define at least one path. However, middlewares are optional.
     routes: {
-        v1: {
+        api: [{
             paths: [
                 '/api/v1',
                 '/user/:user/api/v1'
             ],
+            // Optional: attach middlewares at the begining of the router
+            // to perform custom operations.
+            middlewares: [],
             // Base url for the Detached Maps API
             // "/api/v1/map" is the new API,
-            map: {
+            map: [{
                 paths: [
                     '/map'
-                ]
-            },
+                ],
+                middlewares: [] // Optional
+            }],
             // Base url for the Templated Maps API
             // "/api/v1/map/named" is the new API,
-            template: {
+            template: [{
                 paths: [
                     '/map/named'
-                ]
-            }
-        },
-        // For compatibility with versions up to 1.6.x
-        v0: {
-            paths: [
-                '/tiles'
-            ],
-            // Base url for the Detached Maps API
-            // "/tiles/layergroup" is for compatibility with versions up to 1.6.x
-            map: {
-                paths: [
-                    '/layergroup'
-                ]
-            },
-            // Base url for the Templated Maps API
-            // "/tiles/template" is for compatibility with versions up to 1.6.x
-            template: {
-                paths: [
-                    '/template'
-                ]
-            }
-        }
+                ],
+                middlewares: [] // Optional
+            }]
+        }]
     },
 
     // Resource URLs expose endpoints to request/retrieve metadata associated to Maps: dataviews, analysis node status.
@@ -193,12 +181,12 @@ let config = {
                 // max number of rows to return when querying data, 0 means no limit
                 row_limit: 0,
                 /*
-                * Set persist_connection to false if you want
-                * database connections to be closed on renderer
-                * expiration (1 minute after last use).
-                * Setting to true (the default) would never
-                * close any connection for the server's lifetime
-                */
+                 * Set persist_connection to false if you want
+                 * database connections to be closed on renderer
+                 * expiration (1 minute after last use).
+                 * Setting to true (the default) would never
+                 * close any connection for the server's lifetime
+                 */
                 persist_connection: false,
                 simplify_geometries: true,
                 use_overviews: true, // use overviews to retrieve raster

@@ -22,7 +22,7 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
             - ./node_modules
-      - run: yarn build:clean && yarn build:min && yarn wait-on http://127.0.0.1:8181 && MIN=1 yarn mocha test/acceptance/e2e.test.js --timeout 25000
+      - run: yarn build:clean && yarn build:min && yarn wait-on http://127.0.0.1:8181 && MIN=1 yarn mocha test/acceptance/e2e.test.js --timeout 250000
 
   test-e2e-pg11:
     docker:
@@ -38,7 +38,7 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
             - ./node_modules
-      - run: yarn build:clean && yarn build:min && yarn wait-on http://127.0.0.1:8181 && MIN=1 yarn mocha test/acceptance/e2e.test.js --timeout 25000
+      - run: yarn build:clean && yarn build:min && yarn wait-on http://127.0.0.1:8181 && MIN=1 yarn mocha test/acceptance/e2e.test.js --timeout 250000
 
   test-unit-lint-docs:
     docker:

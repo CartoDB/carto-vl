@@ -155,3 +155,36 @@ When a PR is merged into `master` for a patch release, after releasing, we merge
 ## Release
 
 The release workflow is documented internally.
+
+## Docker Images
+
+The Docker configuration lives in [/test/acceptance/docker](/test/acceptance/docker). This configuration includes:
+
+* `/test/acceptance/docker/config/environments/test.js` - [Windshaft](https://github.com/CartoDB/Windshaft-cartodb/tree/master/config/environments) configuration file
+* `/test/acceptance/docker/test/support/prepare_db.sh` - Database setup
+* `/test/acceptance/docker/prepare.sh` - Tests setup
+* `/test/acceptance/docker/deploy.sh` - Windshaft & redis setup
+
+If we change the configuration (due to a change in Windshaft, for example) we have to rebuild the Docker images we're using both locally and in our CI environment:
+
+* [carto/windshaft-cartovl-testing](https://hub.docker.com/r/carto/windshaft-cartovl-testing) (local e2e tests)
+* [carto/windshaft-cartovl-testing-pg10](https://hub.docker.com/r/carto/windshaft-cartovl-testing-pg10) (CI - using Postgres 10)
+* [carto/windshaft-cartovl-testing-pg11](https://hub.docker.com/r/carto/windshaft-cartovl-testing-pg11) (CI - using Postgres 11)
+
+First of all, you need to have access to [Docker Hub](https://docs.docker.com/docker-hub/) and login from your local machine. If you don't have an account, please request access.
+
+Make the necessary changes in the configuration files and **build** each image using this command:
+
+```sh
+$ docker build -t carto/windshaft-cartovl-testing test/acceptance/docker
+$ docker build -t carto/windshaft-cartovl-testing-pg10 test/acceptance/docker
+$ docker build -t carto/windshaft-cartovl-testing-pg11 test/acceptance/docker
+```
+
+And finally, **push** them to Docker Hub:
+
+```sh
+$ docker push carto/windshaft-cartovl-testing
+$ docker push carto/windshaft-cartovl-testing-pg10
+$ docker push carto/windshaft-cartovl-testing-pg11
+```

@@ -15,7 +15,5 @@ echo "port 6335" | redis-server - > ./redis.log &
 PID_REDIS=$!
 echo ${PID_REDIS} > ${BASEDIR}/redis.pid
 
-/etc/init.d/postgresql start
-
 cd /mnt/Windshaft-cartodb/
-node app.js development
+/etc/init.d/postgresql start && node app.js development
