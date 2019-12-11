@@ -16,7 +16,7 @@ The library currently requires:
 
 For a good experience, >= 8GB or RAM is recommended and also having a dedicated GPU with updated drivers.
 
-Some browsers, specially in old mobile devices, only have experimental or partial WebGL support. We cannot guarantee that CARTO VL will work on those cases.
+Some browsers, specially in mobile devices, only have experimental or partial WebGL support. We cannot guarantee that CARTO VL will work on those cases.
 
 To easily check if your browser is fully compatible, just open the [browser support example](https://carto.com/developers/carto-vl/examples/#example-check-for-browser-support). It will use two functions from CARTO VL library to check for the requirements: `carto.isBrowserSupported()` and `carto.unsupportedBrowserReasons()`. That page will clearly display in a panel if any issue is found in your browser or everything is fine.
 
