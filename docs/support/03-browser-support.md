@@ -18,6 +18,6 @@ For a good experience, >= 8GB or RAM is recommended and also having a dedicated 
 
 Some browsers, specially in mobile devices, only have experimental or partial WebGL support. We cannot guarantee that CARTO VL will work on those cases.
 
-To easily check if your browser is fully compatible, just open the [browser support example](https://carto.com/developers/carto-vl/examples/#example-check-for-browser-support). It will use two functions from CARTO VL library to check for the requirements: `carto.isBrowserSupported()` and `carto.unsupportedBrowserReasons()`. That page will clearly display in a panel if any issue is found in your browser or everything is fine.
+To check if your browser supports WebGL, just open the [browser support example](https://carto.com/developers/carto-vl/examples/#example-check-for-browser-support). It will use two functions from CARTO VL library to check for the requirements: `carto.isBrowserSupported()` and `carto.unsupportedBrowserReasons()`. The example map will clearly display if your browser has at least partial support for WebGL. If WebGL is not supported, an error message will be shown in a panel instead.
 
 You can grab more information regarding your browser's WebGL support in this link: [WebGL Report](http://webglreport.com/). For more details about WebGL extensions, you can have a look at [Khronos WebGL Extension Registry](https://www.khronos.org/registry/webgl/extensions/). And if you want to check some stats about different WebGL parameters and extensions, you can visit [WebGL Stats](https://webglstats.com/webgl).
