@@ -24,12 +24,22 @@ export default class BucketsGLSLHelper {
 
         // Get coode for buckets comparisons
         const funcName = `buckets${this.buckets._uid}`;
+        let nullValueIndex = null
+        
+        this.buckets.list.value.forEach((listElement, index) => {
+            if (listElement === null) {
+                nullValueIndex = index+1
+                return
+            }
+        });
         const elif = this._getComparisons(childSources);
         const funcBody = this.buckets.list.elems.map(elif).join('');
-
         const preface = `float ${funcName}(float x){
             ${funcBody}
-            return ${this.buckets.input.type === 'category' ? OTHERS_GLSL_VALUE : (this.buckets.numCategories - 1).toFixed(20)};
+
+            return ${this.buckets.input.type === 'category' || nullValueIndex !== null
+                ? OTHERS_GLSL_VALUE
+                : (this.buckets.numCategories - 1).toFixed(20)};
         }`;
 
         return {
@@ -46,25 +56,15 @@ export default class BucketsGLSLHelper {
 
         // When there is "OTHERS" we don't need to take it into account
         const divisor = this.buckets.numCategoriesWithoutOthers - 1 || 1;
-        const buckets = this.buckets
 
-        let elif;
-        if (divisor <= SAFE_NUMBER_ELSE_IF_COMPARISONS) {
-            // just one expression, with one 'if' & several 'else if'
-            elif = (_, index) => {
-                const inCmp = buckets.list.value[index] === null ? '==' : cmp
-                    return `${index > 0 ? 'else' : ''} if (x${inCmp}(${childSources.list.inline[index]})){
-                        return ${index}./${divisor.toFixed(20)};}`;
-                }
-        } else {
-            // multiple, independent, 'if' expressions (order is assumed)
-            elif = (_, index) => {
-                const inCmp = buckets.list.value[index] === null ? '==' : cmp
-                return `if (x${inCmp}(${childSources.list.inline[index]})){
+        return (_, index) => {
+                if (childSources.list.inline[index]!==null) {
+                    return `if (x${cmp}(${childSources.list.inline[index]})){
                         return ${index}./${divisor.toFixed(20)};
                     }`;
-            }
+                }
+
+                return ''
         }
-        return elif;
     }
 }
