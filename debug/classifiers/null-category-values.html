@@ -126,19 +126,7 @@
             @numeric_value: $numeric_value
             @category_value: $category_value 
 
-            // Numeric
-            // color: ramp(linear($numeric_value), [indigo, orange, white, green]) // null values get 'others' default color
-            // color: ramp(buckets($numeric_value, [-9, -1, 0, 4]), [red, indigo, orange, white, green], blue) // null values get 'others' color
-
-            // Category
-            // color: ramp($category_value, bold, blue) // nulls are classified as another category
-            color: ramp(buckets($category_value, ['a', 'b', 'c', 'd']), bold) // allows to classify null values
-
-            // Combine filters
-            //filter: not(isNull($numeric_value))
-            //filter: isNull($numeric_value)
-            //filter: not(isNull($category_value))
-            //filter: isNull($category_value)
+            color: ramp(buckets($category_value, ['a', 'b', 'c', 'd']), bold) // classifies null values as others
 
             strokeWidth: 0
             width: 50
