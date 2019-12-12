@@ -1,4 +1,5 @@
 import BaseExpression from '../base';
+import BaseNumber from './number';
 
 export default class ListGeneric extends BaseExpression {
     get value () {
@@ -10,7 +11,7 @@ export default class ListGeneric extends BaseExpression {
     }
 
     _applyToShaderSource (getGLSLforProperty) {
-        const childGLSL = this.elems.map(elem => elem._applyToShaderSource(getGLSLforProperty));
+        const childGLSL = this.elems.map(elem => elem._applyToShaderSource(getGLSLforProperty))
         return {
             preface: childGLSL.map(c => c.preface).join('\n'),
             inline: childGLSL.map(c => c.inline)

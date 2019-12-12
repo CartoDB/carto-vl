@@ -275,5 +275,5 @@ function _mixNumber (x, y, a) {
 }
 
 function _isNumber (value) {
-    return Number.isFinite(value) || value === Infinity || value === -Infinity || Number.isNaN(value);
+    return value === null || Number.isFinite(value) || value === Infinity || value === -Infinity || Number.isNaN(value);
 }

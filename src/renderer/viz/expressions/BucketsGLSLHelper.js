@@ -46,20 +46,24 @@ export default class BucketsGLSLHelper {
 
         // When there is "OTHERS" we don't need to take it into account
         const divisor = this.buckets.numCategoriesWithoutOthers - 1 || 1;
+        const buckets = this.buckets
 
         let elif;
         if (divisor <= SAFE_NUMBER_ELSE_IF_COMPARISONS) {
             // just one expression, with one 'if' & several 'else if'
-            elif = (_, index) =>
-                `${index > 0 ? 'else' : ''} if (x${cmp}(${childSources.list.inline[index]})){
-                return ${index}./${divisor.toFixed(20)};
-            }`;
+            elif = (_, index) => {
+                const inCmp = buckets.list.value[index] === null ? '==' : cmp
+                    return `${index > 0 ? 'else' : ''} if (x${inCmp}(${childSources.list.inline[index]})){
+                        return ${index}./${divisor.toFixed(20)};}`;
+                }
         } else {
             // multiple, independent, 'if' expressions (order is assumed)
-            elif = (_, index) =>
-                `if (x${cmp}(${childSources.list.inline[index]})){
-                return ${index}./${divisor.toFixed(20)};
-            }`;
+            elif = (_, index) => {
+                const inCmp = buckets.list.value[index] === null ? '==' : cmp
+                return `if (x${inCmp}(${childSources.list.inline[index]})){
+                        return ${index}./${divisor.toFixed(20)};
+                    }`;
+            }
         }
         return elif;
     }
