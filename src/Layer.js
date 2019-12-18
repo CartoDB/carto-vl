@@ -23,28 +23,28 @@ const states = Object.freeze({
 });
 
 /**
-*
-* A Layer is the primary way to visualize geospatial data.
-*
-* To create a layer a {@link carto.source|source} and {@link carto.Viz|viz} are required:
-*
-* - The {@link carto.source|source} is used to know **what** data will be displayed in the Layer.
-* - The {@link carto.Viz|viz} is used to know **how** to draw the data in the Layer, Viz instances can only be bound to one single layer.
-*
-* Note: This Layer implements {@link https://www.mapbox.com/mapbox-gl-js/api/#customlayerinterface|Mapbox GL JS - Custom Layer Interface}
-*
-* @param {String} id - The ID of the layer. Can be used in the {@link addTo|addTo} function
-* @param {carto.source} source - The source of the data
-* @param {carto.Viz} viz - The description of the visualization of the data
-* @throws CartoError
-*
-* @example
-* const layer = new carto.Layer('layer0', source, viz);
-*
-* @constructor Layer
-* @name carto.Layer
-* @api
-*/
+ *
+ * A Layer is the primary way to visualize geospatial data.
+ *
+ * To create a layer a {@link carto.source|source} and {@link carto.Viz|viz} are required:
+ *
+ * - The {@link carto.source|source} is used to know **what** data will be displayed in the Layer.
+ * - The {@link carto.Viz|viz} is used to know **how** to draw the data in the Layer, Viz instances can only be bound to one single layer.
+ *
+ * Note: This Layer implements {@link https://www.mapbox.com/mapbox-gl-js/api/#customlayerinterface|Mapbox GL JS - Custom Layer Interface}
+ *
+ * @param {String} id - The ID of the layer. Can be used in the {@link addTo|addTo} function
+ * @param {carto.source} source - The source of the data
+ * @param {carto.Viz} viz - The description of the visualization of the data
+ * @throws CartoError
+ *
+ * @example
+ * const layer = new carto.Layer('layer0', source, viz);
+ *
+ * @constructor Layer
+ * @name carto.Layer
+ * @api
+ */
 
 export default class Layer {
     constructor (id, source, viz) {
@@ -458,15 +458,18 @@ export default class Layer {
     }
 
     _checkSourceRequestsAndFireEvents (isNewMatrix) {
-        const checkForDataframesUpdate = this._source.requestData(this._getZoom(), this._getViewport());
+        if (this.checkForDataframesUpdate) this.checkForDataframesUpdate.cancel();
 
-        checkForDataframesUpdate.then(dataframesHaveChanged => {
+        this.checkForDataframesUpdate = this._source.requestData(this._getZoom(), this._getViewport());
+
+        this.checkForDataframesUpdate.then(dataframesHaveChanged => {
             if (dataframesHaveChanged) {
                 this._needRefresh().then(() => {
                     if (this._state === states.INIT) {
                         this._state = states.IDLE;
                         this._fire('loaded');
                     }
+                    this._fire('dataloaded');
                     this._fire('updated', 'different dataframes required from source');
                 });
             } else {

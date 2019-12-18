@@ -1,3 +1,4 @@
+import CancelablePromise from 'cancelable-promise';
 import DataframeCache from './DataframeCache';
 import { rTiles } from '../client/rsys';
 import { isSetsEqual } from '../utils/util';
@@ -40,31 +41,37 @@ export default class TileClient {
         return Math.abs(x + y) % this._templateURLs.length;
     }
 
-    async _getTiles (tiles, urlToDataframeTransformer) {
-        this._nextGroupID++;
-        const requestGroupID = this._nextGroupID;
+    _getTiles (tiles, urlToDataframeTransformer) {
+        const _promise = new CancelablePromise(async resolve => {
+            this._nextGroupID++;
+            const requestGroupID = this._nextGroupID;
 
-        const completedDataframes = await Promise.all(tiles.map(({ x, y, z }) => {
-            return this._cache.get(`${x},${y},${z}`, () => this._requestDataframe(x, y, z, urlToDataframeTransformer)).then(dataframe => {
-                dataframe.orderID = x + y / 1000;
-                return dataframe;
+            const completedDataframes = await Promise.all(
+                tiles.map(({ x, y, z }) => {
+                    return this._cache.get(`${x},${y},${z}`, () => this._requestDataframe(x, y, z, urlToDataframeTransformer)).then(dataframe => {
+                        dataframe.orderID = x + y / 1000;
+                        return dataframe;
+                    });
+                }));
+
+            if (requestGroupID < this._currentRequestGroupID) {
+                return true;
+            }
+            this._currentRequestGroupID = requestGroupID;
+
+            this._oldDataframes.forEach(d => {
+                d.active = false;
             });
-        }));
+            completedDataframes.forEach(d => {
+                d.active = true;
+            });
 
-        if (requestGroupID < this._currentRequestGroupID) {
-            return true;
-        }
-        this._currentRequestGroupID = requestGroupID;
+            const dataframesChanged = !isSetsEqual(new Set(completedDataframes), new Set(this._oldDataframes));
+            if (this._oldDataframes && !_promise._canceled) this._oldDataframes = completedDataframes;
 
-        this._oldDataframes.forEach(d => {
-            d.active = false;
+            resolve(dataframesChanged);
         });
-        completedDataframes.forEach(d => {
-            d.active = true;
-        });
-        const dataframesChanged = !isSetsEqual(new Set(completedDataframes), new Set(this._oldDataframes));
-        this._oldDataframes = completedDataframes;
-        return dataframesChanged;
+        return _promise;
     }
 
     async _requestDataframe (x, y, z, urlToDataframeTransformer) {
