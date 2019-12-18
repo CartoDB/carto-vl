@@ -458,9 +458,14 @@ export default class Layer {
     }
 
     _checkSourceRequestsAndFireEvents (isNewMatrix) {
-        const checkForDataframesUpdate = this._source.requestData(this._getZoom(), this._getViewport());
+        if (this.checkForDataframesUpdate && this.checkForDataframesUpdate.cancel) {
+            this.checkForDataframesUpdate.cancel();
+        } else {
+        }
 
-        checkForDataframesUpdate.then(dataframesHaveChanged => {
+        this.checkForDataframesUpdate = this._source.requestData(this._getZoom(), this._getViewport());
+
+        this.checkForDataframesUpdate.then(dataframesHaveChanged => {
             if (dataframesHaveChanged) {
                 this._needRefresh().then(() => {
                     if (this._state === states.INIT) {
