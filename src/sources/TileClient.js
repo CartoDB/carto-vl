@@ -1,3 +1,4 @@
+import CancelablePromise from 'cancelable-promise';
 import DataframeCache from './DataframeCache';
 import { rTiles } from '../client/rsys';
 import { isSetsEqual } from '../utils/util';

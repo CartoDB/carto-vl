@@ -460,7 +460,6 @@ export default class Layer {
     _checkSourceRequestsAndFireEvents (isNewMatrix) {
         if (this.checkForDataframesUpdate && this.checkForDataframesUpdate.cancel) {
             this.checkForDataframesUpdate.cancel();
-        } else {
         }
 
         this.checkForDataframesUpdate = this._source.requestData(this._getZoom(), this._getViewport());
