@@ -4,7 +4,6 @@
 .vscode/
 *_out.png
 *.log
-dist/
 docs/all
 docs/public
 examples/ignore/
