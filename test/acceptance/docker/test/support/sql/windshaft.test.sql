@@ -193,9 +193,8 @@ CREATE TABLE IF NOT EXISTS
 INSERT INTO CDB_TableMetadata (tabname, updated_at) VALUES ('test_table'::regclass, '2009-02-13T23:31:30.123Z');
 INSERT INTO CDB_TableMetadata (tabname, updated_at) VALUES ('test_table_private_1'::regclass, '2009-02-13T23:31:30.123Z');
 
--- GRANT SELECT ON CDB_TableMetadata TO :PUBLICUSER;
-GRANT SELECT ON CDB_TableMetadata TO :TESTUSER;
-GRANT SELECT ON CDB_TableMetadata TO test_windshaft_regular1; -- for analysis. Warning: TBA
+GRANT ALL ON cartodb.CDB_TableMetadata TO :PUBLICUSER;
+GRANT ALL ON cartodb.CDB_TableMetadata TO :TESTUSER;
 
 -- long name table
 CREATE TABLE
