@@ -14,3 +14,4 @@ temp/
 test/acceptance/docker/Windshaft-cartodb/
 test/acceptance/e2e/**/*.html
 test/integration/render/**/*.html
+.idea

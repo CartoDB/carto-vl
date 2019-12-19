@@ -1,6 +1,6 @@
 {
   "name": "@carto/carto-vl",
-  "version": "1.4.2",
+  "version": "1.4.3-alpha.0",
   "sideEffects": false,
   "description": "CARTO Vector library",
   "repository": {
@@ -61,7 +61,7 @@
     "glob": "^7.1.2",
     "http-server": "^0.11.1",
     "jasmine-core": "^3.2.1",
-    "jsdoc": "^3.5.5",
+    "jsdoc": "^3.6.3",
     "jsdoc-escape-at": "^1.0.1",
     "karma": "^3.0.0",
     "karma-chrome-launcher": "^2.2.0",
