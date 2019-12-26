@@ -1,6 +1,6 @@
 {
   "name": "@carto/carto-vl",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "sideEffects": false,
   "description": "CARTO Vector library",
   "repository": {
