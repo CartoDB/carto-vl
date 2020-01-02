@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.4.4] 2020-02-01
+
+### Changed
+- Remove 'color' key in legend data
+
+## [1.4.3] 2019-26-12
+
+### Fixed
+- Fix best subpalette detection
+- Update browser support documentation
+- Fix Windshaft request
+- Fix "too complex" error in belongs expression
+- Fix using length as a property name
+
+## [1.4.2] 2019-24-10
+
+### Fixed
+- Lower minimum MAX_VERTEX_TEXTURE_IMAGE_UNITS requirement
+
 ## [1.4.1] 2019-23-07
 
 ### Fixed

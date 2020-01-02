@@ -407,6 +407,45 @@ describe('src/renderer/dataframe/Dataframe', () => {
             });
         });
     });
+
+    describe('.getPropertyTexture', () => {
+        const dataframe = new Dataframe({
+            center: { x: 0, y: 0 },
+            scale: 1,
+            geom: new Float32Array([
+                0, 0,
+                0, 0,
+                0, 0,
+
+                1, 1,
+                1, 1,
+                1, 1
+            ]),
+            properties: {
+                id: [1, 2]
+            },
+            type: GEOMETRY_TYPE.POINT,
+            size: 2,
+            active: true,
+            metadata: new Metadata({
+                properties: {
+                    cartodb_id: {
+                        type: 'number'
+                    },
+                    length: {
+                        type: 'number'
+                    }
+                },
+                idProperty: 'cartodb_id'
+            })
+        });
+        dataframe._loadPropertyValuesToTexture = (propertyName) => (dataframe.propertyTex['_' + propertyName] = 'texture');
+
+        it('should not throw an exception when passing any property name', () => {
+            expect(() => dataframe.getPropertyTexture('cartodb_id')).not.toThrow();
+            expect(() => dataframe.getPropertyTexture('length')).not.toThrow();
+        });
+    });
 });
 
 function expectEqualFeatures (result, expected) {
