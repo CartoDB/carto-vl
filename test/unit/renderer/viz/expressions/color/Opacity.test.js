@@ -34,7 +34,7 @@ describe('src/renderer/viz/expressions/opacity', () => {
             const expected = {
                 name: 'color',
                 data: [{
-                    key: 'color',
+                    key: '',
                     value: {
                         r: 0,
                         g: 0,
@@ -52,7 +52,7 @@ describe('src/renderer/viz/expressions/opacity', () => {
             const expected = {
                 name: 'color',
                 data: [{
-                    key: 'color',
+                    key: '',
                     value: {
                         r: 255,
                         g: 1,
@@ -70,7 +70,7 @@ describe('src/renderer/viz/expressions/opacity', () => {
             const expected = {
                 name: 'color',
                 data: [{
-                    key: 'color',
+                    key: '',
                     value: {
                         r: 0,
                         g: 0.9999316244751483,
@@ -88,7 +88,7 @@ describe('src/renderer/viz/expressions/opacity', () => {
             const expected = {
                 name: 'color',
                 data: [{
-                    key: 'color',
+                    key: '',
                     value: {
                         r: 0,
                         g: 10.20000000000001,
@@ -106,7 +106,7 @@ describe('src/renderer/viz/expressions/opacity', () => {
             const expected = {
                 name: 'color',
                 data: [{
-                    key: 'color',
+                    key: '',
                     value: {
                         r: 255,
                         g: 255,
@@ -124,7 +124,7 @@ describe('src/renderer/viz/expressions/opacity', () => {
             const expected = {
                 name: 'color',
                 data: [{
-                    key: 'color',
+                    key: '',
                     value: {
                         r: 250,
                         g: 186,

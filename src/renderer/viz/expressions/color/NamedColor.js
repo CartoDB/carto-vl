@@ -56,7 +56,7 @@ export default class NamedColor extends BaseExpression {
     getLegendData () {
         const name = 'color';
         const value = this.color;
-        const key = 'color';
+        const key = '';
         const data = [{ key, value }];
 
         return { name, data };
