@@ -55,7 +55,7 @@ export class BQMVTWorker {
 
     async fetchBQSTile (x, y, z) {
         console.log('Fetch BigQuery Storage', x, y, z);
-        if (z === 14) {
+        if (x === 4821 && y === 6149 && z === 14) {
             return fetch('http://localhost:8080/debug/bq-mvt/14_4821_6149.pbf');
         }
     }

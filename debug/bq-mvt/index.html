@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="http://localhost:8080/dist/carto-vl.js"></script>
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.css" rel="stylesheet" />
+    <link href="https://carto.com/developers/carto-vl/v1.4.4/examples/maps/style.css" rel="stylesheet">
+</head>
+
+<body>
+    <div id="map"></div>
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.voyager,
+            center: [-74.06, 40.89],
+            zoom: 14
+
+        });
+
+        const metadata = {
+            idProperty: 'geoid',
+            properties: {
+                'area': { type: 'number' },
+                'geoid': { type: 'category' }
+            }
+        };
+        
+        const source = new carto.source.BQMVT(metadata);
+        const viz = new carto.Viz(`
+            color: ramp(linear($area, 0, 2000000), [blue, red])
+            strokeColor: opacity(white, 0.6)
+        `);
+        const layer = new carto.Layer('layer', source, viz);
+
+        layer.addTo(map, 'watername_ocean');
+        layer.on('loaded', () => {
+            window.loaded = true;
+        });
+    </script>
+</body>
+
+</html>
