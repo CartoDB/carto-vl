@@ -1,8 +1,8 @@
 
-import Dataframe from '../renderer/dataframe/Dataframe';
-import Metadata from '../renderer/Metadata';
-import MVTMetadata from './MVTMetadata';
-import Base from './Base';
+import Dataframe from '../../renderer/dataframe/Dataframe';
+import Metadata from '../../renderer/Metadata';
+import MVTMetadata from '../MVTMetadata';
+import Base from '../Base';
 import BQTileClient from './BQTileClient';
 import BQMVTWorker from './BQMVTWorker';
 

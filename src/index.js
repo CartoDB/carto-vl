@@ -45,7 +45,7 @@ import * as expressions from './renderer/viz/expressions';
 import Dataset from './sources/Dataset';
 import GeoJSON from './sources/GeoJSON';
 import MVT from './sources/MVT';
-import BQMVT from './sources/BQMVT';
+import BQMVT from './sources/bigquery/BQMVT';
 import SQL from './sources/SQL';
 import { on, off } from './utils/events';
 import { isBrowserSupported, unsupportedBrowserReasons } from './renderer/Renderer';

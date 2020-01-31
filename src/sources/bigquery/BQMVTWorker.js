@@ -1,13 +1,13 @@
 import { VectorTile } from '@mapbox/vector-tile';
 import * as Protobuf from 'pbf';
-import * as rsys from '../client/rsys';
-import { decodeLines, decodePolygons } from '../client/mvt/feature-decoder';
-import MVTMetadata from './MVTMetadata';
-import DummyDataframe from '../renderer/dataframe/DummyDataframe';
-import CartoValidationError, { CartoValidationErrorTypes } from '../errors/carto-validation-error';
-import CartoRuntimeError, { CartoRuntimeErrorTypes } from '../errors/carto-runtime-error';
-import { GEOMETRY_TYPE } from '../utils/geometry';
-import BigQuery from './BigQuery';
+import * as rsys from '../../client/rsys';
+import { decodeLines, decodePolygons } from '../../client/mvt/feature-decoder';
+import MVTMetadata from '../MVTMetadata';
+import DummyDataframe from '../../renderer/dataframe/DummyDataframe';
+import CartoValidationError, { CartoValidationErrorTypes } from '../../errors/carto-validation-error';
+import CartoRuntimeError, { CartoRuntimeErrorTypes } from '../../errors/carto-runtime-error';
+import { GEOMETRY_TYPE } from '../../utils/geometry';
+import BQClient from './BQClient';
 
 // TODO import correctly
 const RTT_WIDTH = 1024;
@@ -23,10 +23,10 @@ const MVT_TO_CARTO_TYPES = {
 
 export default class BQMVTWorker {
     constructor () {
-        const token = 'ya29.Iq8BvAd6Pm9x2zaEXZFrRCsvOWM6qbg0bOo9yQ_C4jpAy1EitQfQ8jKHh8dbYGcUuURLfd9pmMjG6CVmBdVF3zk3AVEspG--zrYTls4jxsJgeD9Tyu6k4lGUF8rc8Y29nzcdCpgR7zWxLCPRLOW1OndnWcTfBC3pxi2Qtpum1OPMTlIQ6Rilu5vDhS6aq8m5dpp-6tXjZy4cskdu4q0mTqX16nB6omKgplsd2pNJG5UWLw';
+        const token = 'ya29.Iq8BvAdk_j4zWucmthW8Wxfq2nkQFCh0jjbyTbm5SuGv0Ap4Sy63YBIJhNg3gsK0E17wRIqLOvsuYujexVYb3JYHxY8iUMx9ebbVHKxZiW5PqEFTcfpTz4wsNgozk5sTEWs5lJdo-hRqDoiqV0rLEs6Ai15w_d1UM-xJckWi28dO2C0m-6065Ve1wiPQV7x-IM9oksJ4CYNEBXEOFvaFolKGr5mk3mxca7oVcmxJB_b9qw';
 
         this._ready = false;
-        this._client = new BigQuery();
+        this._client = new BQClient();
         this._client.init(token).then(() => {
             console.log('READY!');
             this._ready = true;

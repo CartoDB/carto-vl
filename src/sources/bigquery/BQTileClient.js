@@ -1,6 +1,6 @@
-import DataframeCache from './DataframeCache';
-import { rTiles } from '../client/rsys';
-import { isSetsEqual } from '../utils/util';
+import DataframeCache from '../DataframeCache';
+import { rTiles } from '../../client/rsys';
+import { isSetsEqual } from '../../utils/util';
 
 export default class BQTileClient {
     constructor (templateURLs) {
@@ -43,6 +43,11 @@ export default class BQTileClient {
     async _getTiles (tiles, urlToDataframeTransformer) {
         this._nextGroupID++;
         const requestGroupID = this._nextGroupID;
+
+        // TODO:
+        // Extract non-cached tiles
+        // Request all tiles at the same time
+        // Generate all the dataframes from the response
 
         const completedDataframes = await Promise.all(tiles.map(({ x, y, z }) => {
             return this._cache.get(`${x},${y},${z}`, () => this._requestDataframe(x, y, z, urlToDataframeTransformer)).then(dataframe => {
