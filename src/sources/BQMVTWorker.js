@@ -58,8 +58,6 @@ export default class BQMVTWorker {
     }
 
     async fetchBQSTile (x, y, z) {
-        console.log('Fetch BigQuery Storage', x, y, z);
-
         if (this._ready) {
             return this._client.query(x, y, z);
         }
@@ -89,8 +87,6 @@ export default class BQMVTWorker {
         if (!mvtLayer) {
             return { empty: true };
         }
-
-        console.log(mvtLayer)
 
         const { geometries, properties, propertiesArrayBuffer, numFeatures } = this._decodeMVTLayer(mvtLayer, metadata, MVT_EXTENT);
         const rs = rsys.getRsysFromTile(x, y, z);
