@@ -68,8 +68,7 @@ export default class BQTileClient {
     }
 
     async _requestDataframe (x, y, z, urlToDataframeTransformer) {
-        const url = this._getTileUrl(x, y, z);
-        const dataframe = await urlToDataframeTransformer(x, y, z, url);
+        const dataframe = await urlToDataframeTransformer(x, y, z);
         if (!dataframe.empty) {
             this._addDataframe(dataframe);
         }

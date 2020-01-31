@@ -4,7 +4,7 @@ import Metadata from '../renderer/Metadata';
 import MVTMetadata from './MVTMetadata';
 import Base from './Base';
 import BQTileClient from './BQTileClient';
-import Worker from './MVTWorkers.worker';
+import BQMVTWorker from './BQMVTWorker';
 
 export default class BQMVT extends Base {
     /**
@@ -43,9 +43,7 @@ export default class BQMVT extends Base {
         this._initMetadata(metadata);
         this._initOptions(options);
 
-        this._workerDispatch = {};
-        this._mID = 0;
-        this._workerName = 'BQMVT';
+        this._noworker = new BQMVTWorker();
     }
 
     _initMetadata (metadata) {
@@ -68,14 +66,6 @@ export default class BQMVT extends Base {
 
         options.viewportZoomToSourceZoom = options.viewportZoomToSourceZoom || Math.ceil;
         this._options = options;
-    }
-
-    get _worker () {
-        if (!this._workerInstance) {
-            this._workerInstance = new Worker();
-            this._workerInstance.onmessage = this._receiveMessageFromWorker.bind(this);
-        }
-        return this._workerInstance;
     }
 
     _receiveMessageFromWorker (event) {
@@ -119,28 +109,24 @@ export default class BQMVT extends Base {
         );
     }
 
-    _urlToDataframeTransformer (x, y, z, url) {
+    _urlToDataframeTransformer (x, y, z) {
         return new Promise(resolve => {
-            const validUrl = this._validUrlForWorker(url);
-            this._postMessageToWorker({ x, y, z }, validUrl);
-
-            this._metadataSent = true;
-            this._workerDispatch[this._mID] = resolve;
-            this._mID++;
+            this._requestDataframe({ x, y, z }, resolve);
         });
     }
 
-    _postMessageToWorker ({ x, y, z }, url) {
-        this._worker.postMessage({
+    async _requestDataframe ({ x, y, z }, resolve) {
+        const dataframe = await this._noworker.processEvent({
             x,
             y,
             z,
-            url,
             layerID: this._options.layerID,
-            metadata: this._metadataSent ? undefined : this._metadata,
-            mID: this._mID,
-            workerName: this._workerName
+            metadata: this._metadata
         });
+        if (!dataframe.empty) {
+            this._updateMetadataWith(dataframe);
+        }
+        resolve(dataframe);
     }
 
     _viewportZoomToSourceZoom (zoom) {

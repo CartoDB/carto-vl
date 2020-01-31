@@ -7,6 +7,7 @@ import DummyDataframe from '../renderer/dataframe/DummyDataframe';
 import CartoValidationError, { CartoValidationErrorTypes } from '../errors/carto-validation-error';
 import CartoRuntimeError, { CartoRuntimeErrorTypes } from '../errors/carto-runtime-error';
 import { GEOMETRY_TYPE } from '../utils/geometry';
+import BigQuery from './BigQuery';
 
 // TODO import correctly
 const RTT_WIDTH = 1024;
@@ -20,32 +21,25 @@ const MVT_TO_CARTO_TYPES = {
     3: GEOMETRY_TYPE.POLYGON
 };
 
-export class BQMVTWorker {
-    // Worker API
-    onmessage (event) {
-        this.processEvent(event).then(message => {
-            const transferables = [];
-            if (!message.dataframe.empty) {
-                transferables.push(message.dataframe.propertiesArrayBuffer);
-                transferables.push(message.dataframe.decodedGeom.verticesArrayBuffer);
-                if (message.dataframe.decodedGeom.normalsArrayBuffer) {
-                    transferables.push(message.dataframe.decodedGeom.normalsArrayBuffer);
-                }
-            }
-            postMessage(message, transferables);
+export default class BQMVTWorker {
+    constructor () {
+        const token = 'ya29.Iq8BvAd6Pm9x2zaEXZFrRCsvOWM6qbg0bOo9yQ_C4jpAy1EitQfQ8jKHh8dbYGcUuURLfd9pmMjG6CVmBdVF3zk3AVEspG--zrYTls4jxsJgeD9Tyu6k4lGUF8rc8Y29nzcdCpgR7zWxLCPRLOW1OndnWcTfBC3pxi2Qtpum1OPMTlIQ6Rilu5vDhS6aq8m5dpp-6tXjZy4cskdu4q0mTqX16nB6omKgplsd2pNJG5UWLw';
+
+        this._ready = false;
+        this._client = new BigQuery();
+        this._client.init(token).then(() => {
+            console.log('READY!');
+            this._ready = true;
         });
     }
-    async processEvent (event) {
-        const params = event.data;
+
+    async processEvent (params) {
         if (params.metadata) {
             this.castMetadata(params.metadata);
             this.metadata = params.metadata;
         }
-        const dataframe = await this._requestDataframe(params.x, params.y, params.z, params.url, params.layerID, this.metadata);
-        return {
-            mID: params.mID,
-            dataframe
-        };
+        const dataframe = await this._requestDataframe(params.x, params.y, params.z, params.layerID, this.metadata);
+        return dataframe;
     }
 
     castMetadata (metadata) {
@@ -53,14 +47,7 @@ export class BQMVTWorker {
         metadata.setCodecs();
     }
 
-    async fetchBQSTile (x, y, z) {
-        console.log('Fetch BigQuery Storage', x, y, z);
-        if (x === 4821 && y === 6149 && z === 14) {
-            return fetch('http://localhost:8080/debug/bq-mvt/14_4821_6149.pbf');
-        }
-    }
-
-    async _requestDataframe (x, y, z, url, layerID, metadata) {
+    async _requestDataframe (x, y, z, layerID, metadata) {
         const response = await this.fetchBQSTile(x, y, z);
         if (response) {
             const dataframe = await this.responseToDataframeTransformer(response, x, y, z, layerID, metadata);
@@ -70,13 +57,25 @@ export class BQMVTWorker {
         }
     }
 
-    async responseToDataframeTransformer (response, x, y, z, layerID, metadata) {
+    async fetchBQSTile (x, y, z) {
+        console.log('Fetch BigQuery Storage', x, y, z);
+
+        if (this._ready) {
+            return this._client.query(x, y, z);
+        }
+
+        // if ((x === 4821 && y === 6149 && z === 14)) {
+        //     const resp = await fetch('http://localhost:8080/debug/bq-mvt/14_4821_6149.pbf');
+        //     return resp.arrayBuffer();
+        // }
+    }
+
+    async responseToDataframeTransformer (buffer, x, y, z, layerID, metadata) {
         const MVT_EXTENT = metadata.extent;
-        const arrayBuffer = await response.arrayBuffer();
-        if (arrayBuffer.byteLength === 0 || response === 'null') {
+        if (buffer.byteLength === 0) {
             return { empty: true };
         }
-        const tile = new VectorTile(new Protobuf(arrayBuffer));
+        const tile = new VectorTile(new Protobuf(buffer));
 
         if (Object.keys(tile.layers).length > 1 && !layerID) {
             throw new CartoValidationError(
@@ -90,6 +89,8 @@ export class BQMVTWorker {
         if (!mvtLayer) {
             return { empty: true };
         }
+
+        console.log(mvtLayer)
 
         const { geometries, properties, propertiesArrayBuffer, numFeatures } = this._decodeMVTLayer(mvtLayer, metadata, MVT_EXTENT);
         const rs = rsys.getRsysFromTile(x, y, z);

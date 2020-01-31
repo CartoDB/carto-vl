@@ -3,6 +3,7 @@
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://apis.google.com/js/api.js"></script>
     <script src="http://localhost:8080/dist/carto-vl.js"></script>
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
@@ -17,7 +18,7 @@
             container: 'map',
             style: carto.basemaps.voyager,
             center: [-74.06, 40.89],
-            zoom: 14
+            zoom: 15
 
         });
 
@@ -31,7 +32,7 @@
         
         const source = new carto.source.BQMVT(metadata);
         const viz = new carto.Viz(`
-            color: ramp(linear($area, 0, 2000000), [blue, red])
+            color: opacity(ramp(linear($area, 0, 2000000), [blue, red]), 0.5)
             strokeColor: opacity(white, 0.6)
         `);
         const layer = new carto.Layer('layer', source, viz);
