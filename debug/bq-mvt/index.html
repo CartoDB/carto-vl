@@ -3,7 +3,6 @@
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://apis.google.com/js/api.js"></script>
     <script src="http://localhost:8080/dist/carto-vl.js"></script>
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
@@ -29,8 +28,10 @@
                 'geoid': { type: 'category' }
             }
         };
+
+        const token = 'ya29.Iq8BvAcOpD8BZDkvY02Rc1nu0aatmcKoiAj3Vf3h46mK51tzl7MijJdLwxewq1UvYXXjW4E2OoAAX1cSHtNEwxFP7i0WTMO-5uLES21lfSRyDUemZKApT4wTL91hZcxzObvtuiH2a4hA1dy5LJDdmRY6iwlTSHWQMvYpFC-XxDym4bWAYW7okbsLYHasXOkslcyS7I0__zuphbP7IpTLb23jKVDIxKjzf3moaPwjLOj9MQ';
         
-        const source = new carto.source.BQMVT(metadata);
+        const source = new carto.source.BQMVT(token, metadata);
         const viz = new carto.Viz(`
             color: opacity(ramp(linear($area, 0, 2000000), [blue, red]), 0.5)
             strokeColor: opacity(white, 0.6)

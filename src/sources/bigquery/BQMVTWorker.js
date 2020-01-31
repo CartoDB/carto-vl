@@ -22,9 +22,7 @@ const MVT_TO_CARTO_TYPES = {
 };
 
 export default class BQMVTWorker {
-    constructor () {
-        const token = 'ya29.Iq8BvAdk_j4zWucmthW8Wxfq2nkQFCh0jjbyTbm5SuGv0Ap4Sy63YBIJhNg3gsK0E17wRIqLOvsuYujexVYb3JYHxY8iUMx9ebbVHKxZiW5PqEFTcfpTz4wsNgozk5sTEWs5lJdo-hRqDoiqV0rLEs6Ai15w_d1UM-xJckWi28dO2C0m-6065Ve1wiPQV7x-IM9oksJ4CYNEBXEOFvaFolKGr5mk3mxca7oVcmxJB_b9qw';
-
+    constructor (token) {
         this._ready = false;
         this._client = new BQClient();
         this._client.init(token).then(() => {
