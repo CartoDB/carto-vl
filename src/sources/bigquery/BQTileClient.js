@@ -3,12 +3,7 @@ import { rTiles } from '../../client/rsys';
 import { isSetsEqual } from '../../utils/util';
 
 export default class BQTileClient {
-    constructor (templateURLs) {
-        if (!Array.isArray(templateURLs)) {
-            templateURLs = [templateURLs];
-        }
-
-        this._templateURLs = templateURLs;
+    constructor () {
         this._nextGroupID = 0;
         this._currentRequestGroupID = 0;
         this._oldDataframes = [];
@@ -19,9 +14,9 @@ export default class BQTileClient {
         this._addDataframe = addDataframe;
     }
 
-    requestData (zoom, viewport, urlToDataframeTransformer, viewportZoomToSourceZoom = Math.ceil) {
+    requestData (zoom, viewport, requestDataframe, viewportZoomToSourceZoom = Math.ceil) {
         const tiles = rTiles(zoom, viewport, viewportZoomToSourceZoom);
-        return this._getTiles(tiles, urlToDataframeTransformer);
+        return this._getTiles(tiles, requestDataframe);
     }
 
     free () {
@@ -30,17 +25,7 @@ export default class BQTileClient {
         this._oldDataframes = [];
     }
 
-    _getTileUrl (x, y, z) {
-        const subdomainIndex = this._getSubdomainIndex(x, y);
-        return this._templateURLs[subdomainIndex].replace('{x}', x).replace('{y}', y).replace('{z}', z);
-    }
-
-    _getSubdomainIndex (x, y) {
-        // Reference https://github.com/Leaflet/Leaflet/blob/v1.3.1/src/layer/tile/TileLayer.js#L214-L217
-        return Math.abs(x + y) % this._templateURLs.length;
-    }
-
-    async _getTiles (tiles, urlToDataframeTransformer) {
+    async _getTiles (tiles, requestDataframe) {
         this._nextGroupID++;
         const requestGroupID = this._nextGroupID;
 
@@ -50,7 +35,7 @@ export default class BQTileClient {
         // Generate all the dataframes from the response
 
         const completedDataframes = await Promise.all(tiles.map(({ x, y, z }) => {
-            return this._cache.get(`${x},${y},${z}`, () => this._requestDataframe(x, y, z, urlToDataframeTransformer)).then(dataframe => {
+            return this._cache.get(`${x},${y},${z}`, () => this._requestDataframe(x, y, z, requestDataframe)).then(dataframe => {
                 dataframe.orderID = x + y / 1000;
                 return dataframe;
             });
@@ -72,8 +57,8 @@ export default class BQTileClient {
         return dataframesChanged;
     }
 
-    async _requestDataframe (x, y, z, urlToDataframeTransformer) {
-        const dataframe = await urlToDataframeTransformer(x, y, z);
+    async _requestDataframe (x, y, z, requestDataframe) {
+        const dataframe = await requestDataframe(x, y, z);
         if (!dataframe.empty) {
             this._addDataframe(dataframe);
         }

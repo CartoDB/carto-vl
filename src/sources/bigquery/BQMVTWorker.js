@@ -60,7 +60,7 @@ export default class BQMVTWorker {
             return this._client.query(x, y, z);
         }
 
-        // if ((x === 4821 && y === 6149 && z === 14)) {
+        // if (x === 4821 && y === 6149 && z === 14) {
         //     const resp = await fetch('http://localhost:8080/debug/bq-mvt/14_4821_6149.pbf');
         //     return resp.arrayBuffer();
         // }
