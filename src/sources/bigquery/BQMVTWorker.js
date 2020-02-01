@@ -36,8 +36,7 @@ export default class BQMVTWorker {
             this.castMetadata(params.metadata);
             this.metadata = params.metadata;
         }
-        const dataframe = await this._requestDataframe(params.x, params.y, params.z, params.layerID, this.metadata);
-        return dataframe;
+        return this._requestDataframes(params.tiles, params.layerID, this.metadata);
     }
 
     castMetadata (metadata) {
@@ -45,31 +44,32 @@ export default class BQMVTWorker {
         metadata.setCodecs();
     }
 
-    async _requestDataframe (x, y, z, layerID, metadata) {
-        const response = await this.fetchBQSTile(x, y, z);
-        if (response) {
-            const dataframe = await this.responseToDataframeTransformer(response, x, y, z, layerID, metadata);
-            return dataframe;
-        } else {
-            return { empty: true };
+    async _requestDataframes (tiles, layerID, metadata) {
+        const dataframes = [];
+        const responseTiles = await this.fetchBQSTiles(tiles);
+        for (let i = 0; i < tiles.length; i++) {
+            const t = tiles[i];
+            const responseTile = responseTiles && responseTiles.find((rt) => (rt.x === t.x && rt.y === t.y && rt.z === t.z));
+            if (responseTile) {
+                const dataframe = await this.responseToDataframeTransformer(responseTile, layerID, metadata);
+                dataframes.push(dataframe);
+            } else {
+                dataframes.push({ x: t.x, y: t.y, z: t.z, empty: true });
+            }
         }
+        return dataframes;
     }
 
-    async fetchBQSTile (x, y, z) {
+    async fetchBQSTiles (tiles) {
         if (this._ready) {
-            return this._client.query(x, y, z);
+            return this._client.fetchTiles(tiles);
         }
-
-        // if (x === 4821 && y === 6149 && z === 14) {
-        //     const resp = await fetch('http://localhost:8080/debug/bq-mvt/14_4821_6149.pbf');
-        //     return resp.arrayBuffer();
-        // }
     }
 
-    async responseToDataframeTransformer (buffer, x, y, z, layerID, metadata) {
+    async responseToDataframeTransformer ({ x, y, z, buffer }, layerID, metadata) {
         const MVT_EXTENT = metadata.extent;
         if (buffer.byteLength === 0) {
-            return { empty: true };
+            return { x, y, z, empty: true };
         }
         const tile = new VectorTile(new Protobuf(buffer));
 
@@ -88,9 +88,7 @@ export default class BQMVTWorker {
 
         const { geometries, properties, propertiesArrayBuffer, numFeatures } = this._decodeMVTLayer(mvtLayer, metadata, MVT_EXTENT);
         const rs = rsys.getRsysFromTile(x, y, z);
-        const dataframe = this._generateDataFrame(rs, geometries, properties, propertiesArrayBuffer, numFeatures, metadata.geomType, metadata);
-
-        return dataframe;
+        return this._generateDataFrame(rs, geometries, properties, propertiesArrayBuffer, numFeatures, metadata.geomType, metadata, x, y, z);
     }
 
     _decodeMVTLayer (mvtLayer, metadata, mvtExtent) {
@@ -248,7 +246,7 @@ export default class BQMVTWorker {
         }
     }
 
-    _generateDataFrame (rs, geometry, properties, propertiesArrayBuffer, size, type, metadata) {
+    _generateDataFrame (rs, geometry, properties, propertiesArrayBuffer, size, type, metadata, x, y, z) {
         return new DummyDataframe({
             active: false,
             center: rs.center,
@@ -258,7 +256,10 @@ export default class BQMVTWorker {
             scale: rs.scale,
             size: size,
             type: type,
-            metadata
+            metadata,
+            x,
+            y,
+            z
         });
     }
 }

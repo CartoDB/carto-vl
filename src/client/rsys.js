@@ -105,7 +105,7 @@ function wRectangleTiles (z, wr) {
     let tiles = [];
     for (let x = tMinx; x <= tMaxx; ++x) {
         for (let y = tMiny; y <= tMaxy; ++y) {
-            tiles.push({ x: x, y: y, z: z });
+            tiles.push({ x, y, z });
         }
     }
     return tiles;

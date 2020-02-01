@@ -66,26 +66,27 @@ export default class BQMVT extends Base {
     }
 
     requestData (zoom, viewport) {
-        const requestDataframe = this._requestDataframe.bind(this);
+        const requestDataframes = this._requestDataframes.bind(this);
         const viewportZoomToSourceZoom = this._viewportZoomToSourceZoom.bind(this);
 
         return this._tileClient.requestData(zoom, viewport,
-            requestDataframe, viewportZoomToSourceZoom
+            requestDataframes, viewportZoomToSourceZoom
         );
     }
 
-    async _requestDataframe (x, y, z) {
-        const dataframe = await this._noworker.processEvent({
-            x,
-            y,
-            z,
+    async _requestDataframes (tiles) {
+        const dataframes = await this._noworker.processEvent({
+            tiles,
             layerID: this._options.layerID,
             metadata: this._metadata
         });
-        if (!dataframe.empty) {
-            this._updateMetadataWith(dataframe);
+        for (let i = 0; i < dataframes.length; i++) {
+            const dataframe = dataframes[i];
+            if (!dataframe.empty) {
+                this._updateMetadataWith(dataframe);
+            }
         }
-        return dataframe;
+        return dataframes;
     }
 
     _viewportZoomToSourceZoom (zoom) {
