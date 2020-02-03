@@ -21,7 +21,7 @@ const MVT_TO_CARTO_TYPES = {
     3: GEOMETRY_TYPE.POLYGON
 };
 
-export default class BQMVTWorker {
+export default class BQTileService {
     constructor (bqSource) {
         this._ready = false;
         this._client = new BQClient(bqSource);
@@ -31,7 +31,7 @@ export default class BQMVTWorker {
         });
     }
 
-    async processEvent (params) {
+    async requestDataframes (params) {
         if (params.metadata) {
             this.castMetadata(params.metadata);
             this.metadata = params.metadata;
@@ -46,7 +46,7 @@ export default class BQMVTWorker {
 
     async _requestDataframes (tiles, layerID, metadata) {
         const dataframes = [];
-        const responseTiles = await this.fetchBQSTiles(tiles);
+        const responseTiles = await this.fetchTiles(tiles);
         for (let i = 0; i < tiles.length; i++) {
             const t = tiles[i];
             const responseTile = responseTiles && responseTiles.find((rt) => (rt.x === t.x && rt.y === t.y && rt.z === t.z));
@@ -60,7 +60,7 @@ export default class BQMVTWorker {
         return dataframes;
     }
 
-    async fetchBQSTiles (tiles) {
+    async fetchTiles (tiles) {
         if (this._ready) {
             return this._client.fetchTiles(tiles);
         }

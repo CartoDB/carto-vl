@@ -4,15 +4,15 @@ import Metadata from '../../renderer/Metadata';
 import MVTMetadata from '../MVTMetadata';
 import Base from '../Base';
 import BQTileClient from './BQTileClient';
-import BQMVTWorker from './BQMVTWorker';
+import BQTileService from './BQTileService';
 
 export default class BQMVT extends Base {
     constructor (bqSource, metadata = new MVTMetadata(), options) {
         super();
 
         this._bqSource = bqSource;
-        this._noworker = new BQMVTWorker(bqSource);
-        this._tileClient = new BQTileClient('');
+        this._tileClient = new BQTileClient();
+        this._tileService = new BQTileService(bqSource);
 
         this._initMetadata(metadata);
         this._initOptions(options);
@@ -74,7 +74,7 @@ export default class BQMVT extends Base {
     }
 
     async _requestDataframes (tiles) {
-        const dataframes = await this._noworker.processEvent({
+        const dataframes = await this._tileService.requestDataframes({
             tiles,
             layerID: this._options.layerID,
             metadata: this._metadata

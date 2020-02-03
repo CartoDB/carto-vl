@@ -30,7 +30,7 @@ export default class BQClient {
             z = tiles[0].z;
         }
         if (z === 14) {
-            console.log('Fetch BigQuery tiles', tiles);
+            // console.log('Fetch BigQuery tiles', tiles);
 
             if (MOCK) {
                 return tiles.map(({ x, y, z }) => ({ x, y, z, buffer: decode(MVT_MOCK) }));

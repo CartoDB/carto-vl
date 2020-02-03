@@ -12,19 +12,25 @@
 
 <body>
     <div id="map"></div>
+    <div id="loader">
+        <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+            <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+                <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+            </svg>
+        </div>
+    </div>
     <script>
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.voyager,
             center: [-74.06, 40.89],
-            zoom: 15
-
+            zoom: 15,
+            pitchWithRotate: false
         });
 
         const projectId = 'cartodb-on-gcp-backend-team';
         const datasetId = 'google_next';
         const tableId = 'tiger2015_block_groups_manhattan_mvt';
-        const token = 'ya29.Iq8BvAe4mMxqOYAPePiM3c2RwqW6gbHN9s6AGFIBDV7wBcbH8H0zvNLz3FKken8evxiB8eAQGEyCEAZJe815w2usieKJ5ujhthFn3E9HcyWwURY3BETEGlkHNkq6vEdp4lBboEzEYcBL_JzsKlwqwvyDLihdpMiE7ghoIoAUFcOA5ZLJG56zSJMARVdeX_gU2bP9U0Rqr-aZTRKa5S8Eex_aJVREDMbZUyv19yizfQc8yw';
         const metadata = {
             idProperty: 'geoid',
             properties: {
@@ -32,6 +38,7 @@
                 'geoid': { type: 'category' }
             }
         };
+        const token = 'ya29.Iq8BvAeDbOQVpNSscrOLOVvjakADPqAVfxnDiUahBhi28k5Qd54TCB4sejwua86IkhIGqVyawyEOFMEErgYXMYk-tMU1sdtOYO6ZVBwXOMYTsDIeS6DMtQj9KS8UyX5CR1GnnesySqh8Nv4xgJJN4ynhvOH8UxXgmko3O8PqpPkgkd-TBSun4_w6x8wmKxHBce2cAPpqkQB-2N1RhP8pP_3uCIE7nQtZwKHx5O7keoINvw';
 
         const source = new carto.source.BQMVT({ projectId, datasetId, tableId, token }, metadata);
         const viz = new carto.Viz(`
@@ -42,7 +49,7 @@
 
         layer.addTo(map, 'watername_ocean');
         layer.on('loaded', () => {
-            window.loaded = true;
+            document.getElementById('loader').style.opacity = '0';
         });
     </script>
 </body>

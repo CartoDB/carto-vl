@@ -15,7 +15,7 @@ export default class BQTileClient {
     }
 
     requestData (zoom, viewport, requestDataframes, viewportZoomToSourceZoom = Math.ceil) {
-        const extend = 0;
+        const extend = 1; // one-tile ring over the viewport
         const tiles = rTiles(zoom, viewport, viewportZoomToSourceZoom, extend);
         return this._getTiles(tiles, requestDataframes);
     }
