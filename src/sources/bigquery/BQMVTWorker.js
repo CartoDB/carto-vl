@@ -22,10 +22,10 @@ const MVT_TO_CARTO_TYPES = {
 };
 
 export default class BQMVTWorker {
-    constructor (token) {
+    constructor (bqSource) {
         this._ready = false;
-        this._client = new BQClient();
-        this._client.init(token).then(() => {
+        this._client = new BQClient(bqSource);
+        this._client.init().then(() => {
             console.log('READY!');
             this._ready = true;
         });

@@ -21,6 +21,10 @@
 
         });
 
+        const projectId = 'cartodb-on-gcp-backend-team';
+        const datasetId = 'google_next';
+        const tableId = 'tiger2015_block_groups_manhattan_mvt';
+        const token = 'ya29.Iq8BvAe4mMxqOYAPePiM3c2RwqW6gbHN9s6AGFIBDV7wBcbH8H0zvNLz3FKken8evxiB8eAQGEyCEAZJe815w2usieKJ5ujhthFn3E9HcyWwURY3BETEGlkHNkq6vEdp4lBboEzEYcBL_JzsKlwqwvyDLihdpMiE7ghoIoAUFcOA5ZLJG56zSJMARVdeX_gU2bP9U0Rqr-aZTRKa5S8Eex_aJVREDMbZUyv19yizfQc8yw';
         const metadata = {
             idProperty: 'geoid',
             properties: {
@@ -28,10 +32,8 @@
                 'geoid': { type: 'category' }
             }
         };
-        
-        const token = 'ya29.Iq8BvAdhYlu-J94FLxTgwgRysGYJzKZS4yr9l_oE2t11iuEdOyIkf8HUOLUmcSjJRBxflS9fImB6OTWVu-GjGyv9paT69pMPaPWPPmfPjgwjx57hsnkSJYRfGzRCBZQI-yLdbX8_UNfD69EA7B3Zc7jvtoNtlflmnJVYv63EOUpR4j3YunfJ9lsnqwp8zg7wvkDEN0QUny4ee9_JejymJgHl9vMOsXAlks5S-Pv00NAdlQ';
 
-        const source = new carto.source.BQMVT(token, metadata);
+        const source = new carto.source.BQMVT({ projectId, datasetId, tableId, token }, metadata);
         const viz = new carto.Viz(`
             color: opacity(ramp(linear($area, 0, 2000000), [blue, red]), 0.5)
             strokeColor: opacity(white, 0.6)

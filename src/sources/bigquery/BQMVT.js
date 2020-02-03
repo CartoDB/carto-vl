@@ -7,16 +7,15 @@ import BQTileClient from './BQTileClient';
 import BQMVTWorker from './BQMVTWorker';
 
 export default class BQMVT extends Base {
-    constructor (token, metadata = new MVTMetadata(), options) {
+    constructor (bqSource, metadata = new MVTMetadata(), options) {
         super();
 
-        this._token = token;
+        this._bqSource = bqSource;
+        this._noworker = new BQMVTWorker(bqSource);
         this._tileClient = new BQTileClient('');
 
         this._initMetadata(metadata);
         this._initOptions(options);
-
-        this._noworker = new BQMVTWorker(token);
     }
 
     _initMetadata (metadata) {
@@ -54,7 +53,7 @@ export default class BQMVT extends Base {
     }
 
     _clone () {
-        return new BQMVT(this._token, JSON.parse(JSON.stringify(this._metadata)), this._options);
+        return new BQMVT(this._bqSource, JSON.parse(JSON.stringify(this._metadata)), this._options);
     }
 
     bindLayer (addDataframe) {
