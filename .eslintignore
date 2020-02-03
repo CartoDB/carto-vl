@@ -6,4 +6,3 @@
 /examples/ignore
 /test/acceptance/docker/Windshaft-cartodb
 /temp
-/src/sources/bigquery/gapi.js
