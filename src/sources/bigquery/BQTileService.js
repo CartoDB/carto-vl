@@ -23,12 +23,7 @@ const MVT_TO_CARTO_TYPES = {
 
 export default class BQTileService {
     constructor (bqSource) {
-        this._ready = false;
         this._client = new BQClient(bqSource);
-        this._client.init().then(() => {
-            console.log('READY!');
-            this._ready = true;
-        });
     }
 
     async requestDataframes (params) {
@@ -46,7 +41,7 @@ export default class BQTileService {
 
     async _requestDataframes (tiles, layerID, metadata) {
         const dataframes = [];
-        const responseTiles = await this.fetchTiles(tiles);
+        const responseTiles = await this._client.fetchTiles(tiles);
         for (let i = 0; i < tiles.length; i++) {
             const t = tiles[i];
             const responseTile = responseTiles && responseTiles.find((rt) => (rt.x === t.x && rt.y === t.y && rt.z === t.z));
@@ -58,12 +53,6 @@ export default class BQTileService {
             }
         }
         return dataframes;
-    }
-
-    async fetchTiles (tiles) {
-        if (this._ready) {
-            return this._client.fetchTiles(tiles);
-        }
     }
 
     async responseToDataframeTransformer ({ x, y, z, buffer }, layerID, metadata) {

@@ -22,7 +22,6 @@ export default class Windshaft {
         this._exclusive = true;
 
         this._MNS = null;
-        this._promiseMNS = null;
         this.inProgressInstantiations = {};
     }
 

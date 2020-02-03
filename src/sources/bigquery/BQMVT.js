@@ -6,6 +6,10 @@ import Base from '../Base';
 import BQTileClient from './BQTileClient';
 import BQTileService from './BQTileService';
 
+/*
+ *  This is a PoC based on the MVT source to fetch the tiles directly from BigQuery
+ */
+
 export default class BQMVT extends Base {
     constructor (bqSource, metadata = new MVTMetadata(), options) {
         super();

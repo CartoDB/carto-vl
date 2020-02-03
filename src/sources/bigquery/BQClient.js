@@ -11,9 +11,10 @@ export default class BQClient {
         this._datasetId = bqSource.datasetId;
         this._tableId = bqSource.tableId;
         this._token = bqSource.token;
+        this._initialized = false;
     }
 
-    init () {
+    async init () {
         return new Promise((resolve, reject) => {
             gapi.load('client', () => {
                 gapi.auth.setToken({ access_token: this._token });
@@ -25,6 +26,11 @@ export default class BQClient {
     }
 
     async fetchTiles (tiles) {
+        if (!this._initialized) {
+            await this.init();
+            this._initialized = true;
+        }
+
         let z = 0;
         if (tiles && tiles.length) {
             z = tiles[0].z;
