@@ -56,7 +56,6 @@ export default class BQMVT extends Base {
     }
 
     _receiveMessageFromWorker (event) {
-        console.log('HELOOO', event)
         const { mID, dataframes } = event.data;
         for (let i = 0; i < dataframes.length; i++) {
             const dataframe = dataframes[i];
