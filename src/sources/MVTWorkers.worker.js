@@ -1,4 +1,5 @@
 import { MVTWorker } from './MVTWorker';
+import { BQMVTWorker } from './bigquery/BQMVTWorker';
 import { WindshaftWorker } from '../client/WindshaftWorker';
 
 // This file publishes a Web Worker onmessage function that will redirect incoming messages
@@ -7,6 +8,7 @@ import { WindshaftWorker } from '../client/WindshaftWorker';
 
 const workers = {
     MVT: new MVTWorker(),
+    BQMVT: new BQMVTWorker(),
     windshaft: new WindshaftWorker()
 };
 

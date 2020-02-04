@@ -4,7 +4,7 @@ import Metadata from '../../renderer/Metadata';
 import MVTMetadata from '../MVTMetadata';
 import Base from '../Base';
 import BQTileClient from './BQTileClient';
-import BQTileService from './BQTileService';
+import Worker from '../MVTWorkers.worker';
 
 /*
  *  This is a PoC based on the MVT source to fetch the tiles directly from BigQuery
@@ -16,10 +16,13 @@ export default class BQMVT extends Base {
 
         this._bqSource = bqSource;
         this._tileClient = new BQTileClient();
-        this._tileService = new BQTileService(bqSource);
 
         this._initMetadata(metadata);
         this._initOptions(options);
+
+        this._workerDispatch = {};
+        this._mID = 0;
+        this._workerName = 'BQMVT';
     }
 
     _initMetadata (metadata) {
@@ -42,6 +45,26 @@ export default class BQMVT extends Base {
 
         options.viewportZoomToSourceZoom = options.viewportZoomToSourceZoom || Math.ceil;
         this._options = options;
+    }
+
+    get _worker () {
+        if (!this._workerInstance) {
+            this._workerInstance = new Worker();
+            this._workerInstance.onmessage = this._receiveMessageFromWorker.bind(this);
+        }
+        return this._workerInstance;
+    }
+
+    _receiveMessageFromWorker (event) {
+        console.log('HELOOO', event)
+        const { mID, dataframes } = event.data;
+        for (let i = 0; i < dataframes.length; i++) {
+            const dataframe = dataframes[i];
+            if (!dataframe.empty) {
+                this._updateMetadataWith(dataframe);
+            }
+        }
+        this._workerDispatch[mID](dataframes);
     }
 
     _updateMetadataWith (dataframe) {
@@ -78,18 +101,24 @@ export default class BQMVT extends Base {
     }
 
     async _requestDataframes (tiles) {
-        const dataframes = await this._tileService.requestDataframes({
-            tiles,
-            layerID: this._options.layerID,
-            metadata: this._metadata
+        return new Promise(resolve => {
+            this._postMessageToWorker(tiles);
+
+            this._metadataSent = true;
+            this._workerDispatch[this._mID] = resolve;
+            this._mID++;
         });
-        for (let i = 0; i < dataframes.length; i++) {
-            const dataframe = dataframes[i];
-            if (!dataframe.empty) {
-                this._updateMetadataWith(dataframe);
-            }
-        }
-        return dataframes;
+    }
+
+    _postMessageToWorker (tiles) {
+        this._worker.postMessage({
+            tiles,
+            bqSource: this._bqSource,
+            layerID: this._options.layerID,
+            metadata: this._metadataSent ? undefined : this._metadata,
+            mID: this._mID,
+            workerName: this._workerName
+        });
     }
 
     _viewportZoomToSourceZoom (zoom) {
