@@ -24,25 +24,25 @@
             container: 'map',
             style: carto.basemaps.voyager,
             center: [-74.06, 40.89],
-            zoom: 14,
+            zoom: 13,
             pitchWithRotate: false
         });
 
-        const projectId = 'cartodb-on-gcp-backend-team';
+        const projectId = 'cartodb-gcp-backend-data-team';
         const datasetId = 'google_next';
-        const tableId = 'tiger2015_block_groups_manhattan_mvt';
+        const tableId = 'usa_clipped_bg_13_mvts';
         const metadata = {
             idProperty: 'geoid',
             properties: {
-                'area': { type: 'number' },
+                'x': { type: 'number' },
                 'geoid': { type: 'category' }
             }
         };
-        const token = 'ya29.Iq8BvAc8G7A6RC-ay2J4naPZwLn9asZxTh5BirtAaNJAoWzipJTP31JFn4lsz0CtNv0JBIzdI-fwpkojAYniizU570HIXF4nGuWzl107YDFhbhuFmmqIn2_Me7gdSG69oerPQVXoE9TF2CiKdhA9jF2xEBsux_7o7ruz8xRc5naQmpgmJA-FBJKoS0PRpt0q1wd5_msm0Ps4MoNHd3BnuwSVpwwMDxxAC4Cs2vNArq-iTQ';
+        const token = 'ya29.Iq8BvAdqEL2tmbIziS335CTt5OOFdDUx1AU2LjO4ve9POqvx1ltqyDzmLKKOEOqKapJQzuRov4Ie69MEzBOxh0TITST9gozsGQBWHrLxTRi-y-D7-XXpkG1hjb6bpmXzGCills1aY7ZRK7dxBxmztR9PlLBBN2tSE3T7g9u0Nm_Er3lmjKBRblqxbOAmBOKXw50Y1W7QHKDGtpSHi_H0Uc-iHYuGrhaY-4w6JXzzd3arEA';
 
         const source = new carto.source.BQMVT({ projectId, datasetId, tableId, token }, metadata);
         const viz = new carto.Viz(`
-            color: opacity(ramp(linear($area, 0, 2000000), [blue, red]), 0.5)
+            color: opacity(ramp(linear($x, 2400, 2420), vivid), 0.5)
             strokeColor: opacity(white, 0.6)
         `);
         const layer = new carto.Layer('layer', source, viz);
