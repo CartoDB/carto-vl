@@ -48,7 +48,7 @@ export class BQMVTWorker {
     async _requestDataframes (tiles, bqSource, layerID, metadata) {
         const dataframes = [];
         const client = new BQClient(bqSource);
-        const responseTiles = await client.fetchTiles(tiles);
+        const responseTiles = await client.fetchRawTiles(tiles);
         for (let i = 0; i < tiles.length; i++) {
             const t = tiles[i];
             const responseTile = responseTiles && responseTiles.find((rt) => (rt.x === t.x && rt.y === t.y && rt.z === t.z));
@@ -68,6 +68,8 @@ export class BQMVTWorker {
             return { x, y, z, empty: true };
         }
         const tile = new VectorTile(new Protobuf(buffer));
+
+        console.log('TILE', tile)
 
         if (Object.keys(tile.layers).length > 1 && !layerID) {
             throw new CartoValidationError(

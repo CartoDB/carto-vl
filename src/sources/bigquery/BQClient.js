@@ -1,7 +1,12 @@
 
+import { parse } from 'wellknown';
 import { decode } from 'base64-arraybuffer';
+import { fromGeojsonVt } from 'vt-pbf';
+import geojsonVt from 'geojson-vt';
 
 const ENDPOINT_URL = 'https://bigquery.googleapis.com/bigquery/v2';
+
+let requests = 0;
 
 export default class BQClient {
     constructor (bqSource) {
@@ -52,7 +57,6 @@ export default class BQClient {
                 const jobId = result.jobReference.jobId;
                 setTimeout(async () => {
                     const result = await this.getQueryResults(jobId);
-                    console.log('timer', result);
                     if (result.jobComplete) {
                         resolve(result);
                     } else {
@@ -86,10 +90,10 @@ export default class BQClient {
             for (let i = 0; i < result.rows.length; i++) {
                 const row = result.rows[i];
                 if (row.f && row.f.length === 4) {
-                    const z = parseInt(row.f[0]['v']);
-                    const x = parseInt(row.f[1]['v']);
-                    const y = parseInt(row.f[2]['v']);
-                    const mvt = row.f[3]['v'];
+                    const z = parseInt(row.f[0].v);
+                    const x = parseInt(row.f[1].v);
+                    const y = parseInt(row.f[2].v);
+                    const mvt = row.f[3].v;
                     mvts.push({ z, x, y, buffer: decode(mvt) });
                 }
             }
@@ -100,4 +104,122 @@ export default class BQClient {
     _tileFilter (tile) {
         return `(z = ${tile.z} AND x = ${tile.x} AND y = ${tile.y})`;
     }
+
+    async fetchRawTiles (tiles) {
+        if (requests > 0) {
+            return [];
+        }
+
+        requests = 1;
+
+        console.log('REQUEST', tiles)
+
+        // const result = await this.execute(`
+        //     SELECT x,y,ARRAY_AGG(STRUCT(geom_table)) as geoms 
+        //     FROM \`carto-do-public-data.usa_carto.geography_usa_blockgroup_2015\` as geom_table, 
+        //     unnest(\`cartodb-gcp-backend-data-team\`.tiler.getTilesBBOX(-73.955397,40.724201,-73.924341,40.743828, 14, 256))
+        //     WHERE 
+        //         ST_INTERSECTSBOX(geom,bbox[OFFSET(0)],bbox[OFFSET(1)],bbox[OFFSET(2)],bbox[OFFSET(3)])
+        //         AND ST_INTERSECTSBOX(geom,-73.955397,40.724201,-73.924341,40.743828 )
+        //     GROUP by x,y
+        //     LIMIT 1;
+        // `);
+
+        const x = 4826;
+        const y = 6158;
+        const z = 14;
+        // const { x, y, geojson } = bq2geojson(result);
+        // console.log(x, y, geojson)
+
+        const geoj = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "id": 0,
+                    "properties": {
+                        "geoid": "1234"
+                    },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [
+                                    -73.95309448242188,
+                                    40.73399053853161
+                                ],
+                                [
+                                    -73.9536952972412,
+                                    40.73138896860918
+                                ],
+                                [
+                                    -73.94768714904785,
+                                    40.73138896860918
+                                ],
+                                [
+                                    -73.94871711730957,
+                                    40.73444580280967
+                                ],
+                                [
+                                    -73.95309448242188,
+                                    40.73399053853161
+                                ]
+                            ]
+                        ]
+                    }
+                }
+            ]
+        };
+
+        const tileindex = geojsonVt(geoj);
+
+        const tile = tileindex.getTile(1, 0, 0);
+
+        console.log(tileindex)
+        console.log(tile)
+
+        // pass in an object mapping layername -> tile object
+        const mvtBuffer = fromGeojsonVt({ 'geojsonLayer': tile });
+
+        console.log(mvtBuffer)
+
+        return [{ z, x, y, buffer: mvtBuffer }];
+    }
+}
+
+function bq2geojson (result) {
+    const row = result.rows[0];
+
+    const x = parseInt(row.f[0].v);
+    const y = parseInt(row.f[1].v);
+    const geoms = row.f[2].v;
+
+    const geojson = {
+        type: 'FeatureCollection',
+        features: []
+    };
+
+    for (let i = 0; i < geoms.length; i++) {
+        const geoid = geoms[i].v.f[0].v.f[0].v;
+        // const label = geoms[i].v.f[0].v.f[1].v;
+        // const area = geoms[i].v.f[0].v.f[2].v;
+        // const perimeter = geoms[i].v.f[0].v.f[3].v;
+        // const num_vertices = geoms[i].v.f[0].v.f[4].v;
+        const geom = geoms[i].v.f[0].v.f[5].v;
+        const geometry = parse(geom);
+        geojson.features.push({
+            type: 'Feature',
+            geometry,
+            properties: {
+                geoid
+                // label,
+                // area,
+                // perimeter,
+                // num_vertices
+            }
+        });
+        i = 100000;
+    }
+
+    return { x, y, geojson };
 }
