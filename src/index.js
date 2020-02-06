@@ -47,6 +47,7 @@ import GeoJSON from './sources/GeoJSON';
 import MVT from './sources/MVT';
 import BQMVT from './sources/bigquery/BQMVT';
 import SQL from './sources/SQL';
+import BQClient from './sources/bigquery/BQClient';
 import { on, off } from './utils/events';
 import { isBrowserSupported, unsupportedBrowserReasons } from './renderer/Renderer';
 
@@ -70,5 +71,5 @@ import { version } from '../package.json';
 
 const source = { Dataset, SQL, GeoJSON, MVT, BQMVT };
 
-export { version, on, off, isBrowserSupported, unsupportedBrowserReasons, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Interactivity, basemaps };
-export default { version, on, off, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Interactivity, basemaps };
+export { version, on, off, isBrowserSupported, unsupportedBrowserReasons, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Interactivity, basemaps, BQClient };
+export default { version, on, off, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Interactivity, basemaps, BQClient };

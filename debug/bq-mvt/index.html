@@ -20,30 +20,29 @@
         </div>
     </div>
     <script>
-        const map = new mapboxgl.Map({
-            container: 'map',
-            style: carto.basemaps.voyager,
-            center: [-74.06, 40.89],
-            zoom: 13,
-            pitchWithRotate: false
-        });
-
         const projectId = 'cartodb-gcp-backend-data-team';
         const datasetId = 'google_next';
-        const tableId = 'usa_clipped_bg_13_mvts';
+        const tableId = 'usa_clipped_blocks_14_mvts';
         const metadata = {
             idProperty: 'geoid',
             properties: {
-                'x': { type: 'number' },
                 'geoid': { type: 'category' }
             }
         };
-        const token = 'ya29.Iq8BvAdqEL2tmbIziS335CTt5OOFdDUx1AU2LjO4ve9POqvx1ltqyDzmLKKOEOqKapJQzuRov4Ie69MEzBOxh0TITST9gozsGQBWHrLxTRi-y-D7-XXpkG1hjb6bpmXzGCills1aY7ZRK7dxBxmztR9PlLBBN2tSE3T7g9u0Nm_Er3lmjKBRblqxbOAmBOKXw50Y1W7QHKDGtpSHi_H0Uc-iHYuGrhaY-4w6JXzzd3arEA';
+        const token = 'ya29.Iq8BvAf5LmPuK_sxJDW8ZiI2JR7JcpIk38i10Ub22QHcwu_OGNK_Devpg7AIQ_ouOwPlTIyla6Mybqv8tEHi9ZrQzPn56RsYWfFcwoRyl3GYJtYGmlUGLDjt4DducyYjDgdv4moVaev3LDUqhvQ27wv0K4lUyZW98c9YcoBJ2gjRbvEiJ2VQr5-AS92FRQF-evT9uSZK7Zrd-_djTB42gFFxOJj21jEWg3TxIzSDFxVXAw';
+
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.voyager,
+            center: [-73.95, 40.74],
+            zoom: 14,
+            pitchWithRotate: false
+        });
 
         const source = new carto.source.BQMVT({ projectId, datasetId, tableId, token }, metadata);
         const viz = new carto.Viz(`
-            color: opacity(ramp(linear($x, 2400, 2420), vivid), 0.5)
-            strokeColor: opacity(white, 0.6)
+            // color: opacity(ramp(linear($area_tile, 0, 1000000), bold), 0.5)
+            // strokeColor: opacity(white, 0.6)
         `);
         const layer = new carto.Layer('layer', source, viz);
 

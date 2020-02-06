@@ -69,8 +69,6 @@ export class BQMVTWorker {
         }
         const tile = new VectorTile(new Protobuf(buffer));
 
-        console.log('TILE', tile)
-
         if (Object.keys(tile.layers).length > 1 && !layerID) {
             throw new CartoValidationError(
                 `LayerID parameter wasn't specified and the MVT tile contains multiple layers: ${JSON.stringify(Object.keys(tile.layers))}.`,
