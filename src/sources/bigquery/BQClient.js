@@ -111,7 +111,9 @@ export default class BQClient {
         }
         requests = 1;
 
-        console.log('Fetch Raw Tile');
+        console.log('Fetch Raw Tiles');
+
+        const time1 = getTime();
 
         const result = await this.execute(`
             SELECT x,y,ARRAY_AGG(STRUCT(geom_table)) as geoms 
@@ -119,26 +121,32 @@ export default class BQClient {
             unnest(\`cartodb-gcp-backend-data-team\`.tiler.getTilesBBOX(-73.955397,40.724201,-73.924341,40.743828, 14, 256))
             WHERE ST_INTERSECTSBOX(geom, bbox[OFFSET(0)], bbox[OFFSET(1)], bbox[OFFSET(2)], bbox[OFFSET(3)])
                   AND ST_INTERSECTSBOX(geom, -73.955397, 40.724201, -73.924341, 40.743828)
-            GROUP by x,y
-            LIMIT 1;
+            GROUP by x,y;
         `);
 
+        const time2 = getTime();
+        console.log(time2 - time1);
+
         const z = 14;
-        const { x, y, geojson } = bq2geojson(result);
+        const mvts = [];
 
-        const tileindex = geojsonVt(geojson, { tolerance: 0 });
+        for (let i = 0; i < result.rows.length; i++) {
+            const { x, y, geojson } = bq2geojson(result.rows[i]);
 
-        const tile = tileindex.getTile(z, x, y);
+            const tileindex = geojsonVt(geojson, { tolerance: 0 });
 
-        const mvtBuffer = fromGeojsonVt({ 'default': tile }, { version: 2 });
+            const tile = tileindex.getTile(z, x, y);
 
-        return [{ z, x, y, buffer: mvtBuffer }];
+            const mvtBuffer = fromGeojsonVt({ 'default': tile }, { version: 2 });
+
+            mvts.push({ z, x, y, buffer: mvtBuffer });
+        }
+
+        return mvts;
     }
 }
 
-function bq2geojson (result) {
-    const row = result.rows[0];
-
+function bq2geojson (row) {
     const x = parseInt(row.f[0].v);
     const y = parseInt(row.f[1].v);
     const geoms = row.f[2].v;
@@ -150,8 +158,8 @@ function bq2geojson (result) {
 
     for (let i = 0; i < geoms.length; i++) {
         const geoid = geoms[i].v.f[0].v.f[0].v;
-        // const label = geoms[i].v.f[0].v.f[1].v;
-        // const area = geoms[i].v.f[0].v.f[2].v;
+        const label = geoms[i].v.f[0].v.f[1].v;
+        const area = geoms[i].v.f[0].v.f[2].v;
         // const perimeter = geoms[i].v.f[0].v.f[3].v;
         // const num_vertices = geoms[i].v.f[0].v.f[4].v;
         const geom = geoms[i].v.f[0].v.f[5].v;
@@ -160,9 +168,9 @@ function bq2geojson (result) {
             type: 'Feature',
             geometry,
             properties: {
-                geoid
-                // label,
-                // area,
+                geoid,
+                label,
+                area
                 // perimeter,
                 // num_vertices
             }
@@ -170,4 +178,8 @@ function bq2geojson (result) {
     }
 
     return { x, y, geojson };
+}
+
+function getTime () {
+    return (new Date()).getTime();
 }
