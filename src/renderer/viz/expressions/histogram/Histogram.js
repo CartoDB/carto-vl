@@ -66,7 +66,7 @@ export default class Histogram extends BaseExpression {
         const range = max - min;
         const sizeMinusOne = size - 1;
 
-        for (let i = 0; i < arrayLength; i++) {
+        for (let i = 0; i < arrayLength -1; i++) {
             const x = array[i][0];
             const y = array[i][1];
             const index = Math.min(Math.floor(size * (x - min) / range), sizeMinusOne);
