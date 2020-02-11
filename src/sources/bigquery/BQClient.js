@@ -46,6 +46,9 @@ export default class BQClient {
 
     async execute (sqlQuery) {
         const result = await this.query(sqlQuery);
+        if (result.error) {
+            return result;
+        }
         return this._pollingQuery(result);
     }
 
@@ -105,42 +108,67 @@ export default class BQClient {
         return `(z = ${tile.z} AND x = ${tile.x} AND y = ${tile.y})`;
     }
 
-    async fetchRawTiles () {
+    async fetchRawTiles (tiles) {
         if (requests > 0) {
             return [];
         }
         requests = 1;
 
+        console.log(tiles)
+
         console.log('Fetch Raw Tiles');
 
         const time1 = getTime();
 
-        const result = await this.execute(`
-            SELECT x,y,ARRAY_AGG(STRUCT(geom_table)) as geoms 
-            FROM \`carto-do-public-data.usa_carto.geography_usa_blockgroup_2015\` as geom_table, 
-            unnest(\`cartodb-gcp-backend-data-team\`.tiler.getTilesBBOX(-73.955397,40.724201,-73.924341,40.743828, 14, 256))
-            WHERE ST_INTERSECTSBOX(geom, bbox[OFFSET(0)], bbox[OFFSET(1)], bbox[OFFSET(2)], bbox[OFFSET(3)])
-                  AND ST_INTERSECTSBOX(geom, -73.955397, 40.724201, -73.924341, 40.743828)
-            GROUP by x,y;
-        `);
+        const z = 14;
+        const x = tiles.map((tile) => tile.x);
+        const y = tiles.map((tile) => tile.y);
+        const extent = 4096;
+
+        const query = `
+            WITH tiles_bbox AS (
+                SELECT * FROM UNNEST(tiler.getTilesBounds(${z}, [${x}], [${y}], ${extent}))
+            )
+
+            SELECT b.z, b.x, b.y, tiler.mvt(b.z, b.x, b.y, array_agg(TO_JSON_STRING(a)), 'geom') as mvt
+            FROM \`rmr_tests.geography_usa_block_2019_bbox_double\` a, tiles_bbox AS b
+            WHERE NOT ((a.xmin > b.xmax) OR (a.xmax < b.xmin)  OR (a.ymax < b.ymin) OR (a.ymin > b.ymax))
+            GROUP BY b.z, b.x, b.y
+        `;
+
+        const result = await this.execute(query);
 
         const time2 = getTime();
         console.log(time2 - time1);
 
-        const z = 14;
         const mvts = [];
 
-        for (let i = 0; i < result.rows.length; i++) {
-            const { x, y, geojson } = bq2geojson(result.rows[i]);
-
-            const tileindex = geojsonVt(geojson, { tolerance: 0 });
-
-            const tile = tileindex.getTile(z, x, y);
-
-            const mvtBuffer = fromGeojsonVt({ 'default': tile }, { version: 2 });
-
-            mvts.push({ z, x, y, buffer: mvtBuffer });
+        if (result && result.rows) {
+            for (let i = 0; i < result.rows.length; i++) {
+                const row = result.rows[i];
+                if (row.f && row.f.length === 4) {
+                    const z = parseInt(row.f[0].v);
+                    const x = parseInt(row.f[1].v);
+                    const y = parseInt(row.f[2].v);
+                    const mvt = row.f[3].v;
+                    mvts.push({ z, x, y, buffer: decode(mvt) });
+                }
+            }
         }
+
+        // const z = 14;
+
+        // for (let i = 0; i < result.rows.length; i++) {
+        //     const { x, y, geojson } = bq2geojson(result.rows[i]);
+
+        //     const tileindex = geojsonVt(geojson, { tolerance: 0 });
+
+        //     const tile = tileindex.getTile(z, x, y);
+
+        //     const mvtBuffer = fromGeojsonVt({ 'default': tile }, { version: 2 });
+
+        //     mvts.push({ z, x, y, buffer: mvtBuffer });
+        // }
 
         return mvts;
     }
