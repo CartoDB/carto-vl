@@ -1,6 +1,6 @@
 import BaseExpression from './base';
 import { implicitCast, getOrdinalFromIndex, checkMaxArguments, checkType, checkFeatureIndependent } from './utils';
-import { OTHERS_INDEX, OTHERS_LABEL } from './constants';
+import { OTHERS_INDEX, OTHERS_LABEL, ALTERNATIVE_SORT } from './constants';
 import CartoValidationError, { CartoValidationErrorTypes } from '../../../errors/carto-validation-error';
 import BucketsGLSLHelper from './BucketsGLSLHelper';
 
@@ -172,11 +172,17 @@ export default class Buckets extends BaseExpression {
         const name = this.toString();
         const list = this.list.elems.map(elem => elem.value);
         const config = {
-            othersLabel: options && options.othersLabel ? options.othersLabel : this.othersLabel.value
+            othersLabel: options && options.othersLabel ? options.othersLabel : this.othersLabel.value,
+            sort: options ? options.sort : ALTERNATIVE_SORT.ASCENDING
         };
-        const data = this.input.type === 'number'
+
+        let data = this.input.type === 'number'
             ? _getLegendDataNumeric(list)
             : _getLegendDataCategory(list, this._numDatasetCategories, config);
+
+        if (config.sort && config.sort === ALTERNATIVE_SORT) {
+            data = data.sort((a, b) => b.key - a.key);
+        }
 
         return { data, name };
     }

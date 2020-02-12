@@ -1,5 +1,6 @@
 import BaseExpression from '../base';
 import { checkType, checkMaxArguments, checkExpression, implicitCast } from '../utils';
+import { ALTERNATIVE_SORT } from '../constants';
 
 /**
  * Override the input opacity.
@@ -71,6 +72,7 @@ export default class Opacity extends BaseExpression {
             return { ...legend, data };
         } else {
             const data = legend.data;
+
             return { ...legend, data, alpha };
         }
     }

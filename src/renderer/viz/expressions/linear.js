@@ -4,7 +4,7 @@ import { globalMin, globalMax } from '../expressions';
 import { castTimeRange, msToDate } from '../../../utils/util';
 import IdentityCodec from '../../../codecs/Identity';
 import TimeZoneDate from '../../../utils/time/TimeZoneDate';
-import { DEFAULT_SAMPLES } from './constants';
+import { DEFAULT_SAMPLES, ALTERNATIVE_SORT } from './constants';
 /**
 * Linearly interpolates the value of a given input between a minimum and a maximum. If `min` and `max` are not defined they will
 * default to `globalMin(input)` and `globalMax(input)`.
@@ -249,13 +249,17 @@ export default class Linear extends BaseExpression {
             : this.samples;
 
         const INC = 1 / (samples - 1);
-        const data = [];
+        let data = [];
 
         for (let i = 0; data.length < samples; i += INC) {
             const value = clamp(i, 0, 1);
             const key = i * (max - min) + min;
 
             data.push({ key, value });
+        }
+
+        if (options.sort && options.sort === ALTERNATIVE_SORT) {
+            data = data.sort((a, b) => b.key - a.key);
         }
 
         return { data, min, max, name };

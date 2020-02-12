@@ -4,7 +4,7 @@ import Property from './basic/property';
 import Linear from './linear';
 import CIELabGLSL from './color/CIELab.glsl';
 import CategoryIndex from './CategoryIndex';
-import { OTHERS_GLSL_VALUE, OTHERS_INDEX, DEFAULT_OPTIONS, DEFAULT_RAMP_OTHERS } from './constants';
+import { OTHERS_GLSL_VALUE, OTHERS_INDEX, DEFAULT_OPTIONS, DEFAULT_RAMP_OTHERS, ALTERNATIVE_SORT } from './constants';
 import Palette from './color/palettes/Palette';
 import Base from './base';
 import Constant from './basic/constant';
@@ -77,10 +77,15 @@ export default class RampGeneric extends Base {
         const config = Object.assign({}, DEFAULT_OPTIONS, options);
         const type = this.input.type;
         const legendData = this.input.getLegendData(config);
-        const data = legendData.data.map(({ key, value }) => {
-            value = this._calcEval(value, undefined);
-            return { key, value };
-        });
+        let data = legendData.data
+            .map(({ key, value }) => {
+                value = this._calcEval(value, undefined);
+                return { key, value };
+            });
+        
+        if (config.sort && config.sort === ALTERNATIVE_SORT) {
+            data = data.sort((a, b) => b.key - a.key);
+        }
 
         return { type, ...legendData, data };
     }
