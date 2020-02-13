@@ -76,15 +76,16 @@ export default class RampGeneric extends Base {
     getLegendData (options) {
         const config = Object.assign({}, DEFAULT_OPTIONS, options);
         const type = this.input.type;
-        const legendData = this.input.getLegendData(config);
+        let legendData = this.input.getLegendData(config);
         let data = legendData.data
             .map(({ key, value }) => {
                 value = this._calcEval(value, undefined);
                 return { key, value };
             });
-        
+
         if (config.sort && config.sort === ALTERNATIVE_SORT) {
-            data = data.sort((a, b) => b.key - a.key);
+            data = data.sort((a, b) => b.key[0] - a.key[0]);
+            legendData = legendData.data.sort((a, b) => b.key[0] - a.key[0]);
         }
 
         return { type, ...legendData, data };
