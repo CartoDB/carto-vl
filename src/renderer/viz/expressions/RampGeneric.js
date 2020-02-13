@@ -84,8 +84,13 @@ export default class RampGeneric extends Base {
             });
 
         if (config.order && config.order === SORT_DESC) {
-            data = data.sort((a, b) => b.key[0] - a.key[0]);
-            legendData = legendData.data.sort((a, b) => b.key[0] - a.key[0]);
+            data = Array.isArray(data[0].key) || typeof data[0].key === 'number'
+                ? _sortNumericValues(data, config.order)
+                : _sortCategoricalValues(data, config.order);
+ 
+            data = Array.isArray(legendData[0].key) || typeof legendData[0].key === 'number'
+                ? _sortNumericValues(legendData.data, config.order)
+                : _sortCategoricalValues(legendData.data, config.order);
         }
 
         return { type, ...legendData, data };
@@ -161,4 +166,22 @@ function _mixClampGLSL (currentValue, nextBlend, index, listLength) {
     const clamp = `clamp((x - ${min})/${max}, 0., 1.)`;
 
     return `mix(${currentValue}, ${nextBlend}, ${clamp})`;
+}
+
+function _sortCategoricalValues (data, order) {
+    return order === SORT_DESC
+        ? data.sort((a, b) => b.key.localeCompare(a.key))
+        : data.sort((a, b) => a.key.localeCompare(b.key));
+}
+
+function _sortNumericValues (data, order) {
+    if (Array.isArray(data[0].key)) {
+        return order === SORT_DESC
+            ? data = data.sort((a, b) => b.key[0] - a.key[0])
+            : data;
+    }
+
+    return order === SORT_DESC
+        ? data = data.sort((a, b) => a.key - b.key)
+        : data;
 }
