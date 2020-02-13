@@ -1,6 +1,6 @@
 import BaseExpression from './base';
 import { checkExpression, implicitCast, checkType, checkMaxArguments } from './utils';
-import { ALTERNATIVE_SORT } from './constants';
+import { SORT_DESC } from './constants';
 
 const SQRT_MAX_CATEGORIES_PER_PROPERTY = 256;
 
@@ -151,7 +151,7 @@ export default class CategoryIndex extends BaseExpression {
             data.push({ key, value });
         }
 
-        if (options.sort && options.sort === ALTERNATIVE_SORT) {
+        if (options.order && options.order === SORT_DESC) {
             data = data.sort((a, b) => b.key - a.key);
         }
 

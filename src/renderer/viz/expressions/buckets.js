@@ -1,6 +1,6 @@
 import BaseExpression from './base';
 import { implicitCast, getOrdinalFromIndex, checkMaxArguments, checkType, checkFeatureIndependent } from './utils';
-import { OTHERS_INDEX, OTHERS_LABEL, ALTERNATIVE_SORT } from './constants';
+import { OTHERS_INDEX, OTHERS_LABEL, SORT_DESC } from './constants';
 import CartoValidationError, { CartoValidationErrorTypes } from '../../../errors/carto-validation-error';
 import BucketsGLSLHelper from './BucketsGLSLHelper';
 
@@ -173,7 +173,7 @@ export default class Buckets extends BaseExpression {
         const list = this.list.elems.map(elem => elem.value);
         const config = {
             othersLabel: options && options.othersLabel ? options.othersLabel : this.othersLabel.value,
-            sort: options ? options.sort : ALTERNATIVE_SORT.ASCENDING
+            order: options ? options.order : SORT_DESC.ASCENDING
         };
 
         let data = this.input.type === 'number'
@@ -185,7 +185,7 @@ export default class Buckets extends BaseExpression {
     }
 }
 
-function _getLegendDataNumeric (list, sort) {
+function _getLegendDataNumeric (list, order) {
     let data = [];
 
     for (let i = 0; i <= list.length; i++) {
@@ -196,7 +196,7 @@ function _getLegendDataNumeric (list, sort) {
         data.push({ key, value });
     }
 
-    if (sort && sort === ALTERNATIVE_SORT) {
+    if (order && order === SORT_DESC) {
         data = data.sort((a, b) => b.key[0] - a.key[0]);
     }
 
@@ -219,7 +219,7 @@ function _getLegendDataCategory (list, numDatasetCategories, config) {
         });
     }
 
-    if (config.sort && config.sort === ALTERNATIVE_SORT) {
+    if (config.order && config.order === SORT_DESC) {
         data = data.sort((a, b) => b.key - a.key);
     }
 

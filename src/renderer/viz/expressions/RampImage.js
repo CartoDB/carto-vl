@@ -5,7 +5,7 @@ import CategoryIndex from './CategoryIndex';
 import ListImage from './ListImage';
 import Image from './Image';
 import Base from './base';
-import { OTHERS_GLSL_VALUE, DEFAULT_RAMP_OTHERS, ALTERNATIVE_SORT } from './constants';
+import { OTHERS_GLSL_VALUE, DEFAULT_RAMP_OTHERS, SORT_DESC } from './constants';
 
 const DEFAULT_RAMP_OTHERS_IMAGE = new Image(defaultSVGs.circle);
 export default class RampImage extends Base {
@@ -54,7 +54,7 @@ export default class RampImage extends Base {
             return { key, value };
         });
 
-        if (options && options.sort && options.sort === ALTERNATIVE_SORT) {
+        if (options && options.order && options.order === SORT_DESC) {
             data = data.sort((a, b) => b.key - a.key);
         }
 

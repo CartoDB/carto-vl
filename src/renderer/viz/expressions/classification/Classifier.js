@@ -4,7 +4,6 @@ import { number } from '../../expressions';
 import { checkType, checkNumber } from '../utils';
 import CartoValidationError, { CartoValidationErrorTypes } from '../../../../errors/carto-validation-error';
 import ClassifierGLSLHelper from './ClassifierGLSLHelper';
-import { ALTERNATIVE_SORT } from '../constants';
 
 export const DEFAULT_HISTOGRAM_SIZE = 1000;
 
