@@ -180,7 +180,6 @@ export default class Buckets extends BaseExpression {
             ? _getLegendDataNumeric(list, config.sort)
             : _getLegendDataCategory(list, this._numDatasetCategories, config);
 
-
         return { data, name };
     }
 }
