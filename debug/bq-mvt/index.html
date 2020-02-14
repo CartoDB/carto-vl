@@ -26,22 +26,23 @@
         const metadata = {
             idProperty: 'geoid',
             properties: {
-                'geoid': { type: 'category' }
+                'geoid': { type: 'category' },
+                'do_area': { type: 'number' }
             }
         };
-        const token = 'ya29.Iq8BvAfG0LdMjYqg_4bvVFZ-JSZ7huHnL5_gtrVOKFThF6R1jEG_FugIuLX2ktNtKbaBcQsUV2KxYiBpt9lI8oGGyMszM4IcrbQZamnHOARqW42SZJTT-BF2e7PqsM8Ag5ug8R9p9EFYcSmN9jWXHEiO9QrUjAYWHeJGqRDOHTjKl9rNZyHmTKvOjYXwrJrkKugFxfTY161AknxygzCtFBje-IsO5jZ6LXWkB5lV2dBNAg';
+        const token = 'ya29.Iq8BvQfu4qAGBDQIgxtuUuDfEvst-FdURf7_dapu7ph84A_V1ZNYGsl6pD7cguCMxKuIDfguGUcHAt3BKG7KvA8dnfl9LiIPbUmzQfOqZG1LYgr_q2fyXXc_Fon3lofm4Zb65JpW8Bct7qlfbVseDfhH8ETyA6gJBSwh6dBzKWpCmw2I3sSWwEMLazk_2SXt7DhWJATjDa98poXKeMZou7LnDIVXzeUd04cVaIbNVG9jfA';
 
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.voyager,
-            center: [-73.95, 40.74],
-            zoom: 14,
+            center: [-74, 40.74],
+            zoom: 12,
             pitchWithRotate: false
         });
 
         const source = new carto.source.BQMVT({ projectId, datasetId, tableId, token }, metadata);
         const viz = new carto.Viz(`
-            // color: opacity(ramp(linear($area_tile, 0, 1000000), bold), 0.5)
+            color: opacity(ramp(linear($do_area, 0, 1000000), bold), 1)
             // strokeColor: opacity(white, 0.6)
         `);
         const layer = new carto.Layer('layer', source, viz);

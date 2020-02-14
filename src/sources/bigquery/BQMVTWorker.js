@@ -49,11 +49,11 @@ export class BQMVTWorker {
         const dataframes = [];
         const client = new BQClient(bqSource);
         const responseTiles = await client.fetchRawTiles(tiles);
-        for (let i = 0; i < tiles.length; i++) {
-            const t = tiles[i];
-            const responseTile = responseTiles && responseTiles.find((rt) => (rt.x === t.x && rt.y === t.y && rt.z === t.z));
-            if (responseTile) {
-                const dataframe = await this.responseToDataframeTransformer(responseTile, layerID, metadata);
+        for (let i = 0; i < responseTiles.length; i++) {
+            const t = responseTiles[i];
+            // const responseTile = responseTiles && responseTiles.find((rt) => (rt.x === t.x && rt.y === t.y && rt.z === t.z));
+            if (t) {
+                const dataframe = await this.responseToDataframeTransformer(t, layerID, metadata);
                 dataframes.push(dataframe);
             } else {
                 dataframes.push({ x: t.x, y: t.y, z: t.z, empty: true });
