@@ -1,12 +1,7 @@
 
-import { parse } from 'wellknown';
 import { decode } from 'base64-arraybuffer';
-import { fromGeojsonVt } from 'vt-pbf';
-import geojsonVt from 'geojson-vt';
 
 const ENDPOINT_URL = 'https://bigquery.googleapis.com/bigquery/v2';
-
-let requests = 0;
 
 export default class BQClient {
     constructor (bqSource) {
@@ -109,21 +104,12 @@ export default class BQClient {
     }
 
     async fetchRawTiles (tiles) {
-        // if (requests > 0) {
-        //     return [];
-        // }
-        // requests = 1;
-
-        console.log(tiles)
-
-        console.log('Fetch Raw Tiles');
+        console.log('Fetch Raw Tiles', tiles);
 
         const time1 = getTime();
 
         const x = tiles.map((tile) => tile.x);
         const y = tiles.map((tile) => tile.y);
-        // const x = tiles[0].x;
-        // const y = tiles[0].y;
         const z = tiles[0].z;
 
         const query = `
@@ -161,12 +147,10 @@ export default class BQClient {
         //         WHERE a.geoid = b.geoid
         //     )
         //     SELECT tiler.ST_ASMVT(b.z, b.x, b.y, ARRAY_AGG(TO_JSON_STRING(a)), 1) AS tile
-        //     FROM tiles_geom a, tiles_xyz b 
+        //     FROM tiles_geom a, tiles_xyz b
         //     WHERE a.geoid = b.geoid
         //     GROUP BY b.z, b.x, b.y
         // `;
-
-        console.log(query)
 
         const result = await this.execute(query);
 
@@ -188,8 +172,6 @@ export default class BQClient {
             }
         }
 
-        // console.log(mvts)
-
         // if (result && result.rows) {
         //     for (let i = 0; i < result.rows.length; i++) {
         //         const row = result.rows[i];
@@ -203,56 +185,8 @@ export default class BQClient {
         //     }
         // }
 
-        // const z = 14;
-
-        // for (let i = 0; i < result.rows.length; i++) {
-        //     const { x, y, geojson } = bq2geojson(result.rows[i]);
-
-        //     const tileindex = geojsonVt(geojson, { tolerance: 0 });
-
-        //     const tile = tileindex.getTile(z, x, y);
-
-        //     const mvtBuffer = fromGeojsonVt({ 'default': tile }, { version: 2 });
-
-        //     mvts.push({ z, x, y, buffer: mvtBuffer });
-        // }
-
         return mvts;
     }
-}
-
-function bq2geojson (row) {
-    const x = parseInt(row.f[0].v);
-    const y = parseInt(row.f[1].v);
-    const geoms = row.f[2].v;
-
-    const geojson = {
-        type: 'FeatureCollection',
-        features: []
-    };
-
-    for (let i = 0; i < geoms.length; i++) {
-        const geoid = geoms[i].v.f[0].v.f[0].v;
-        const label = geoms[i].v.f[0].v.f[1].v;
-        const area = geoms[i].v.f[0].v.f[2].v;
-        // const perimeter = geoms[i].v.f[0].v.f[3].v;
-        // const num_vertices = geoms[i].v.f[0].v.f[4].v;
-        const geom = geoms[i].v.f[0].v.f[5].v;
-        const geometry = parse(geom);
-        geojson.features.push({
-            type: 'Feature',
-            geometry,
-            properties: {
-                geoid,
-                label,
-                area
-                // perimeter,
-                // num_vertices
-            }
-        });
-    }
-
-    return { x, y, geojson };
 }
 
 function getTime () {
