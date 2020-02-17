@@ -193,7 +193,7 @@ describe('src/renderer/viz/expressions/opacity', () => {
 
             const color = opacity(ramp(property('grade'), [namedColor('blue'), namedColor('red')]), 0.5);
             color._bindMetadata(METADATA);
-            const actual = color.getLegendData({order: 'DESC'});
+            const actual = color.getLegendData({ order: 'DESC' });
 
             const expected = {
                 type: 'category',

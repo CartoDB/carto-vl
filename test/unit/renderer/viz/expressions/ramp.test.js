@@ -1059,7 +1059,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     r._resolveAliases();
                     r._bindMetadata(METADATA);
 
-                    actual = r.getLegendData({order: 'DESC'}).data;
+                    actual = r.getLegendData({ order: 'DESC' }).data;
                     expected = [
                         {
                             key: [2.5, 4],
@@ -1106,7 +1106,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                     r._bindMetadata(METADATA);
 
-                    actual = r.getLegendData({order: 'DESC'}).data;
+                    actual = r.getLegendData({ order: 'DESC' }).data;
                     expected = [
                         {
                             key: [2.5, Number.POSITIVE_INFINITY],
@@ -1119,7 +1119,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     ];
 
                     expect(actual).toEqual(expected);
-                })
+                });
             });
 
             describe('and it is a linear input', () => {
@@ -1167,7 +1167,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         {
                             key: 1,
                             value: red.value
-                        }                        
+                        }
                     ];
                     expect(actual).toEqual(expected);
                 });
@@ -1230,7 +1230,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 it('should return legend data in descending order', () => {
                     const r = ramp(top($grade, 2), [red, blue]);
                     r._bindMetadata(METADATA);
-                    actual = r.getLegendData({order: 'DESC'}).data;
+                    actual = r.getLegendData({ order: 'DESC' }).data;
                     expected = [
                         {
                             key: 'B',
@@ -1296,7 +1296,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                     r._bindMetadata(METADATA);
 
-                    actual = r.getLegendData({order: 'DESC'}).data;
+                    actual = r.getLegendData({ order: 'DESC' }).data;
                     expected = [
                         {
                             key: 'C',

@@ -183,5 +183,5 @@ function _sortNumericValues (data, order) {
 }
 
 function _checkBuckets (data) {
-    return data[0] && (Array.isArray(data[0].key) || typeof data[0].key === 'number');
+    return data[0] && (Array.isArray(data[0].key) || (typeof data[0].key === 'number'));
 }

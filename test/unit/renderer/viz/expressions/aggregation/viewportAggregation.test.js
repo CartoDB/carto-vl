@@ -276,7 +276,7 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
             ramp._bindMetadata(METADATA);
             fakeDrawMetadata(viewportHistogram);
 
-            const values = ramp.getLegendData({order: 'DESC'}).data;
+            const values = ramp.getLegendData({ order: 'DESC' }).data;
             const joinedValues = viewportHistogram.getJoinedValues(values);
 
             expect(joinedValues).toEqual(
