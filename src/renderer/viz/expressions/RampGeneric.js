@@ -84,13 +84,9 @@ export default class RampGeneric extends Base {
             });
 
         if (config.order && config.order === SORT_DESC) {
-            data = Array.isArray(data[0].key) || typeof data[0].key === 'number'
+            data = _checkBuckets(data)
                 ? _sortNumericValues(data, config.order)
                 : _sortCategoricalValues(data, config.order);
- 
-            data = Array.isArray(legendData[0].key) || typeof legendData[0].key === 'number'
-                ? _sortNumericValues(legendData.data, config.order)
-                : _sortCategoricalValues(legendData.data, config.order);
         }
 
         return { type, ...legendData, data };
@@ -177,11 +173,15 @@ function _sortCategoricalValues (data, order) {
 function _sortNumericValues (data, order) {
     if (Array.isArray(data[0].key)) {
         return order === SORT_DESC
-            ? data = data.sort((a, b) => b.key[0] - a.key[0])
+            ? data.sort((a, b) => b.key[0] - a.key[0])
             : data;
     }
 
     return order === SORT_DESC
-        ? data = data.sort((a, b) => a.key - b.key)
+        ? data.sort((a, b) => b.key - a.key)
         : data;
+}
+
+function _checkBuckets (data) {
+    return data[0] && (Array.isArray(data[0].key) || typeof data[0].key === 'number');
 }

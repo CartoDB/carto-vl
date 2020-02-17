@@ -177,6 +177,47 @@ describe('src/renderer/viz/expressions/opacity', () => {
 
             expect(actual).toEqual(expected);
         });
+
+        it('should return legend data in descending order', () => {
+            const METADATA = new Metadata({
+                properties: {
+                    grade: {
+                        type: 'category',
+                        categories: [
+                            { name: 'A' },
+                            { name: 'B' }
+                        ]
+                    }
+                }
+            });
+
+            const color = opacity(ramp(property('grade'), [namedColor('blue'), namedColor('red')]), 0.5);
+            color._bindMetadata(METADATA);
+            const actual = color.getLegendData({order: 'DESC'});
+
+            const expected = {
+                type: 'category',
+                data: [{
+                    key: 'B',
+                    value: {
+                        r: 255,
+                        g: 0,
+                        b: 0,
+                        a: 0.5
+                    }
+                }, {
+                    key: 'A',
+                    value: {
+                        r: 0,
+                        g: 0,
+                        b: 255,
+                        a: 0.5
+                    }
+                }]
+            };
+
+            expect(actual).toEqual(expected);
+        });
     });
 
     describe('regression', () => {

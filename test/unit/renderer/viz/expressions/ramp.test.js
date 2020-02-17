@@ -1050,6 +1050,28 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                     expect(actual).toEqual(expected);
                 });
+
+                it('should return legend data in descending order', () => {
+                    let actual;
+                    let expected;
+
+                    const r = ramp(globalEqIntervals($price, 2), [red, blue]);
+                    r._resolveAliases();
+                    r._bindMetadata(METADATA);
+
+                    actual = r.getLegendData({order: 'DESC'}).data;
+                    expected = [
+                        {
+                            key: [2.5, 4],
+                            value: blue.value
+                        }, {
+                            key: [1, 2.5],
+                            value: red.value
+                        }
+                    ];
+
+                    expect(actual).toEqual(expected);
+                });
             });
 
             describe('and it is a buckets input', () => {
@@ -1075,6 +1097,29 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                     expect(actual).toEqual(expected);
                 });
+
+                it('should return legend data in descending order', () => {
+                    let actual;
+                    let expected;
+
+                    const r = ramp(buckets($price, [2.5]), [red, blue]);
+
+                    r._bindMetadata(METADATA);
+
+                    actual = r.getLegendData({order: 'DESC'}).data;
+                    expected = [
+                        {
+                            key: [2.5, Number.POSITIVE_INFINITY],
+                            value: blue.value
+                        },
+                        {
+                            key: [Number.NEGATIVE_INFINITY, 2.5],
+                            value: red.value
+                        }
+                    ];
+
+                    expect(actual).toEqual(expected);
+                })
             });
 
             describe('and it is a linear input', () => {
@@ -1100,6 +1145,29 @@ describe('src/renderer/viz/expressions/ramp', () => {
                             key: 4,
                             value: blue.value
                         }
+                    ];
+                    expect(actual).toEqual(expected);
+                });
+
+                it('should return legend data in descending order', () => {
+                    const r = ramp(linear($price), [red, blue]);
+
+                    r._bindMetadata(METADATA);
+
+                    actual = r.getLegendData({ samples: 3, order: 'DESC' }).data;
+                    expected = [
+                        {
+                            key: 4,
+                            value: blue.value
+                        },
+                        {
+                            key: 2.5,
+                            value: { r: 202, g: 0, b: 136, a: 1 } // interpolated
+                        },
+                        {
+                            key: 1,
+                            value: red.value
+                        }                        
                     ];
                     expect(actual).toEqual(expected);
                 });
@@ -1158,6 +1226,24 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         }
                     ];
                 });
+
+                it('should return legend data in descending order', () => {
+                    const r = ramp(top($grade, 2), [red, blue]);
+                    r._bindMetadata(METADATA);
+                    actual = r.getLegendData({order: 'DESC'}).data;
+                    expected = [
+                        {
+                            key: 'B',
+                            value: blue.value
+                        }, {
+                            key: 'A',
+                            value: red.value
+                        }, {
+                            key: OTHERS_LABEL,
+                            value: r.others.value
+                        }
+                    ];
+                });
             });
 
             describe('and it is a bucket input with a color array', () => {
@@ -1199,6 +1285,28 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         }, {
                             key: 'C',
                             value: yellow.color
+                        }
+                    ];
+
+                    expect(actual).toEqual(expected);
+                });
+
+                it('should return legend data in descending order', () => {
+                    const r = ramp(buckets($grade, ['A', 'B', 'C']), [red, blue, yellow]);
+
+                    r._bindMetadata(METADATA);
+
+                    actual = r.getLegendData({order: 'DESC'}).data;
+                    expected = [
+                        {
+                            key: 'C',
+                            value: yellow.color
+                        }, {
+                            key: 'B',
+                            value: blue.color
+                        }, {
+                            key: 'A',
+                            value: red.color
                         }
                     ];
 
