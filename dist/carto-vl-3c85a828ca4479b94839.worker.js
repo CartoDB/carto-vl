@@ -10555,16 +10555,20 @@ function rTiles (zoom, bounds, viewportZoomToSourceZoom = Math.ceil, extend = 0)
  * @return {Array} - array of TC tiles {x, y, z}
  */
 function wRectangleTiles (z, wr, ex = 0) {
-    const [wMinx, wMiny, wMaxx, wMaxy] = wr;
+    if (z === null) {
+        // Skip request when zoom is null
+        return [];
+    }
+    let tiles = [];
     const n = (1 << z); // for 0 <= z <= 30 equals Math.pow(2, z)
-
     const clamp = x => Math.min(Math.max(x, 0), n - 1);
+    const [wMinx, wMiny, wMaxx, wMaxy] = wr;
+
     // compute tile coordinate ranges
     const tMinx = clamp(Math.floor(n * (wMinx + 1) * 0.5)) - ex;
     const tMaxx = clamp(Math.ceil(n * (wMaxx + 1) * 0.5) - 1) + ex;
     const tMiny = clamp(Math.floor(n * (1 - wMaxy) * 0.5)) - ex;
     const tMaxy = clamp(Math.ceil(n * (1 - wMiny) * 0.5) - 1) + ex;
-    let tiles = [];
     for (let x = tMinx; x <= tMaxx; ++x) {
         for (let y = tMiny; y <= tMaxy; ++y) {
             tiles.push({ x, y, z });
@@ -12439,10 +12443,11 @@ class BQClient {
         const x = tiles.map((tile) => tile.x);
         const y = tiles.map((tile) => tile.y);
         const z = tiles[0].z;
+        const margin = 16 / 4096;
 
         const query = `
             WITH tiles_bbox AS (
-                SELECT * FROM UNNEST(tiler.getTilesBounds(${z}, [${x}], [${y}]))
+                SELECT * FROM UNNEST(tiler.getTilesBounds(${z}, [${x}], [${y}], ${margin}))
             ),
             tiles_xyz AS (
                 SELECT b.z, b.x, b.y, a.geoid
@@ -12450,35 +12455,15 @@ class BQClient {
                 WHERE NOT ((a.xmin > b.xmax) OR (a.xmax < b.xmin)  OR (a.ymax < b.ymin) OR (a.ymin > b.ymax))
             ),
             tiles_geom AS (
-                SELECT a.geoid, a.geo_json as geom, a.do_area
+                SELECT b.z, b.x, b.y, a.geoid, a.geo_json as geom, a.do_area
                 FROM \`alasarr.geography_usa_block_2019_bbox_double_geojson\` a, tiles_xyz b
                 WHERE a.geoid = b.geoid
             )
             SELECT tiler.ST_ASMVT2(b.z, b.x, b.y, ARRAY_AGG(a), 0) AS tile
             FROM tiles_geom a, tiles_xyz b
-            WHERE a.geoid = b.geoid
+            WHERE a.z = b.z AND a.x = b.x AND a.y = b.y AND a.geoid = b.geoid
             GROUP BY b.z, b.x, b.y
         `;
-
-        // const query = `
-        //     WITH tiles_bbox AS (
-        //         SELECT * FROM UNNEST(tiler.getTilesBounds(${z}, [${x}], [${y}]))
-        //     ),
-        //     tiles_xyz AS (
-        //         SELECT b.z, b.x, b.y, a.geoid
-        //         FROM \`rmr_tests.geography_usa_block_2019_bbox_double\` a, tiles_bbox b
-        //         WHERE NOT ((a.xmin > b.xmax) OR (a.xmax < b.xmin)  OR (a.ymax < b.ymin) OR (a.ymin > b.ymax))
-        //     ),
-        //     tiles_geom AS (
-        //         SELECT a.geoid, ST_ASGEOJSON(a.geom) AS geom
-        //         FROM  \`rmr_tests.geography_usa_block_2019_bbox_double\` a, tiles_xyz b
-        //         WHERE a.geoid = b.geoid
-        //     )
-        //     SELECT tiler.ST_ASMVT(b.z, b.x, b.y, ARRAY_AGG(TO_JSON_STRING(a)), 1) AS tile
-        //     FROM tiles_geom a, tiles_xyz b
-        //     WHERE a.geoid = b.geoid
-        //     GROUP BY b.z, b.x, b.y
-        // `;
 
         const result = await this.execute(query);
 
@@ -12486,6 +12471,19 @@ class BQClient {
         console.log(time2 - time1);
 
         const mvts = [];
+
+        // if (result && result.rows) {
+        //     for (let i = 0; i < result.rows.length; i++) {
+        //         const row = result.rows[i];
+        //         if (row.f && row.f.length === 4) {
+        //             const z = parseInt(row.f[0].v);
+        //             const x = parseInt(row.f[1].v);
+        //             const y = parseInt(row.f[2].v);
+        //             const buffer = decode(row.f[3].v);
+        //             mvts.push({ z, x, y, buffer });
+        //         }
+        //     }
+        // }
 
         if (result && result.rows) {
             for (let i = 0; i < result.rows.length; i++) {
@@ -12499,19 +12497,6 @@ class BQClient {
                 }
             }
         }
-
-        // if (result && result.rows) {
-        //     for (let i = 0; i < result.rows.length; i++) {
-        //         const row = result.rows[i];
-        //         if (row.f && row.f.length === 4) {
-        //             const z = parseInt(row.f[0].v);
-        //             const x = parseInt(row.f[1].v);
-        //             const y = parseInt(row.f[2].v);
-        //             const mvt = row.f[3].v;
-        //             mvts.push({ z, x, y, buffer: decode(mvt) });
-        //         }
-        //     }
-        // }
 
         return mvts;
     }
@@ -14054,4 +14039,4 @@ function isTimeRange (t) {
 /***/ })
 
 /******/ });
-//# sourceMappingURL=carto-vl-9e5b29c736a547fb5255.worker.js.map
+//# sourceMappingURL=carto-vl-3c85a828ca4479b94839.worker.js.map

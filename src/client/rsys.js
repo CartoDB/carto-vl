@@ -94,16 +94,20 @@ export function rTiles (zoom, bounds, viewportZoomToSourceZoom = Math.ceil, exte
  * @return {Array} - array of TC tiles {x, y, z}
  */
 function wRectangleTiles (z, wr, ex = 0) {
-    const [wMinx, wMiny, wMaxx, wMaxy] = wr;
+    if (z === null) {
+        // Skip request when zoom is null
+        return [];
+    }
+    let tiles = [];
     const n = (1 << z); // for 0 <= z <= 30 equals Math.pow(2, z)
-
     const clamp = x => Math.min(Math.max(x, 0), n - 1);
+    const [wMinx, wMiny, wMaxx, wMaxy] = wr;
+
     // compute tile coordinate ranges
     const tMinx = clamp(Math.floor(n * (wMinx + 1) * 0.5)) - ex;
     const tMaxx = clamp(Math.ceil(n * (wMaxx + 1) * 0.5) - 1) + ex;
     const tMiny = clamp(Math.floor(n * (1 - wMaxy) * 0.5)) - ex;
     const tMaxy = clamp(Math.ceil(n * (1 - wMiny) * 0.5) - 1) + ex;
-    let tiles = [];
     for (let x = tMinx; x <= tMaxx; ++x) {
         for (let y = tMiny; y <= tMaxy; ++y) {
             tiles.push({ x, y, z });

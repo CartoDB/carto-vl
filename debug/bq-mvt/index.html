@@ -30,20 +30,26 @@
                 'do_area': { type: 'number' }
             }
         };
-        const token = 'ya29.Iq8BvQfu4qAGBDQIgxtuUuDfEvst-FdURf7_dapu7ph84A_V1ZNYGsl6pD7cguCMxKuIDfguGUcHAt3BKG7KvA8dnfl9LiIPbUmzQfOqZG1LYgr_q2fyXXc_Fon3lofm4Zb65JpW8Bct7qlfbVseDfhH8ETyA6gJBSwh6dBzKWpCmw2I3sSWwEMLazk_2SXt7DhWJATjDa98poXKeMZou7LnDIVXzeUd04cVaIbNVG9jfA';
+        const token = 'ya29.a0Adw1xeVgmI08FfZKEOS86IgRt51bbl62ZCq0XU0_IrwGmyKchkkCm4P5AhmKcC5Hqi4jK4adbV0sU7ETXtZnUsq4EPQ5ARywxj5X4H1hid8LC3lBs3xISjgpSCydl0bjRJoraV4xjx8j_EnOXQd1u-3s4mcC6aiYo_9ArKEtmZcHgc6KLJjJQgI2qtnYtw4tBCg1di2Vx4NKcU4TkLLcWWzAbIpIXsIRjrBRtnUy36yZwM0QU6pAenJkwRFnClvzJXvkYvivVwzLeg'
 
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.voyager,
             center: [-74, 40.74],
-            zoom: 12,
+            zoom: 14,
             pitchWithRotate: false
         });
 
-        const source = new carto.source.BQMVT({ projectId, datasetId, tableId, token }, metadata);
+        const source = new carto.source.BQMVT({ projectId, datasetId, tableId, token }, metadata, {
+            viewportZoomToSourceZoom: (z) => {
+                if (z > 13) {
+                    return 14;
+                }
+                return null;
+            }
+        });
         const viz = new carto.Viz(`
-            color: opacity(ramp(linear($do_area, 0, 1000000), bold), 1)
-            // strokeColor: opacity(white, 0.6)
+            color: opacity(ramp(linear($do_area, 10000, 20000), [red,blue]), 0.5)
         `);
         const layer = new carto.Layer('layer', source, viz);
 
