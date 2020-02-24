@@ -157,6 +157,7 @@ export default class Ramp extends BaseExpression {
      *
      * @param {Object} config - Optional configuration
      * @param {String} config.othersLabel - Name for other category values. Defaults to 'CARTO_VL_OTHERS'.
+     * @param {String} config.order - Set order to 'DESC' or 'ASC' to sort legend values.
      * @param {Number} config.samples - Number of samples for numeric values to be returned. Defaults to 10. The maximum number of samples is 100.
      * @return {Object} - `{ type, data }`. 'type' could be category or number. Data is an array of { key, value } objects. 'key' depends on the expression type. 'value' is the result evaluated by the ramp. There is more information in the examples.
      * @api
@@ -283,6 +284,53 @@ export default class Ramp extends BaseExpression {
      *   // }
      * });
      *
+     * @example <caption>Get category legend in descending order</caption>
+     * const s = carto.expressions;
+     * const viz = new carto.Viz({
+     *   color: s.ramp(s.top(s.prop('vehicles')), s.palettes.PRISM)
+     * });
+     *
+     * layer.on('loaded', () => {
+     *   const legend = layer.viz.color.getLegendData({
+     *      othersLabel: 'Other Vehicles',
+     *      order: 'DESC'
+     *   });
+     *
+     *   // legend = {
+     *   //    type: 'category',
+     *   //    name: 'top($vehicles)',
+     *   //    data: [
+     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 } },
+     *   //       { key: 'Bicycle', value: { r: 95, g: 70, b: 144, a: 1 } },
+     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 } },
+     *   //       { key: 'Other Vehicles', value: { r: 15, g: 133, b: 84, a: 1 } }
+     *   //     ]
+     *   // }
+     * });
+     *
+     * @example <caption>Get category legend in descending order (String)</caption>
+     * const viz = new carto.Viz(`
+     *   color: ramp(top($vehicles, 5), PRISM)
+     * `);
+     *
+     * layer.on('loaded', () => {
+     *   const legend = layer.viz.color.getLegendData({
+     *      othersLabel: 'Other Vehicles'
+     *      order: 'DESC'
+     *   });
+     *
+     *   // legend = {
+     *   //    type: 'category',
+     *   //    name: 'top($vehicles)',
+     *   //    data: [
+     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 } },
+     *   //       { key: 'Bicycle', value: { r: 95, g: 70, b: 144, a: 1 } },
+     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 } },
+     *   //       { key: 'Other Vehicles', value: { r: 15, g: 133, b: 84, a: 1 } }
+     *   //     ]
+     *   // }
+     * });
+     *
      * @example <caption>Get legend for a linear ramp expression and set number of samples.</caption>
      * const s = carto.expressions;
      * const viz = new carto.Viz({
@@ -324,6 +372,53 @@ export default class Ramp extends BaseExpression {
      *   //       { key: 50, value: { r: 29, g: 105, b: 150, a: 1 } },
      *   //       { key: 75, value: { r: 56, g: 166, b: 165, a: 1 } },
      *   //       { key: 100, value: { r: 15, g: 133, b: 84, a: 1 } }
+     *   //     ]
+     *   // }
+     * });
+     *
+     * @example <caption>Get numeric legend in descending order.</caption>
+     * const s = carto.expressions;
+     * const viz = new carto.Viz({
+     *   color: s.ramp(s.linear(s.prop('numvehicles'), 1, 100), s.palettes.PRISM)
+     * });
+     *
+     * layer.on('loaded', () => {
+     *   const legend = layer.viz.color.getLegendData({
+     *       samples: 4,
+     *       order: 'DESC'
+     *   });
+     *
+     *   // legend = {
+     *   //    type: 'number',
+     *   //    name: 'linear($numvehicles, 1, 100)',
+     *   //    data: [
+     *   //       { key: 100, value: { r: 15, g: 133, b: 84, a: 1 } }
+     *   //       { key: 75, value: { r: 56, g: 166, b: 165, a: 1 } },
+     *   //       { key: 50, value: { r: 29, g: 105, b: 150, a: 1 } },
+     *   //       { key: 25, value: { r: 95, g: 70, b: 144, a: 1 } }
+     *   //     ]
+     *   // }
+     * });
+     *
+     * @example <caption>Get numeric legend in descending order. (String)</caption>
+     * const viz = new carto.Viz(`
+     *   color: ramp(linear($numvehicles, 1, 100), PRISM)
+     * `);
+     *
+     * layer.on('loaded', () => {
+     *   const legend = layer.viz.color.getLegendData({
+     *       samples: 4,
+     *       order: 'DESC'
+     *   });
+     *
+     *   // legend = {
+     *   //    type: 'number',
+     *   //    name: 'linear($numvehicles, 1, 100)',
+     *   //    data: [
+     *   //       { key: 100, value: { r: 15, g: 133, b: 84, a: 1 } }
+     *   //       { key: 75, value: { r: 56, g: 166, b: 165, a: 1 } },
+     *   //       { key: 50, value: { r: 29, g: 105, b: 150, a: 1 } },
+     *   //       { key: 25, value: { r: 95, g: 70, b: 144, a: 1 } }
      *   //     ]
      *   // }
      * });

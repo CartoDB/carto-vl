@@ -269,5 +269,35 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
                 ]
             );
         });
+
+        it('viewportHistogram.getJoinedValues should not be affected by ramp.getLegendData order', () => {
+            const viewportHistogram = s.viewportHistogram($cat);
+            const ramp = s.ramp($cat, s.palettes.PRISM);
+            ramp._bindMetadata(METADATA);
+            fakeDrawMetadata(viewportHistogram);
+
+            const values = ramp.getLegendData({ order: 'DESC' }).data;
+            const joinedValues = viewportHistogram.getJoinedValues(values);
+
+            expect(joinedValues).toEqual(
+                [
+                    {
+                        frequency: 2,
+                        key: 'b',
+                        value: { r: 29, g: 105, b: 150, a: 1 }
+                    },
+                    {
+                        frequency: 1,
+                        key: 'a',
+                        value: { r: 95, g: 70, b: 144, a: 1 }
+                    },
+                    {
+                        frequency: 1,
+                        key: 'c',
+                        value: { r: 56, g: 166, b: 165, a: 1 }
+                    }
+                ]
+            );
+        });
     });
 });
