@@ -283,7 +283,8 @@ export default class Ramp extends BaseExpression {
      *   //     ]
      *   // }
      * });
-          * @example <caption>Get category legend in descending order</caption>
+     *
+     * @example <caption>Get category legend in descending order</caption>
      * const s = carto.expressions;
      * const viz = new carto.Viz({
      *   color: s.ramp(s.top(s.prop('vehicles')), s.palettes.PRISM)
@@ -374,7 +375,8 @@ export default class Ramp extends BaseExpression {
      *   //     ]
      *   // }
      * });
-          * @example <caption>Get numeric legend in descending order.</caption>
+     *
+     * @example <caption>Get numeric legend in descending order.</caption>
      * const s = carto.expressions;
      * const viz = new carto.Viz({
      *   color: s.ramp(s.linear(s.prop('numvehicles'), 1, 100), s.palettes.PRISM)
