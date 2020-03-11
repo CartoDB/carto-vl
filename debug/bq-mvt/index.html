@@ -24,27 +24,36 @@
             container: 'map',
             style: carto.basemaps.voyager,
             center: [-74.06, 40.89],
-            zoom: 13,
+            zoom: 4,
             pitchWithRotate: false
         });
 
-        const projectId = 'cartodb-gcp-backend-data-team';
-        const datasetId = 'google_next';
-        const tableId = 'usa_clipped_bg_13_mvts';
+        const project = 'cartodb-gcp-backend-data-team';
+        const tileset = 'mvt_pool.4096_geography_usa_block_2019';
+        const token = '';
+
+        const data = { tileset, project, token };
         const metadata = {
-            idProperty: 'geoid',
+            idProperty: 'do_num_vertices',
             properties: {
-                'x': { type: 'number' },
-                'geoid': { type: 'category' }
+                'do_num_vertices': { type: 'category' }
+            },
+            extent: '4096'
+        };
+        const options = {
+            viewportZoomToSourceZoom: (zoom) => {
+                if (zoom > 7) {
+                    return 8;
+                }
+                if (zoom > 3) {
+                    return 4;
+                }
+                return 0;
             }
         };
-        const token = 'ya29.Iq8BvAdqEL2tmbIziS335CTt5OOFdDUx1AU2LjO4ve9POqvx1ltqyDzmLKKOEOqKapJQzuRov4Ie69MEzBOxh0TITST9gozsGQBWHrLxTRi-y-D7-XXpkG1hjb6bpmXzGCills1aY7ZRK7dxBxmztR9PlLBBN2tSE3T7g9u0Nm_Er3lmjKBRblqxbOAmBOKXw50Y1W7QHKDGtpSHi_H0Uc-iHYuGrhaY-4w6JXzzd3arEA';
 
-        const source = new carto.source.BQMVT({ projectId, datasetId, tableId, token }, metadata);
-        const viz = new carto.Viz(`
-            color: opacity(ramp(linear($x, 2400, 2420), vivid), 0.5)
-            strokeColor: opacity(white, 0.6)
-        `);
+        const source = new carto.source.BQMVT(data, metadata, options);
+        const viz = new carto.Viz();
         const layer = new carto.Layer('layer', source, viz);
 
         layer.addTo(map, 'watername_ocean');

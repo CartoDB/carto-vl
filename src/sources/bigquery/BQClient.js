@@ -1,14 +1,12 @@
-
-import { decode } from 'base64-arraybuffer';
-
 const ENDPOINT_URL = 'https://bigquery.googleapis.com/bigquery/v2';
+const QUERY_TIMEOUT = 5 * 1000;
+const POLLING_TIMEOUT = 2 * 60 * 1000;
 
-export default class BQClient {
-    constructor (bqSource) {
-        this._projectId = bqSource.projectId;
-        this._datasetId = bqSource.datasetId;
-        this._tableId = bqSource.tableId;
-        this._token = bqSource.token;
+export default class BigQueryClient {
+    constructor (projectId, token) {
+        this._projectId = projectId;
+        this._token = token;
+        this._activeJobs = {};
     }
 
     async list () {
@@ -31,16 +29,20 @@ export default class BQClient {
         return this.fetch('POST', 'queries', {
             kind: 'bigquery#queryRequest',
             query: sqlQuery,
-            useLegacySql: false
+            useLegacySql: false,
+            timeoutMs: QUERY_TIMEOUT
         });
     }
 
     async getQueryResults (jobId) {
-        return this.fetch('GET', `queries/${jobId}`);
+        return this.fetch('GET', `queries/${jobId}?timeoutMs=${QUERY_TIMEOUT}`);
     }
 
     async execute (sqlQuery) {
         const result = await this.query(sqlQuery);
+        if (result.error) {
+            return result;
+        }
         return this._pollingQuery(result);
     }
 
@@ -50,17 +52,41 @@ export default class BQClient {
                 resolve(result);
             } else {
                 const jobId = result.jobReference.jobId;
-                setTimeout(async () => {
-                    const result = await this.getQueryResults(jobId);
-                    console.log('timer', result);
-                    if (result.jobComplete) {
-                        resolve(result);
-                    } else {
-                        resolve(this._pollingQuery(result));
-                    }
-                }, 5000);
+                this._updateJobTime(jobId);
+                if (this._jobTimeout(jobId)) {
+                    this._cancelJob(jobId, reject);
+                } else {
+                    this._getJobResult(jobId, resolve);
+                }
             }
         });
+    }
+
+    _jobTimeout (jobId) {
+        return this._activeJobs[jobId] >= POLLING_TIMEOUT;
+    }
+
+    _updateJobTime (jobId) {
+        if (jobId in this._activeJobs) {
+            this._activeJobs[jobId] += QUERY_TIMEOUT;
+        } else {
+            this._activeJobs[jobId] = QUERY_TIMEOUT;
+        }
+    }
+
+    async _cancelJob (jobId, reject) {
+        const result = await this.cancel(jobId);
+        delete this._activeJobs[jobId];
+        reject(result);
+    }
+
+    async _getJobResult (jobId, resolve) {
+        const result = await this.getQueryResults(jobId);
+        if (result.jobComplete) {
+            resolve(result);
+        } else {
+            resolve(this._pollingQuery(result));
+        }
     }
 
     async fetch (method, url, body) {
@@ -73,31 +99,5 @@ export default class BQClient {
             body: body && JSON.stringify(body)
         });
         return response.json();
-    }
-
-    async fetchTiles (tiles) {
-        const tilesFilter = tiles.map((tile) => this._tileFilter(tile)).join(' OR ');
-        const sqlQuery = `SELECT z,x,y,mvt FROM \`${this._datasetId}.${this._tableId}\` WHERE ${tilesFilter}`;
-
-        const result = await this.query(sqlQuery);
-
-        const mvts = [];
-        if (result && result.rows) {
-            for (let i = 0; i < result.rows.length; i++) {
-                const row = result.rows[i];
-                if (row.f && row.f.length === 4) {
-                    const z = parseInt(row.f[0]['v']);
-                    const x = parseInt(row.f[1]['v']);
-                    const y = parseInt(row.f[2]['v']);
-                    const mvt = row.f[3]['v'];
-                    mvts.push({ z, x, y, buffer: decode(mvt) });
-                }
-            }
-        }
-        return mvts;
-    }
-
-    _tileFilter (tile) {
-        return `(z = ${tile.z} AND x = ${tile.x} AND y = ${tile.y})`;
     }
 }
