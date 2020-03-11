@@ -24,36 +24,35 @@
             container: 'map',
             style: carto.basemaps.voyager,
             center: [-74.06, 40.89],
-            zoom: 4,
+            zoom: 1,
             pitchWithRotate: false
         });
 
         const project = 'cartodb-gcp-backend-data-team';
-        const tileset = 'mvt_pool.4096_geography_usa_block_2019';
-        const token = '';
+        const tileset = 'alasarr.usa_blocks_tiles';
+        const quadKeyZoom = 8;
+        const token = 'ya29.a0Adw1xeX1r-LcDtb7QzZunm1FVO1FRSdpj1Epun3TUN99pZFG1MzhmORIM0-q9_2wfe4m3L0l0exeVYwXVp6a-NWOB8I1y9bBsz7Ss3lYeYio5PSjO0rJ2NblXfPd42I1OextsMg6DUr3on_xPlvY7TgDxTpz_6Kdm0MqDqbVRPxL3mW9xWV_HdFsKRuuev7chVLDo057Xzef7Gmi1VvRrTitC2WJFMryjHJD7IwaNNGIXxBCTVb52Eflv9Dyg-I7zlxUUrwdoP6lm8I';
 
-        const data = { tileset, project, token };
+        const data = { tileset, project, token, quadKeyZoom };
         const metadata = {
-            idProperty: 'do_num_vertices',
+            idProperty: 'geoid',
             properties: {
-                'do_num_vertices': { type: 'category' }
+                'geoid': { type: 'category' }
             },
             extent: '4096'
         };
         const options = {
             viewportZoomToSourceZoom: (zoom) => {
-                if (zoom > 7) {
-                    return 8;
+                return 1;
+                if (zoom > 9) {
+                    return 10;
                 }
-                if (zoom > 3) {
-                    return 4;
-                }
-                return 0;
+                return null;
             }
         };
 
         const source = new carto.source.BQMVT(data, metadata, options);
-        const viz = new carto.Viz();
+        const viz = new carto.Viz('strokeWidth: 0');
         const layer = new carto.Layer('layer', source, viz);
 
         layer.addTo(map, 'watername_ocean');

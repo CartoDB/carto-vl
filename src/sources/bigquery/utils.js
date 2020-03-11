@@ -1,12 +1,15 @@
 import { decode } from 'base64-arraybuffer';
 
-export async function fetchTiles (tiles, tileset, client) {
-    const tilesFilter = tiles.map((tile) => _tileFilter(tile)).join(' OR ');
-    const sqlQuery = `SELECT z,x,y,mvt FROM \`${tileset}\` WHERE ${tilesFilter}`;
+export async function fetchTiles (client, tiles, tileset, quadKeyZoom) {
+    const quadKeys = getDecimalQuadKeysFromTiles(tiles, quadKeyZoom);
+    const quadKeysFilter = quadKeys.length ? `quadkey IN (${quadKeys})` : 'TRUE';
+    const tilesFilter = tiles.map((tile) => tileFilter(tile)).join(' OR ');
+    const sqlQuery = `
+        SELECT z, x, y, mvt
+        FROM \`${tileset}\`
+        WHERE (${quadKeysFilter}) AND (${tilesFilter})`;
 
     const result = await client.execute(sqlQuery);
-
-    console.log(tiles, result)
 
     const mvts = [];
     if (result && result.rows) {
@@ -24,6 +27,44 @@ export async function fetchTiles (tiles, tileset, client) {
     return mvts;
 }
 
-function _tileFilter (tile) {
+function getDecimalQuadKeysFromTiles (tiles, quadKeyZoom) {
+    if (quadKeyZoom === 0) {
+        return [];
+    }
+
+    let result = new Set();
+    for (let tile of tiles) {
+        result.add(getDecimalQuadKeysFromTile(tile, quadKeyZoom));
+    }
+
+    return [...result].filter(x => x);
+}
+
+function getDecimalQuadKeysFromTile (tile, quadKeyZoom) {
+    if (tile.z === 0) {
+        return null;
+    }
+
+    quadKeyZoom = (quadKeyZoom === undefined || quadKeyZoom === null || quadKeyZoom < 0) ? tile.z : quadKeyZoom;
+
+    let index = '';
+    for (let z0 = tile.z; z0 > 0; z0--) {
+        let b = 0;
+        let mask = 1 << (z0 - 1);
+        if ((tile.x & mask) !== 0) b++;
+        if ((tile.y & mask) !== 0) b += 2;
+        index += b.toString();
+    }
+
+    if (index.length >= quadKeyZoom) {
+        index = index.substring(0, quadKeyZoom);
+    } else {
+        index += '0'.repeat(quadKeyZoom - index.length);
+    }
+
+    return parseInt(index, 4);
+}
+
+function tileFilter (tile) {
     return `(z = ${tile.z} AND x = ${tile.x} AND y = ${tile.y})`;
 }

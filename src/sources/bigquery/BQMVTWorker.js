@@ -49,7 +49,7 @@ export class BQMVTWorker {
     async _requestDataframes (tiles, bqSource, layerID, metadata) {
         const dataframes = [];
         const client = new BQClient(bqSource.project, bqSource.token);
-        const responseTiles = await fetchTiles(tiles, bqSource.tileset, client);
+        const responseTiles = await fetchTiles(client, tiles, bqSource.tileset, bqSource.quadKeyZoom);
         for (let i = 0; i < tiles.length; i++) {
             const t = tiles[i];
             const responseTile = responseTiles && responseTiles.find((rt) => (rt.x === t.x && rt.y === t.y && rt.z === t.z));
@@ -82,8 +82,6 @@ export class BQMVTWorker {
         if (!mvtLayer) {
             return { empty: true };
         }
-
-        console.log(mvtLayer)
 
         const { geometries, properties, propertiesArrayBuffer, numFeatures } = this._decodeMVTLayer(mvtLayer, metadata, MVT_EXTENT);
         const rs = rsys.getRsysFromTile(x, y, z);

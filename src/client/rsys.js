@@ -83,7 +83,11 @@ function tileRsys (x, y, z) {
  * @return {Array} - array of TC tiles {x, y, z}
  */
 export function rTiles (zoom, bounds, viewportZoomToSourceZoom = Math.ceil, extend = 0) {
-    return wRectangleTiles(viewportZoomToSourceZoom(zoom), bounds, extend);
+    const z = viewportZoomToSourceZoom(zoom);
+    if (typeof z === 'number') {
+        return wRectangleTiles(z, bounds, extend);
+    }
+    return [];
 }
 
 /**
