@@ -1,13 +1,14 @@
 import { decode } from 'base64-arraybuffer';
 
 export async function fetchTiles (client, tiles, tileset, quadKeyZoom) {
+    const ids = getDecimalQuadKeysFromTiles(tiles);
+    const idsFilter = ids.length ? `id IN (${ids})` : 'TRUE';
     const quadKeys = getDecimalQuadKeysFromTiles(tiles, quadKeyZoom);
     const quadKeysFilter = quadKeys.length ? `quadkey IN (${quadKeys})` : 'TRUE';
-    const tilesFilter = tiles.map((tile) => tileFilter(tile)).join(' OR ');
     const sqlQuery = `
         SELECT z, x, y, mvt
         FROM \`${tileset}\`
-        WHERE (${quadKeysFilter}) AND (${tilesFilter})`;
+        WHERE (${quadKeysFilter}) AND (${idsFilter})`;
 
     const result = await client.execute(sqlQuery);
 
@@ -37,7 +38,7 @@ function getDecimalQuadKeysFromTiles (tiles, quadKeyZoom) {
         result.add(getDecimalQuadKeysFromTile(tile, quadKeyZoom));
     }
 
-    return [...result].filter(x => x);
+    return [...result].filter(x => x !== null);
 }
 
 function getDecimalQuadKeysFromTile (tile, quadKeyZoom) {
@@ -63,8 +64,4 @@ function getDecimalQuadKeysFromTile (tile, quadKeyZoom) {
     }
 
     return parseInt(index, 4);
-}
-
-function tileFilter (tile) {
-    return `(z = ${tile.z} AND x = ${tile.x} AND y = ${tile.y})`;
 }
