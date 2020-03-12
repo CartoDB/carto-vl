@@ -30,7 +30,8 @@ export default class BigQueryClient {
             kind: 'bigquery#queryRequest',
             query: sqlQuery,
             useLegacySql: false,
-            timeoutMs: QUERY_TIMEOUT
+            timeoutMs: QUERY_TIMEOUT,
+            useQueryCache: true
         });
     }
 

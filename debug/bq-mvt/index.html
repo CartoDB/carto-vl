@@ -24,14 +24,14 @@
             container: 'map',
             style: carto.basemaps.voyager,
             center: [-74.06, 40.89],
-            zoom: 10,
+            zoom: 0,
             pitchWithRotate: false
         });
 
         const project = 'cartodb-gcp-backend-data-team';
-        const tileset = 'jarroyo_tests.usa_blocks_tiles_id';
+        const tileset = 'jarroyo_tests.usa_blocks_tiles_z_x_y';
         const quadKeyZoom = 8;
-        const token = 'ya29.a0Adw1xeVYhKciYn5syucknvbrt0Y6uWgdDLWacRHyQeqHQa7lA-nhbXG1-HHx_HnaJSl-rWoHBSSbDdQah_fbwth321czdR7CsuBa8nK-4gU7h1PSrNcgjb58YKGqC9R_5mW7Lgdc-Y81U9_miL3Hgsa2mq3R3_mUdnfJ4P1ps3lNo_ouikM-0c3p-ELoLM4ZslXpHXHTr5GbbH6Gy6ReFROqoJ-_KsS9dz_D-ZJihehnLvhmLt1AMcfeaCF4imki-1cSD4GMZ3RI_tg';
+        const token = 'ya29.a0Adw1xeV2ofcaBJm0OUE95Pdx9-aLDUrBNyXPTPsEnmDF4GIZNQGrFOHZIUy3bpp0Nd5f-ma9yK5WAwDhq-UK1rRlS8XRybKns5I8V-_6W91zvFJeEbWhoN5KJ6pynuwYzYWMsNl488i2tyyUcE2Kjr6oddvSjxXV-WToUPsyCY0_9PYMGgLzjjcu32pam0tLi-0xvU2LAb8XjW477Io9Q2pJCNQRk7Iq7R8MWTPnHI4FiqnkNJC8_yiOMuUyJ3jdJTgLBb4rvqSBT8I';
 
         const data = { tileset, project, token, quadKeyZoom };
         const metadata = {
@@ -51,7 +51,7 @@
         };
 
         const source = new carto.source.BQMVT(data, metadata, options);
-        const viz = new carto.Viz('strokeColor: opacity(white, 0.5)');
+        const viz = new carto.Viz('color:yellow; strokeColor: opacity(red, 0.5)');
         const layer = new carto.Layer('layer', source, viz);
 
         layer.addTo(map, 'watername_ocean');
