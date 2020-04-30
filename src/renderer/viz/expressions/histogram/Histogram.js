@@ -25,6 +25,10 @@ export default class Histogram extends BaseExpression {
         return this.value;
     }
 
+    getAllCategories () {
+        return this._categories || [];
+    }
+
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
         this._metadata = metadata;
