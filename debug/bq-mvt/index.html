@@ -23,35 +23,22 @@
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.voyager,
-            center: [-74.06, 40.89],
-            zoom: 0,
+            center: [-76.124268, 38.933775],
+            zoom: 12,
             pitchWithRotate: false
         });
 
         const project = 'cartodb-gcp-backend-data-team';
-        const tileset = 'jarroyo_tests.usa_blocks_tiles_z_x_y';
-        const quadKeyZoom = 8;
-        const token = 'ya29.a0Adw1xeV2ofcaBJm0OUE95Pdx9-aLDUrBNyXPTPsEnmDF4GIZNQGrFOHZIUy3bpp0Nd5f-ma9yK5WAwDhq-UK1rRlS8XRybKns5I8V-_6W91zvFJeEbWhoN5KJ6pynuwYzYWMsNl488i2tyyUcE2Kjr6oddvSjxXV-WToUPsyCY0_9PYMGgLzjjcu32pam0tLi-0xvU2LAb8XjW477Io9Q2pJCNQRk7Iq7R8MWTPnHI4FiqnkNJC8_yiOMuUyJ3jdJTgLBb4rvqSBT8I';
+        const dataset = 'carto_tilesets'
+        const tileset = 'unacast_16';
+        const token = 'ya29.a0AfH6SMCUjrwt8sRixYu7_ElLEaw4JpxojCspFWipM_h4lBbDiiWcw2yCKRvFIz7tWit8O00v-cLEvp3gkoOtIwksLn3BHNsTWrUKKpLJuzB4-jQPTD9CNfyvKutXPqJp7o7ryGavG813Fa2lgl3H7PhOLeia0qnveEx7EZgVcVB8kXUHxq58ZkQ5_pOFjsIupoIhZzK_HY93H3DsEqZKVkkiBelOJIzYb02UjtSMedrBvMpmVjBZt7d4fMfjzgOzwDxFNVKziwu8Hg';
 
-        const data = { tileset, project, token, quadKeyZoom };
-        const metadata = {
-            idProperty: 'geoid',
-            properties: {
-                'geoid': { type: 'category' }
-            },
-            extent: '4096'
-        };
-        const options = {
-            viewportZoomToSourceZoom: (zoom) => {
-                if (zoom > 11) {
-                    return 11;
-                }
-                return Math.ceil(zoom);
-            }
-        };
+        const data = { project, dataset, tileset, token };
 
-        const source = new carto.source.BQMVT(data, metadata, options);
-        const viz = new carto.Viz('color:yellow; strokeColor: opacity(red, 0.5)');
+        const source = new carto.source.BQMVT(data, { fitBounds: false });
+        const viz = new carto.Viz(`
+            width: ramp(buckets($device_horizontal_accuracy, [10, 100]), [2, 14])
+        `);
         const layer = new carto.Layer('layer', source, viz);
 
         layer.addTo(map, 'watername_ocean');

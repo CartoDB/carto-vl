@@ -42,7 +42,7 @@ export default class BigQueryClient {
     async execute (sqlQuery) {
         const result = await this.query(sqlQuery);
         if (result.error) {
-            return result;
+            throw Error(`[${result.error.status}] ${result.error.message}`);
         }
         return this._pollingQuery(result);
     }

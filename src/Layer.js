@@ -297,6 +297,16 @@ export default class Layer {
         newSource.bindLayer(this._onDataframeAdded.bind(this));
         if (newSource !== this._source) {
             this._freeSource();
+        } else {
+            // Test: set bounds from tileset metadata
+            if (newSource._tilesetOptions.fitBounds) {
+                let rawCenter = newSource._tilesetMetadata.center;
+                if (rawCenter) {
+                    rawCenter = rawCenter.split(',');
+                    this.map.setCenter([rawCenter[0], rawCenter[1]]);
+                    this.map.setZoom(rawCenter[2]);
+                }
+            }
         }
         this._source = newSource;
     }

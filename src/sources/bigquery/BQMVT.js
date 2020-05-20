@@ -3,22 +3,23 @@ import Dataframe from '../../renderer/dataframe/Dataframe';
 import Metadata from '../../renderer/Metadata';
 import MVTMetadata from '../MVTMetadata';
 import Base from '../Base';
+import BQClient from './BQClient';
 import BQTileClient from './BQTileClient';
 import Worker from '../MVTWorkers.worker';
+import { fetchMetadata } from './utils';
 
 /*
  *  This is a PoC based on the MVT source to fetch the tiles directly from BigQuery
  */
 
 export default class BQMVT extends Base {
-    constructor (bqSource, metadata = new MVTMetadata(), options) {
+    constructor (bqSource, options = {}) {
         super();
 
+        this._metadata = null;
         this._bqSource = bqSource;
+        this._tilesetOptions = { ...{ fitBounds: false }, ...options };
         this._tileClient = new BQTileClient();
-
-        this._initMetadata(metadata);
-        this._initOptions(options);
 
         this._workerDispatch = {};
         this._mID = 0;
@@ -79,15 +80,52 @@ export default class BQMVT extends Base {
     }
 
     _clone () {
-        return new BQMVT(this._bqSource, JSON.parse(JSON.stringify(this._metadata)), this._options);
+        return this;
     }
 
     bindLayer (addDataframe) {
         this._tileClient.bindLayer(addDataframe);
     }
 
-    requestMetadata () {
+    async requestMetadata () {
+        if (!this._metadata) {
+            await this.initMetadata(this._bqSource);
+        }
         return this._metadata;
+    }
+
+    async initMetadata (bqSource) {
+        const client = new BQClient(bqSource.project, bqSource.token);
+        this._tilesetMetadata = await fetchMetadata(client, bqSource.dataset, bqSource.tileset);
+
+        const properties = {};
+        const tilesetProps = JSON.parse(this._tilesetMetadata.properties);
+
+        for (let key in tilesetProps) {
+            const prop = tilesetProps[key];
+            const type = prop.type === 'STRING' ? 'category' : 'number';
+            properties[key] = { type };
+        }
+
+        const metadata = {
+            idProperty: this._tilesetMetadata.id || 'identifier',
+            properties,
+            extent: parseInt(this._tilesetMetadata.tile_extent)
+        };
+
+        const maxZoom = parseInt(this._tilesetMetadata.maxzoom);
+        const options = {
+            maxZoom,
+            viewportZoomToSourceZoom: (zoom) => {
+                if (zoom > maxZoom) {
+                    return maxZoom;
+                }
+                return Math.ceil(zoom);
+            }
+        };
+
+        this._initMetadata(metadata);
+        this._initOptions(options);
     }
 
     requestData (zoom, viewport) {
@@ -114,6 +152,7 @@ export default class BQMVT extends Base {
             tiles,
             bqSource: this._bqSource,
             layerID: this._options.layerID,
+            tilesetMetadata: this._tilesetMetadata,
             metadata: this._metadataSent ? undefined : this._metadata,
             mID: this._mID,
             workerName: this._workerName

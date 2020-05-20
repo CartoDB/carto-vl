@@ -1,15 +1,14 @@
 import { decode } from 'base64-arraybuffer';
+import { inflate } from 'pako';
 
-export async function fetchTiles (client, tiles, tileset, quadKeyZoom) {
-    // const quadkeys = tiles.map((tile) => `'${getQuadkeyFromTile(tile)}'`);
-    // const quadkeys = tiles.map((tile) => getOnedIntegerQuadkeyFromTile(tile));
-    // const quadkeysFilter = quadkeys.length ? `quadkey IN (${quadkeys})` : 'TRUE';
+export async function fetchTiles (client, tiles, dataset, tileset, tilesetMetadata) {
+    const quadKeyZoom = parseInt(tilesetMetadata.carto_quadkey_zoom);
     const parentQuadkeys = getParentIntegerQuadkeysFromTiles(tiles, quadKeyZoom);
-    const parentQuadkeysFilter = parentQuadkeys.length ? `parent_quadkey IN (${parentQuadkeys})` : 'TRUE';
+    const parentQuadkeysFilter = parentQuadkeys.length ? `carto_quadkey IN (${parentQuadkeys})` : 'TRUE';
     const tilesFilter = tiles.map((tile) => tileFilter(tile)).join(' OR ');
     const sqlQuery = `
-        SELECT z, x, y, mvt
-        FROM \`${tileset}\`
+        SELECT zoom_level, tile_column, tile_row, tile_data
+        FROM \`${dataset}.${tileset}\`
         WHERE (${parentQuadkeysFilter}) AND (${tilesFilter})`;
 
     const begin = (new Date()).getTime();
@@ -24,11 +23,13 @@ export async function fetchTiles (client, tiles, tileset, quadKeyZoom) {
         for (let i = 0; i < result.rows.length; i++) {
             const row = result.rows[i];
             if (row.f && row.f.length === 4) {
-                const z = parseInt(row.f[0]['v']);
-                const x = parseInt(row.f[1]['v']);
-                const y = parseInt(row.f[2]['v']);
-                const mvt = row.f[3]['v'];
-                mvts.push({ z, x, y, buffer: decode(mvt) });
+                const z = parseInt(row.f[0].v);
+                const x = parseInt(row.f[1].v);
+                const y = parseInt(row.f[2].v);
+                const mvt = tilesetMetadata.compression === 'gzip'
+                    ? inflate(atob(row.f[3].v))
+                    : decode(row.f[3].v);
+                mvts.push({ z, x, y, buffer: mvt });
                 missedTiles = missedTiles.filter((t) => !(t.z === z && t.x === x && t.y === y));
             }
         }
@@ -36,7 +37,7 @@ export async function fetchTiles (client, tiles, tileset, quadKeyZoom) {
         console.log(`${mvts.length}/${result.totalRows}`);
 
         if (result.totalRows > mvts.length) {
-            const missedmvts = await fetchTiles(client, missedTiles, tileset, quadKeyZoom);
+            const missedmvts = await fetchTiles(client, missedTiles, dataset, tileset, tilesetMetadata);
             mvts = mvts.concat(missedmvts);
         }
     }
@@ -44,16 +45,35 @@ export async function fetchTiles (client, tiles, tileset, quadKeyZoom) {
     return mvts;
 }
 
-function getQuadkeyFromTile (tile) {
-    return getQuadkeyFromTileIndex(tile, '');
+export async function fetchMetadata (client, dataset, tileset) {
+    const sqlQuery = `
+        SELECT name, value
+        FROM \`${dataset}.metadata\`
+        WHERE table_name = '${tileset}'`;
+
+    const begin = (new Date()).getTime();
+    const result = await client.execute(sqlQuery);
+    const end = (new Date()).getTime();
+
+    const metadata = {};
+
+    if (result && result.rows) {
+        for (let i = 0; i < result.rows.length; i++) {
+            const row = result.rows[i];
+            if (row.f && row.f.length === 2) {
+                metadata[row.f[0].v] = row.f[1].v;
+            }
+        }
+    }
+
+    console.log(end - begin);
+
+    return metadata;
 }
 
-// function getOnedIntegerQuadkeyFromTile (tile) {
-//     let index = getQuadkeyFromTileIndex(tile, '1');
-//     return parseInt(index, 4);
-// }
+function getQuadkeyFromTile (tile) {
+    let index = '';
 
-function getQuadkeyFromTileIndex (tile, index) {
     for (let z0 = tile.z; z0 > 0; z0--) {
         let b = 0;
         let mask = 1 << (z0 - 1);
@@ -97,5 +117,5 @@ function getParentIntegerQuadkeysFromTiles (tiles, zOutput) {
 }
 
 function tileFilter (tile) {
-    return `(z = ${tile.z} AND x = ${tile.x} AND y = ${tile.y})`;
+    return `(zoom_level = ${tile.z} AND tile_column = ${tile.x} AND tile_row = ${tile.y})`;
 }

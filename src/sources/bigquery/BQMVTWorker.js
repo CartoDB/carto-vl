@@ -34,7 +34,7 @@ export class BQMVTWorker {
             this.castMetadata(params.metadata);
             this.metadata = params.metadata;
         }
-        const dataframes = await this._requestDataframes(params.tiles, params.bqSource, params.layerID, this.metadata);
+        const dataframes = await this._requestDataframes(params.tiles, params.bqSource, params.layerID, params.tilesetMetadata, this.metadata);
         return {
             mID: params.mID,
             dataframes
@@ -46,10 +46,10 @@ export class BQMVTWorker {
         metadata.setCodecs();
     }
 
-    async _requestDataframes (tiles, bqSource, layerID, metadata) {
+    async _requestDataframes (tiles, bqSource, layerID, tilesetMetadata, metadata) {
         const dataframes = [];
         const client = new BQClient(bqSource.project, bqSource.token);
-        const responseTiles = await fetchTiles(client, tiles, bqSource.tileset, bqSource.quadKeyZoom);
+        const responseTiles = await fetchTiles(client, tiles, bqSource.dataset, bqSource.tileset, tilesetMetadata);
         for (let i = 0; i < tiles.length; i++) {
             const t = tiles[i];
             const responseTile = responseTiles && responseTiles.find((rt) => (rt.x === t.x && rt.y === t.y && rt.z === t.z));
