@@ -5,7 +5,7 @@ import CategoryIndex from './CategoryIndex';
 import ListImage from './ListImage';
 import Image from './Image';
 import Base from './base';
-import { OTHERS_GLSL_VALUE, DEFAULT_RAMP_OTHERS } from './constants';
+import { OTHERS_GLSL_VALUE, DEFAULT_RAMP_OTHERS, SORT_DESC } from './constants';
 
 const DEFAULT_RAMP_OTHERS_IMAGE = new Image(defaultSVGs.circle);
 export default class RampImage extends Base {
@@ -49,10 +49,14 @@ export default class RampImage extends Base {
     getLegendData (options) {
         const type = this.input.type;
         const legendData = this.input.getLegendData(options);
-        const data = legendData.data.map(({ key, value }) => {
+        let data = legendData.data.map(({ key, value }) => {
             value = this._calcEval(value);
             return { key, value };
         });
+
+        if (options && options.order && options.order === SORT_DESC) {
+            data = data.sort((a, b) => b.key - a.key);
+        }
 
         return { type, ...legendData, data };
     }

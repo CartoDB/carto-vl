@@ -4,7 +4,7 @@ import Property from './basic/property';
 import Linear from './linear';
 import CIELabGLSL from './color/CIELab.glsl';
 import CategoryIndex from './CategoryIndex';
-import { OTHERS_GLSL_VALUE, OTHERS_INDEX, DEFAULT_OPTIONS, DEFAULT_RAMP_OTHERS } from './constants';
+import { OTHERS_GLSL_VALUE, OTHERS_INDEX, DEFAULT_OPTIONS, DEFAULT_RAMP_OTHERS, SORT_DESC } from './constants';
 import Palette from './color/palettes/Palette';
 import Base from './base';
 import Constant from './basic/constant';
@@ -76,11 +76,18 @@ export default class RampGeneric extends Base {
     getLegendData (options) {
         const config = Object.assign({}, DEFAULT_OPTIONS, options);
         const type = this.input.type;
-        const legendData = this.input.getLegendData(config);
-        const data = legendData.data.map(({ key, value }) => {
-            value = this._calcEval(value, undefined);
-            return { key, value };
-        });
+        let legendData = this.input.getLegendData(config);
+        let data = legendData.data
+            .map(({ key, value }) => {
+                value = this._calcEval(value, undefined);
+                return { key, value };
+            });
+
+        if (config.order && config.order === SORT_DESC) {
+            data = _checkBuckets(data)
+                ? _sortNumericValues(data, config.order)
+                : _sortCategoricalValues(data, config.order);
+        }
 
         return { type, ...legendData, data };
     }
@@ -155,4 +162,26 @@ function _mixClampGLSL (currentValue, nextBlend, index, listLength) {
     const clamp = `clamp((x - ${min})/${max}, 0., 1.)`;
 
     return `mix(${currentValue}, ${nextBlend}, ${clamp})`;
+}
+
+function _sortCategoricalValues (data, order) {
+    return order === SORT_DESC
+        ? data.sort((a, b) => b.key.localeCompare(a.key))
+        : data.sort((a, b) => a.key.localeCompare(b.key));
+}
+
+function _sortNumericValues (data, order) {
+    if (Array.isArray(data[0].key)) {
+        return order === SORT_DESC
+            ? data.sort((a, b) => b.key[0] - a.key[0])
+            : data;
+    }
+
+    return order === SORT_DESC
+        ? data.sort((a, b) => b.key - a.key)
+        : data;
+}
+
+function _checkBuckets (data) {
+    return data[0] && (Array.isArray(data[0].key) || (typeof data[0].key === 'number'));
 }
