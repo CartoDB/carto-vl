@@ -3,27 +3,41 @@ import Dataframe from '../../renderer/dataframe/Dataframe';
 import Metadata from '../../renderer/Metadata';
 import MVTMetadata from '../MVTMetadata';
 import Base from '../Base';
-import BQClient from './BQClient';
-import BQTileClient from './BQTileClient';
-import Worker from '../MVTWorkers.worker';
-import { fetchMetadata } from './utils';
+import BigQueryTileClient from './BQTileClient';
+import BigQueryTilesetClient from './BQTilesetClient';
+import Worker from '../Workers.worker';
 
-/*
- *  This is a PoC based on the MVT source to fetch the tiles directly from BigQuery
+/**
+ * BigQueryTileset source: PoC based on the MVT source to fetch tiles directly from a tileset in BigQuery.
+ *
+ * @param {object} data - BigQuery data to reference the tileset:
+ * @param {string} data.project - The name of the BigQuery project.
+ * @param {string} data.dataset - The name of the BigQuery dataset.
+ * @param {string} data.tileset - The name of the BigQuery tileset table.
+ * @param {string} data.token   - The token to authorize requests to the BigQuery project.
+ *
+ * @param {object} [metadata] - Optional attributes to overwrite tileset metadata:
+ * @param {string} [metadata.id_property] - The name of the ID property ('cartodb_id', 'geoid').
+ * @param {object} [metadata.properties]  - The information about available columns and types in the MVT ('{"geoid": {"type": "STRING"}, ...').
+ * @param {string} [metadata.maxzoom]     - The maximum zoom with tiles data ('14').
+ * @param {string} [metadata.minzoom]     - The minimum zoom with tiles data ('4').
+ * @param {string} [metadata.center]      - The initial position and zoom of the map ('-76.124268,38.933775,14')
+ * @param {string} [metadata.bounds]      - The global bounds with tiles data available ('78.178689,0.000000,0.000000,39.719731').
+ * @param {string} [metadata.compression] - The type of tile compression ('gzip').
+ * @param {string} [metadata.tile_extent] - The size and resolution of the tile ('4096').
+ * @param {string} [metadata.carto_quadkey_zoom] - The zoom level for quadkey optimization ('8')
  */
-
-export default class BQMVT extends Base {
-    constructor (bqSource, options = {}) {
+export default class BigQueryTileset extends Base {
+    constructor (data, metadata = {}) {
         super();
 
-        this._metadata = null;
-        this._bqSource = bqSource;
-        this._tilesetOptions = { ...{ fitBounds: false }, ...options };
-        this._tileClient = new BQTileClient();
+        this._tilesetData = data;
+        this._tilesetMetadata = metadata;
+        this._tileClient = new BigQueryTileClient();
 
-        this._workerDispatch = {};
         this._mID = 0;
-        this._workerName = 'BQMVT';
+        this._workerDispatch = {};
+        this._workerName = 'BigQueryTileset';
     }
 
     _initMetadata (metadata) {
@@ -38,7 +52,6 @@ export default class BQMVT extends Base {
     _initOptions (options) {
         if (options === undefined) {
             options = {
-                layerID: undefined,
                 viewportZoomToSourceZoom: Math.ceil,
                 maxZoom: undefined
             };
@@ -89,14 +102,16 @@ export default class BQMVT extends Base {
 
     async requestMetadata () {
         if (!this._metadata) {
-            await this.initMetadata(this._bqSource);
+            await this.initMetadata();
         }
         return this._metadata;
     }
 
-    async initMetadata (bqSource) {
-        const client = new BQClient(bqSource.project, bqSource.token);
-        this._tilesetMetadata = await fetchMetadata(client, bqSource.dataset, bqSource.tileset);
+    async initMetadata () {
+        const client = new BigQueryTilesetClient(this._tilesetData.project, this._tilesetData.token);
+        const tilesetMetadata = await client.fetchMetadata(this._tilesetData.dataset, this._tilesetData.tileset);
+
+        this._tilesetMetadata = { ...tilesetMetadata, ...this._tilesetMetadata };
 
         const properties = {};
         const tilesetProps = JSON.parse(this._tilesetMetadata.properties);
@@ -108,7 +123,7 @@ export default class BQMVT extends Base {
         }
 
         const metadata = {
-            idProperty: this._tilesetMetadata.id || 'identifier',
+            idProperty: this._tilesetMetadata.id_property,
             properties,
             extent: parseInt(this._tilesetMetadata.tile_extent)
         };
@@ -150,8 +165,7 @@ export default class BQMVT extends Base {
     _postMessageToWorker (tiles) {
         this._worker.postMessage({
             tiles,
-            bqSource: this._bqSource,
-            layerID: this._options.layerID,
+            tilesetData: this._tilesetData,
             tilesetMetadata: this._tilesetMetadata,
             metadata: this._metadataSent ? undefined : this._metadata,
             mID: this._mID,

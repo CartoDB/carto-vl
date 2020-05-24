@@ -30,12 +30,13 @@
 
         const project = 'cartodb-gcp-backend-data-team';
         const dataset = 'carto_tilesets'
-        const tileset = 'unacast_16';
-        const token = 'ya29.a0AfH6SMCUjrwt8sRixYu7_ElLEaw4JpxojCspFWipM_h4lBbDiiWcw2yCKRvFIz7tWit8O00v-cLEvp3gkoOtIwksLn3BHNsTWrUKKpLJuzB4-jQPTD9CNfyvKutXPqJp7o7ryGavG813Fa2lgl3H7PhOLeia0qnveEx7EZgVcVB8kXUHxq58ZkQ5_pOFjsIupoIhZzK_HY93H3DsEqZKVkkiBelOJIzYb02UjtSMedrBvMpmVjBZt7d4fMfjzgOzwDxFNVKziwu8Hg';
+        const tileset = 'unacast_14';
+        const token = 'ya29.a0AfH6SMD_Kmzd9FwNGA_oBPyc0XYMghdxkUTuSukqk3nBEs76j0DoQL85qW-d4P6kfBHBoOAJfsxqGy-NRahrJ0Lj_f0iIhC5shj4D7kFXyYgjZkSoEq0W4ULI_P_7kCf7bXSCu7c_lkgxVwCwM7UBb51J0-AlLE5KAtWzHnP-rZeMxxIrTOwi13Sep_RF2J7nY0XsQnVcUciG6YPFD5aL1pBmntxsrkY2arWmY8UTDoqeUy421iuO3rPtK5r-fSJxgfaBRK4cA8DAA';
 
         const data = { project, dataset, tileset, token };
+        const metadata = { id_property: 'identifier', center: null }
 
-        const source = new carto.source.BQMVT(data, { fitBounds: false });
+        const source = new carto.source.BigQueryTileset(data, metadata);
         const viz = new carto.Viz(`
             width: ramp(buckets($device_horizontal_accuracy, [10, 100]), [2, 14])
         `);
