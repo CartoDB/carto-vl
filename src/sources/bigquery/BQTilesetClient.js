@@ -70,11 +70,13 @@ export default class BigQueryTilesetClient {
     }
 
     async _execute (sqlQuery) {
+        console.log('>');
+
         const begin = (new Date()).getTime();
         const result = await this._client.execute(sqlQuery);
         const end = (new Date()).getTime();
 
-        console.log(end - begin);
+        console.log('<', end - begin);
 
         return result;
     }

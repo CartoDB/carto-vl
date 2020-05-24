@@ -139,6 +139,15 @@ export default class BigQueryTileset extends Base {
             }
         };
 
+        if (this._tilesetMetadata.center) {
+            const rawCenter = this._tilesetMetadata.center.split(',');
+            this._tilesetMetadata.center = {
+                longitude: parseFloat(rawCenter[0]),
+                latitude: parseFloat(rawCenter[1]),
+                zoom: parseInt(rawCenter[2])
+            };
+        }
+
         this._initMetadata(metadata);
         this._initOptions(options);
     }

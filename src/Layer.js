@@ -298,14 +298,11 @@ export default class Layer {
         if (newSource !== this._source) {
             this._freeSource();
         } else {
-            // Test: set center,zoom from tileset metadata
-            if (newSource._tilesetMetadata) {
-                let rawCenter = newSource._tilesetMetadata.center;
-                if (rawCenter) {
-                    rawCenter = rawCenter.split(',');
-                    this.map.setCenter([rawCenter[0], rawCenter[1]]);
-                    this.map.setZoom(parseInt(rawCenter[2]));
-                }
+            // Test: set center from tileset metadata
+            if (newSource._tilesetMetadata && newSource._tilesetMetadata.center) {
+                const center = newSource._tilesetMetadata.center;
+                this.map.setCenter([center.longitude, center.latitude]);
+                this.map.setZoom(center.zoom);
             }
         }
         this._source = newSource;

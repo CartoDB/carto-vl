@@ -46,45 +46,44 @@ export class BigQueryTilesetWorker {
     }
 
     async _requestDataframes (tiles, tilesetData, tilesetMetadata, metadata) {
-        const dataframes = [];
         const client = new BigQueryTilesetClient(tilesetData.project, tilesetData.token);
         const responseTiles = await client.fetchTiles(tiles, tilesetData.dataset, tilesetData.tileset, tilesetMetadata);
-        for (let i = 0; i < tiles.length; i++) {
-            const t = tiles[i];
+        const dataframes = await Promise.all(tiles.map((t) => {
             const responseTile = responseTiles && responseTiles.find((rt) => (rt.x === t.x && rt.y === t.y && rt.z === t.z));
             if (responseTile) {
-                const dataframe = await this.responseToDataframeTransformer(responseTile, metadata);
-                dataframes.push(dataframe);
+                return this.responseToDataframeTransformer(responseTile, metadata);
             } else {
-                dataframes.push({ x: t.x, y: t.y, z: t.z, empty: true });
+                return { x: t.x, y: t.y, z: t.z, empty: true };
             }
-        }
+        }));
         return dataframes;
     }
 
-    async responseToDataframeTransformer ({ x, y, z, buffer }, metadata) {
-        const MVT_EXTENT = metadata.extent;
-        if (buffer.byteLength === 0) {
-            return { x, y, z, empty: true };
-        }
-        const tile = new VectorTile(new Protobuf(buffer));
+    responseToDataframeTransformer ({ x, y, z, buffer }, metadata) {
+        return new Promise((resolve) => {
+            const MVT_EXTENT = metadata.extent;
+            if (buffer.byteLength === 0) {
+                return resolve({ x, y, z, empty: true });
+            }
+            const tile = new VectorTile(new Protobuf(buffer));
 
-        if (Object.keys(tile.layers).length > 1) {
-            throw new CartoValidationError(
-                `LayerID parameter wasn't specified and the MVT tile contains multiple layers: ${JSON.stringify(Object.keys(tile.layers))}.`,
-                CartoValidationErrorTypes.MISSING_REQUIRED
-            );
-        }
+            if (Object.keys(tile.layers).length > 1) {
+                throw new CartoValidationError(
+                    `LayerID parameter wasn't specified and the MVT tile contains multiple layers: ${JSON.stringify(Object.keys(tile.layers))}.`,
+                    CartoValidationErrorTypes.MISSING_REQUIRED
+                );
+            }
 
-        const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
+            const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
 
-        if (!mvtLayer) {
-            return { empty: true };
-        }
+            if (!mvtLayer) {
+                return resolve({ empty: true });
+            }
 
-        const { geometries, properties, propertiesArrayBuffer, numFeatures } = this._decodeMVTLayer(mvtLayer, metadata, MVT_EXTENT);
-        const rs = rsys.getRsysFromTile(x, y, z);
-        return this._generateDataFrame(rs, geometries, properties, propertiesArrayBuffer, numFeatures, metadata.geomType, metadata, x, y, z);
+            const { geometries, properties, propertiesArrayBuffer, numFeatures } = this._decodeMVTLayer(mvtLayer, metadata, MVT_EXTENT);
+            const rs = rsys.getRsysFromTile(x, y, z);
+            resolve(this._generateDataFrame(rs, geometries, properties, propertiesArrayBuffer, numFeatures, metadata.geomType, metadata, x, y, z));
+        });
     }
 
     _decodeMVTLayer (mvtLayer, metadata, mvtExtent) {
