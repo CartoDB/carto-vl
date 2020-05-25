@@ -1,13 +1,13 @@
-import BQDataframeCache from './BQDataframeCache';
+import BigQueryTileCache from './BQTileCache';
 import { rTiles } from '../../client/rsys';
 import { isSetsEqual } from '../../utils/util';
 
-export default class BQTileClient {
+export default class BigQueryTileClient {
     constructor () {
         this._nextGroupID = 0;
         this._currentRequestGroupID = 0;
         this._oldDataframes = [];
-        this._cache = new BQDataframeCache();
+        this._cache = new BigQueryTileCache();
     }
 
     bindLayer (addDataframe) {
@@ -15,14 +15,14 @@ export default class BQTileClient {
     }
 
     requestData (zoom, viewport, requestDataframes, viewportZoomToSourceZoom = Math.ceil) {
-        const extend = 1; // one-tile ring over the viewport
+        const extend = 0; // one-tile ring over the viewport
         const tiles = rTiles(zoom, viewport, viewportZoomToSourceZoom, extend);
         return this._getTiles(tiles, requestDataframes);
     }
 
     free () {
         this._cache.free();
-        this._cache = new BQDataframeCache();
+        this._cache = new BigQueryTileCache();
         this._oldDataframes = [];
     }
 

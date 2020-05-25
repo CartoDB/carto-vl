@@ -297,6 +297,13 @@ export default class Layer {
         newSource.bindLayer(this._onDataframeAdded.bind(this));
         if (newSource !== this._source) {
             this._freeSource();
+        } else {
+            // Test: set center from tileset metadata
+            if (newSource._tilesetMetadata && newSource._tilesetMetadata.center) {
+                const center = newSource._tilesetMetadata.center;
+                this.map.setCenter([center.longitude, center.latitude]);
+                this.map.setZoom(center.zoom);
+            }
         }
         this._source = newSource;
     }

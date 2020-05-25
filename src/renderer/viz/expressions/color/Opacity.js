@@ -71,6 +71,7 @@ export default class Opacity extends BaseExpression {
             return { ...legend, data };
         } else {
             const data = legend.data;
+
             return { ...legend, data, alpha };
         }
     }

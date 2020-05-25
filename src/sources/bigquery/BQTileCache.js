@@ -1,6 +1,6 @@
 import * as LRU from 'lru-cache';
 
-export default class BQDataframeCache {
+export default class BigQueryTileCache {
     constructor () {
         const lruOptions = {
             max: 512,
