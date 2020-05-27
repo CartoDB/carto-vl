@@ -21,6 +21,8 @@ const MVT_TO_CARTO_TYPES = {
     3: GEOMETRY_TYPE.POLYGON
 };
 
+const DEFAULT_ID_PROPERTY = '___id';
+
 export class BigQueryTilesetWorker {
     // Worker API
     onmessage (event) {
@@ -130,9 +132,9 @@ export class BigQueryTilesetWorker {
         const scalarPropertyCodecs = this._scalarPropertyCodecs(metadata);
         const rangePropertyCodecs = this._rangePropertyCodecs(metadata);
         for (let i = 0; i < mvtLayer.length; i++) {
-            const f = mvtLayer.feature(i);
-            this._checkType(f, metadata.geomType);
-            const geom = f.loadGeometry();
+            const feature = mvtLayer.feature(i);
+            this._checkType(feature, metadata.geomType);
+            const geom = feature.loadGeometry();
             if (decodeFn) {
                 const decodedPolygons = decodeFn(geom, mvtExtent);
                 geometries.push(decodedPolygons);
@@ -152,13 +154,7 @@ export class BigQueryTilesetWorker {
                 pointGeometries[6 * numFeatures + 4] = x;
                 pointGeometries[6 * numFeatures + 5] = y;
             }
-            if (f.properties[metadata.idProperty] === undefined) {
-                throw new CartoRuntimeError(
-                    `MVT feature with undefined idProperty '${metadata.idProperty}'`,
-                    CartoRuntimeErrorTypes.MVT
-                );
-            }
-            this._decodeProperties(metadata, scalarPropertyCodecs, rangePropertyCodecs, properties, f, numFeatures);
+            this._decodeProperties(metadata, scalarPropertyCodecs, rangePropertyCodecs, properties, feature, numFeatures);
             numFeatures++;
         }
 
@@ -227,7 +223,9 @@ export class BigQueryTilesetWorker {
         let length = scalarPropertyCodecs.length;
         for (let j = 0; j < length; j++) {
             const [propertyName, codec] = scalarPropertyCodecs[j];
-            const propertyValue = feature.properties[propertyName];
+            const propertyValue = (propertyName === DEFAULT_ID_PROPERTY)
+                ? feature.id
+                : feature.properties[propertyName];
             properties[propertyName][i] = codec.sourceToInternal(metadata, propertyValue);
         }
 

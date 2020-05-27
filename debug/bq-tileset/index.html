@@ -23,22 +23,22 @@
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.voyager,
-            center: [-76.124268, 38.933775],
-            zoom: 12,
+            // center: [-76.124268, 38.933775],
+            // zoom: 12,
             pitchWithRotate: false
         });
 
         const project = 'cartodb-gcp-backend-data-team';
         const dataset = 'carto_tilesets'
-        const tileset = 'unacast_14';
-        const token = 'ya29.a0AfH6SMD_Kmzd9FwNGA_oBPyc0XYMghdxkUTuSukqk3nBEs76j0DoQL85qW-d4P6kfBHBoOAJfsxqGy-NRahrJ0Lj_f0iIhC5shj4D7kFXyYgjZkSoEq0W4ULI_P_7kCf7bXSCu7c_lkgxVwCwM7UBb51J0-AlLE5KAtWzHnP-rZeMxxIrTOwi13Sep_RF2J7nY0XsQnVcUciG6YPFD5aL1pBmntxsrkY2arWmY8UTDoqeUy421iuO3rPtK5r-fSJxgfaBRK4cA8DAA';
+        const tileset = 'unacast_grouped_21';
+        const token = 'ya29.a0AfH6SMDbGCfWqW44F8fTJtZfitOxDL_aDyopyMuWVdWuPycuyUpG0adNaHLygd3qNpWoUD3hTHYCdevQv2MFejFuBpY-zPzxAWeH1c3yeyndNKoXyx5y1DqYcrxoa4YLvFxYjqCzLLlPaeXV9XB6yN_esiGpMmK6aDWDLnesqd-eqW_4hQK4-ZE8VEso9qrTSZha-y-1AbAwe-1hrh6alPQGtbswnwrp_bxXMIyAaPt5yZiljQr71vgAnDtIYY1jBj0qf4R1rhld';
 
         const data = { project, dataset, tileset, token };
-        const metadata = { id_property: 'identifier', center: null }
+        const metadata = { }
 
         const source = new carto.source.BigQueryTileset(data, metadata);
         const viz = new carto.Viz(`
-            width: ramp(buckets($device_horizontal_accuracy, [10, 100]), [2, 14])
+            width: ramp(buckets($avg_accuracy, [10, 100]), [2, 14])
         `);
         const layer = new carto.Layer('layer', source, viz);
 

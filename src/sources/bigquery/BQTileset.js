@@ -1,11 +1,12 @@
 
 import Dataframe from '../../renderer/dataframe/Dataframe';
-import Metadata from '../../renderer/Metadata';
 import MVTMetadata from '../MVTMetadata';
 import Base from '../Base';
 import BigQueryTileClient from './BQTileClient';
 import BigQueryTilesetClient from './BQTilesetClient';
 import Worker from '../Workers.worker';
+
+const DEFAULT_ID_PROPERTY = '___id';
 
 /**
  * BigQueryTileset source: PoC based on the MVT source to fetch tiles directly from a tileset in BigQuery.
@@ -17,15 +18,14 @@ import Worker from '../Workers.worker';
  * @param {string} data.token   - The token to authorize requests to the BigQuery project.
  *
  * @param {object} [metadata] - Optional attributes to overwrite tileset metadata:
- * @param {string} [metadata.id_property] - The name of the ID property ('cartodb_id', 'geoid').
- * @param {object} [metadata.properties]  - The information about available columns and types in the MVT ('{"geoid": {"type": "STRING"}, ...').
+ * @param {object} [metadata.properties]  - The information about available columns and types in the MVT ('{"prop": "String", ...').
  * @param {string} [metadata.maxzoom]     - The maximum zoom with tiles data ('14').
  * @param {string} [metadata.minzoom]     - The minimum zoom with tiles data ('4').
  * @param {string} [metadata.center]      - The initial position and zoom of the map ('-76.124268,38.933775,14')
  * @param {string} [metadata.bounds]      - The global bounds with tiles data available ('78.178689,0.000000,0.000000,39.719731').
  * @param {string} [metadata.compression] - The type of tile compression ('gzip').
  * @param {string} [metadata.tile_extent] - The size and resolution of the tile ('4096').
- * @param {string} [metadata.carto_quadkey_zoom] - The zoom level for quadkey optimization ('8')
+ * @param {string} [metadata.carto_quadkey_zoom] - The zoom level for quadkey optimization ('8').
  */
 export default class BigQueryTileset extends Base {
     constructor (data, metadata = {}) {
@@ -41,10 +41,7 @@ export default class BigQueryTileset extends Base {
     }
 
     _initMetadata (metadata) {
-        if (!(metadata instanceof Metadata)) {
-            metadata = new MVTMetadata(metadata);
-        }
-
+        metadata = new MVTMetadata(metadata);
         metadata.setCodecs();
         this._metadata = metadata;
     }
@@ -114,16 +111,16 @@ export default class BigQueryTileset extends Base {
         this._tilesetMetadata = { ...tilesetMetadata, ...this._tilesetMetadata };
 
         const properties = {};
-        const tilesetProps = JSON.parse(this._tilesetMetadata.properties);
+        const tilesetProps = JSON.parse(this._tilesetMetadata.json).vector_layers[0].fields;
 
         for (let key in tilesetProps) {
-            const prop = tilesetProps[key];
-            const type = prop.type === 'STRING' ? 'category' : 'number';
+            const type = tilesetProps[key] === 'String' ? 'category' : 'number';
             properties[key] = { type };
         }
+        properties[DEFAULT_ID_PROPERTY] = { type: 'number' };
 
         const metadata = {
-            idProperty: this._tilesetMetadata.id_property,
+            idProperty: DEFAULT_ID_PROPERTY,
             properties,
             extent: parseInt(this._tilesetMetadata.tile_extent)
         };
