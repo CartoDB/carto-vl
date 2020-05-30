@@ -1,6 +1,6 @@
 import BigQueryTileCache from './BQTileCache';
 import { rTiles } from '../../client/rsys';
-import { isSetsEqual } from '../../utils/util';
+import { isSetsEqual, projectToWebMercator, WM_R } from '../../utils/util';
 
 export default class BigQueryTileClient {
     constructor () {
@@ -14,8 +14,9 @@ export default class BigQueryTileClient {
         this._addDataframe = addDataframe;
     }
 
-    requestData (zoom, viewport, requestDataframes, viewportZoomToSourceZoom = Math.ceil) {
-        const extend = 0; // one-tile ring over the viewport
+    requestData (zoom, viewport, requestDataframes, viewportZoomToSourceZoom = Math.ceil, bounds) {
+        const extend = 0; // tile ring around the viewport
+        viewport = this._filterViewport(viewport, bounds);
         const tiles = rTiles(zoom, viewport, viewportZoomToSourceZoom, extend);
         return this._getTiles(tiles, requestDataframes);
     }
@@ -70,5 +71,30 @@ export default class BigQueryTileClient {
             }
             this._cache.set(`${x},${y},${z}`, dataframe);
         }
+    }
+
+    _filterViewport (viewport, bounds) {
+        if (bounds) {
+            const localBounds = this._localBounds(bounds);
+            return [
+                Math.max(viewport[0], localBounds[0]),
+                Math.max(viewport[1], localBounds[1]),
+                Math.min(viewport[2], localBounds[2]),
+                Math.min(viewport[3], localBounds[3])
+            ];
+        }
+        return viewport;
+    }
+
+    _localBounds (bounds) {
+        const sw = projectToWebMercator({
+            lng: bounds[0],
+            lat: bounds[1]
+        });
+        const ne = projectToWebMercator({
+            lng: bounds[2],
+            lat: bounds[3]
+        });
+        return [sw.x / WM_R, sw.y / WM_R, ne.x / WM_R, ne.y / WM_R];
     }
 }

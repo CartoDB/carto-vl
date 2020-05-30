@@ -141,6 +141,17 @@ export default class BigQueryTileset extends Base {
             };
         }
 
+        if (this._tilesetMetadata.bounds) {
+            const rawBounds = this._tilesetMetadata.bounds.split(',');
+            // [xmin, ymin, xmax, ymax]
+            this._tilesetMetadata.bounds = [
+                parseFloat(rawBounds[0]),
+                parseFloat(rawBounds[1]),
+                parseFloat(rawBounds[2]),
+                parseFloat(rawBounds[3])
+            ];
+        }
+
         this._initMetadata(metadata);
         this._initOptions(options);
     }
@@ -150,7 +161,7 @@ export default class BigQueryTileset extends Base {
         const viewportZoomToSourceZoom = this._viewportZoomToSourceZoom.bind(this);
 
         return this._tileClient.requestData(zoom, viewport,
-            requestDataframes, viewportZoomToSourceZoom
+            requestDataframes, viewportZoomToSourceZoom, this._tilesetMetadata.bounds
         );
     }
 
