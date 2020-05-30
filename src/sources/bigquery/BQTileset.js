@@ -26,6 +26,7 @@ const DEFAULT_ID_PROPERTY = '___id';
  * @param {string} [metadata.compression] - The type of tile compression ('gzip').
  * @param {string} [metadata.tile_extent] - The size and resolution of the tile ('4096').
  * @param {string} [metadata.carto_quadkey_zoom] - The zoom level for quadkey optimization ('8').
+ * @param {string} [metadata.extend_maxzoom_tiles] - A flag to use the max zoom tiles for bigger zoom values. Default is false.
  */
 export default class BigQueryTileset extends Base {
     constructor (data, metadata = {}) {
@@ -47,14 +48,6 @@ export default class BigQueryTileset extends Base {
     }
 
     _initOptions (options) {
-        if (options === undefined) {
-            options = {
-                viewportZoomToSourceZoom: Math.ceil,
-                maxZoom: undefined
-            };
-        }
-
-        options.viewportZoomToSourceZoom = options.viewportZoomToSourceZoom || Math.ceil;
         this._options = options;
     }
 
@@ -125,12 +118,15 @@ export default class BigQueryTileset extends Base {
             extent: parseInt(this._tilesetMetadata.tile_extent)
         };
 
+        const minZoom = parseInt(this._tilesetMetadata.minzoom);
         const maxZoom = parseInt(this._tilesetMetadata.maxzoom);
         const options = {
-            maxZoom,
             viewportZoomToSourceZoom: (zoom) => {
                 if (zoom > maxZoom) {
-                    return maxZoom;
+                    return this._tilesetMetadata.extend_maxzoom_tiles ? maxZoom : null;
+                }
+                if (zoom < minZoom) {
+                    return null;
                 }
                 return Math.ceil(zoom);
             }
@@ -180,14 +176,7 @@ export default class BigQueryTileset extends Base {
     }
 
     _viewportZoomToSourceZoom (zoom) {
-        const maxZoom = this._options.maxZoom;
-        const sourceZoom = this._options.viewportZoomToSourceZoom(zoom);
-
-        if (maxZoom === undefined) {
-            return sourceZoom;
-        }
-
-        return Math.min(sourceZoom, maxZoom);
+        return this._options.viewportZoomToSourceZoom(zoom);
     }
 
     free () {

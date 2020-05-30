@@ -77,6 +77,7 @@ export default class Layer {
         this._cameraMatrix = mat4.identity([]);
 
         this._updateLayer = this.update(source, viz);
+        this._map_init = false;
     }
 
     /**
@@ -234,6 +235,14 @@ export default class Layer {
         ]);
         await this._context;
 
+        // Set center from tileset metadata
+        if (!this._map_init && safeSource._tilesetMetadata && safeSource._tilesetMetadata.center) {
+            this._map_init = true;
+            const center = safeSource._tilesetMetadata.center;
+            this.map.setZoom(center.zoom);
+            this.map.setCenter([center.longitude, center.latitude]);
+        }
+
         this._endChange(majorChange, change);
 
         this._commitSuccesfulUpdate(metadata, viz, safeSource);
@@ -297,13 +306,6 @@ export default class Layer {
         newSource.bindLayer(this._onDataframeAdded.bind(this));
         if (newSource !== this._source) {
             this._freeSource();
-        } else {
-            // Test: set center from tileset metadata
-            if (newSource._tilesetMetadata && newSource._tilesetMetadata.center) {
-                const center = newSource._tilesetMetadata.center;
-                this.map.setCenter([center.longitude, center.latitude]);
-                this.map.setZoom(center.zoom);
-            }
         }
         this._source = newSource;
     }

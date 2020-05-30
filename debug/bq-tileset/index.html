@@ -11,7 +11,8 @@
 </head>
 
 <body>
-    <div id="map"></div>
+    <div id="map" style="visibility:hidden;"></div>
+    <span id="info" style="position:absolute;bottom:0;"></span>
     <div id="loader">
         <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
             <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
@@ -23,18 +24,16 @@
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.voyager,
-            // center: [-76.124268, 38.933775],
-            // zoom: 12,
             pitchWithRotate: false
         });
 
         const project = 'cartodb-gcp-backend-data-team';
         const dataset = 'carto_tilesets'
         const tileset = 'unacast_grouped_21';
-        const token = 'ya29.a0AfH6SMDbGCfWqW44F8fTJtZfitOxDL_aDyopyMuWVdWuPycuyUpG0adNaHLygd3qNpWoUD3hTHYCdevQv2MFejFuBpY-zPzxAWeH1c3yeyndNKoXyx5y1DqYcrxoa4YLvFxYjqCzLLlPaeXV9XB6yN_esiGpMmK6aDWDLnesqd-eqW_4hQK4-ZE8VEso9qrTSZha-y-1AbAwe-1hrh6alPQGtbswnwrp_bxXMIyAaPt5yZiljQr71vgAnDtIYY1jBj0qf4R1rhld';
+        const token = 'ya29.a0AfH6SMAkCXPx_y9Ox6WXzEmzpgO-Fdg4nCSsfFRsJSzoEuHX4gVxo6UbcjiJaDZ6dQ87P0tz0UAjttPQrZJLtv-WSqvnmfbmAIHr1sNEje_uB1SOrk3EN5n-kz2smo5Ltd7jMkmlzgNcUzEoYp1Ypuf5ygxC3IzHs-fScQpTAc6xv204sldCsEbHFpXGr8Bu8Zs7Cm_6f1zfDrjEuCEEtPmG8k5SNTi60TD6V--ufW7kA9rwH7x0AaZvaKEK3NTZjjECq25pJLLY';
 
         const data = { project, dataset, tileset, token };
-        const metadata = { }
+        const metadata = { extend_maxzoom_tiles: true };
 
         const source = new carto.source.BigQueryTileset(data, metadata);
         const viz = new carto.Viz(`
@@ -42,10 +41,19 @@
         `);
         const layer = new carto.Layer('layer', source, viz);
 
+        updateZoom();
+        map.on('zoom', updateZoom);
+
         layer.addTo(map, 'watername_ocean');
         layer.on('loaded', () => {
+            document.getElementById('map').style.visibility = 'visible';
             document.getElementById('loader').style.opacity = '0';
         });
+
+        function updateZoom() {
+            const zoom = map.getZoom().toFixed(4)
+            document.getElementById('info').innerText = `Zoom: ${zoom}`
+        }
     </script>
 </body>
 
