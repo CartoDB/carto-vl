@@ -19589,6 +19589,8 @@ const MVT_TO_CARTO_TYPES = {
     3: _utils_geometry__WEBPACK_IMPORTED_MODULE_8__["GEOMETRY_TYPE"].POLYGON
 };
 
+const DEFAULT_ID_PROPERTY = '___id';
+
 class BigQueryTilesetWorker {
     // Worker API
     onmessage (event) {
@@ -19698,9 +19700,9 @@ class BigQueryTilesetWorker {
         const scalarPropertyCodecs = this._scalarPropertyCodecs(metadata);
         const rangePropertyCodecs = this._rangePropertyCodecs(metadata);
         for (let i = 0; i < mvtLayer.length; i++) {
-            const f = mvtLayer.feature(i);
-            this._checkType(f, metadata.geomType);
-            const geom = f.loadGeometry();
+            const feature = mvtLayer.feature(i);
+            this._checkType(feature, metadata.geomType);
+            const geom = feature.loadGeometry();
             if (decodeFn) {
                 const decodedPolygons = decodeFn(geom, mvtExtent);
                 geometries.push(decodedPolygons);
@@ -19720,13 +19722,7 @@ class BigQueryTilesetWorker {
                 pointGeometries[6 * numFeatures + 4] = x;
                 pointGeometries[6 * numFeatures + 5] = y;
             }
-            if (f.properties[metadata.idProperty] === undefined) {
-                throw new _errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_7__["default"](
-                    `MVT feature with undefined idProperty '${metadata.idProperty}'`,
-                    _errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_7__["CartoRuntimeErrorTypes"].MVT
-                );
-            }
-            this._decodeProperties(metadata, scalarPropertyCodecs, rangePropertyCodecs, properties, f, numFeatures);
+            this._decodeProperties(metadata, scalarPropertyCodecs, rangePropertyCodecs, properties, feature, numFeatures);
             numFeatures++;
         }
 
@@ -19795,7 +19791,9 @@ class BigQueryTilesetWorker {
         let length = scalarPropertyCodecs.length;
         for (let j = 0; j < length; j++) {
             const [propertyName, codec] = scalarPropertyCodecs[j];
-            const propertyValue = feature.properties[propertyName];
+            const propertyValue = (propertyName === DEFAULT_ID_PROPERTY)
+                ? feature.id
+                : feature.properties[propertyName];
             properties[propertyName][i] = codec.sourceToInternal(metadata, propertyValue);
         }
 
@@ -21079,4 +21077,4 @@ function isTimeRange (t) {
 /***/ })
 
 /******/ });
-//# sourceMappingURL=carto-vl-5eec9018f114ed8cf9e8.worker.js.map
+//# sourceMappingURL=carto-vl-cf2b1738bce7a41a17b6.worker.js.map
