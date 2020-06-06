@@ -101,32 +101,32 @@ workflows:
   version: 2.1
   build_and_test:
     jobs:
-      - test-e2e-pg10
-      - test-e2e-pg11
+      # - test-e2e-pg10
+      # - test-e2e-pg11
       - test-unit-lint-docs
       - test-render
       - test-user
-      - sauce-connect/with_proxy:
-          name: test-browsers-saucelabs
-          steps:
-            - run: echo Install node and yarn
-            - run: curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
-            - run: sudo apt-get install -y nodejs
-            - run: curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-            - run: echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-            - run: sudo apt-get install apt-transport-https
-            - run: sudo apt-get update && sudo apt-get install yarn
-            - checkout
-            - restore_cache:
-                keys:
-                - v1-dependencies-{{ checksum "package.json" }}
-                # fallback to using the latest cache if no exact match is found
-                - v1-dependencies-
-            - run: yarn install
-            - save_cache:
-                paths:
-                  - node_modules
-                key: v1-dependencies-{{ checksum "package.json" }}
-            - run: yarn test:browsers:compatibility
-          tunnel_identifier: "cartovl-tunnel"
-          version: 4.5.3
+      # - sauce-connect/with_proxy:
+      #     name: test-browsers-saucelabs
+      #     steps:
+      #       - run: echo Install node and yarn
+      #       - run: curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+      #       - run: sudo apt-get install -y nodejs
+      #       - run: curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+      #       - run: echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+      #       - run: sudo apt-get install apt-transport-https
+      #       - run: sudo apt-get update && sudo apt-get install yarn
+      #       - checkout
+      #       - restore_cache:
+      #           keys:
+      #           - v1-dependencies-{{ checksum "package.json" }}
+      #           # fallback to using the latest cache if no exact match is found
+      #           - v1-dependencies-
+      #       - run: yarn install
+      #       - save_cache:
+      #           paths:
+      #             - node_modules
+      #           key: v1-dependencies-{{ checksum "package.json" }}
+      #       - run: yarn test:browsers:compatibility
+      #     tunnel_identifier: "cartovl-tunnel"
+      #     version: 4.5.3
