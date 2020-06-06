@@ -26,7 +26,7 @@
         .content .info {
             position: absolute;
             margin: 8px;
-            top: 0;
+            z-index: 1;
         }
         .container-fluid {
             padding: 16px;
@@ -41,8 +41,8 @@
 
 <body>
     <div class="content">
-        <div class="map" id="map"></div>
         <span class="info" id="info"></span>
+        <div class="map" id="map"></div>
     </div>
     <div class="container-fluid">
         <div class="row">
@@ -54,7 +54,7 @@
                     </div>
                     <div class="form-group">
                         <label for="token">Token</label>
-                        <input type="password" class="form-control" id="token" placeholder="Enter GCP token" value="ya29.a0AfH6SMBOzjUlphHCdXr0ASViPa3LUpwdoozRfPzSA63V4PFUPNcBtMy0-pJi9FysNlOxo7l0EYiWg8hpWb7_N0I26HU_FoJlnb37kRBb8R5GQRMkk88q89PD463NpmAAfx-wyrHtLr23RP5TV4LQVMjLXpn6_zabVB8QlI9n3dtAvLsgo4mrExpWrY9atGHJOC2eenOAX3Pv8il2ez8G5iRMY_rMmbovoEXRLVIwXVDqvx1EVZhd335jeGpvXnILPE1dm7cQKlsaog">
+                        <input type="text" class="form-control" id="token" placeholder="Enter GCP token" value="">
                     </div>
                     <button type="submit" class="btn btn-primary">Render layer</button>
                 </form>

@@ -104,7 +104,7 @@ workflows:
       # - test-e2e-pg10
       # - test-e2e-pg11
       - test-unit-lint-docs
-      - test-render
+      # - test-render
       - test-user
       # - sauce-connect/with_proxy:
       #     name: test-browsers-saucelabs
