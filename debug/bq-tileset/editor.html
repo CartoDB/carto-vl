@@ -49,6 +49,10 @@
             <div class="col-md-2">
                 <form action="javascript:renderLayer()">
                     <div class="form-group">
+                        <label for="tileset">Project</label>
+                        <input type="text" class="form-control" id="project" placeholder="Enter project" value="cartodb-gcp-backend-data-team">
+                    </div>
+                    <div class="form-group">
                         <label for="tileset">Tileset</label>
                         <input type="text" class="form-control" id="tileset" placeholder="Enter tileset" value="unacast_grouped_21">
                     </div>
@@ -62,7 +66,7 @@
             <div class="col-md-10">
                 <div class="form-group">
                     <label for="style">Style</label>
-                    <textarea class="form-control" id="style" rows="6"></textarea>
+                    <textarea class="form-control" id="style" rows="9"></textarea>
                 </div>
             </div>
 
@@ -82,7 +86,7 @@
         function renderLayer () {
             layer && layer.remove();
 
-            const project = 'cartodb-gcp-backend-data-team';
+            const project = document.getElementById('project').value;
             const dataset = 'carto_tilesets'
             const tileset = document.getElementById('tileset').value;
             const token = document.getElementById('token').value;

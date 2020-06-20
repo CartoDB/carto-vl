@@ -27,7 +27,7 @@
         .content .map {
             position: absolute;
             top: 0;
-            bottom: 243px;
+            bottom: 330px;
             width: 100%;
         }
         .content .info {
@@ -45,7 +45,7 @@
             resize: none;
         }
         .compare-swiper-vertical {
-            top: calc(50% - 122px) !important;
+            top: calc(50% - 165px) !important;
         }
     </style>
 </head>
@@ -61,6 +61,10 @@
             <div class="col-md-2">
                 <form action="javascript:renderLayer(0)">
                     <div class="form-group">
+                        <label for="tileset">Project</label>
+                        <input type="text" class="form-control" id="project0" placeholder="Enter project" value="cartodb-gcp-backend-data-team">
+                    </div>
+                    <div class="form-group">
                         <label for="tileset">Tileset</label>
                         <input type="text" class="form-control" id="tileset0" placeholder="Enter tileset" value="unacast_grouped_21">
                     </div>
@@ -74,17 +78,21 @@
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="style">Style</label>
-                    <textarea class="form-control" id="style0" rows="6"></textarea>
+                    <textarea class="form-control" id="style0" rows="9"></textarea>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="style">Style</label>
-                    <textarea class="form-control" id="style1" rows="6"></textarea>
+                    <textarea class="form-control" id="style1" rows="9"></textarea>
                 </div>
             </div>
             <div class="col-md-2">
                 <form action="javascript:renderLayer(1)">
+                    <div class="form-group">
+                        <label for="tileset">Project</label>
+                        <input type="text" class="form-control" id="project1" placeholder="Enter project" value="cartodb-gcp-backend-data-team">
+                    </div>
                     <div class="form-group">
                         <label for="tileset">Tileset</label>
                         <input type="text" class="form-control" id="tileset1" placeholder="Enter tileset" value="unacast_grouped_21">
@@ -120,7 +128,7 @@
         function renderLayer (index) {
             layers[index] && layers[index].remove();
 
-            const project = 'cartodb-gcp-backend-data-team';
+            const project = document.getElementById('project' + index).value;
             const dataset = 'carto_tilesets'
             const tileset = document.getElementById('tileset' + index).value;
             const token = document.getElementById('token' + index).value;
