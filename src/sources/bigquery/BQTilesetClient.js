@@ -1,6 +1,9 @@
 import BigQueryClient from './BQClient';
+import GilbertPartition from './BQQuadkey';
 import { decode } from 'base64-arraybuffer';
 import { inflate } from 'pako';
+
+let partitioner = null;
 
 export default class BigQueryTilesetClient {
     constructor (projectId, token) {
@@ -26,12 +29,14 @@ export default class BigQueryTilesetClient {
             }
         }
 
+        const params = JSON.parse(metadata.quadkey_params);
+        partitioner = initializePartitioner(params);
+
         return metadata;
     }
 
     async fetchTiles (tiles, dataset, tileset, tilesetMetadata) {
-        const quadKeyZoom = parseInt(tilesetMetadata.carto_quadkey_zoom);
-        const parentQuadkeys = getParentIntegerQuadkeysFromTiles(tiles, quadKeyZoom);
+        const parentQuadkeys = getParentQuadkeysFromTiles(tiles);
         const parentQuadkeysFilter = parentQuadkeys.length ? `carto_quadkey IN (${parentQuadkeys})` : 'TRUE';
         const tilesFilter = tiles.map((tile) => tileFilter(tile)).join(' OR ');
         const sqlQuery = `
@@ -82,49 +87,27 @@ export default class BigQueryTilesetClient {
     }
 }
 
-function getParentIntegerQuadkeysFromTiles (tiles, zOutput) {
-    if (zOutput === 0) {
-        return [];
-    }
+function initializePartitioner (parameters) {
+    const zRange = {
+        zmin: parameters.zmin,
+        zmax: parameters.zmax
+    };
+    const zmaxBBox = {
+        xmin: parameters.xmin,
+        xmax: parameters.xmax,
+        ymin: parameters.ymin,
+        ymax: parameters.ymax
+    };
+    const partitions = parameters.partitions;
+    return new GilbertPartition(partitions, zRange, zmaxBBox);
+}
 
+function getParentQuadkeysFromTiles (tiles) {
     let result = new Set();
     for (let tile of tiles) {
-        result.add(getParentIntegerQuadkeyFromTile(tile, zOutput));
+        partitioner.getPartition({ z: tile.z, x: tile.x, y: tile.y });
     }
-
     return [...result].filter(x => x !== null);
-}
-
-function getParentIntegerQuadkeyFromTile (tile, zOutput) {
-    if (tile.z === 0) {
-        return null;
-    }
-
-    zOutput = (zOutput === undefined || zOutput === null || zOutput < 0) ? tile.z : zOutput;
-
-    let index = getQuadkeyFromTile(tile);
-
-    if (index.length >= zOutput) {
-        index = index.substring(0, zOutput);
-    } else {
-        index += '0'.repeat(zOutput - index.length);
-    }
-
-    return parseInt(index, 4);
-}
-
-function getQuadkeyFromTile (tile) {
-    let index = '';
-
-    for (let z0 = tile.z; z0 > 0; z0--) {
-        let b = 0;
-        let mask = 1 << (z0 - 1);
-        if ((tile.x & mask) !== 0) b++;
-        if ((tile.y & mask) !== 0) b += 2;
-        index += b.toString();
-    }
-
-    return index;
 }
 
 function tileFilter (tile) {
