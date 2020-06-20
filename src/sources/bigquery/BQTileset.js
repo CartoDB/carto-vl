@@ -25,7 +25,7 @@ const DEFAULT_ID_PROPERTY = '___id';
  * @param {string} [metadata.bounds]      - The global bounds with tiles data available ('78.178689,0.000000,0.000000,39.719731').
  * @param {string} [metadata.compression] - The type of tile compression ('gzip').
  * @param {string} [metadata.tile_extent] - The size and resolution of the tile ('4096').
- * @param {string} [metadata.carto_quadkey_zoom] - The zoom level for quadkey optimization ('8').
+ * @param {string} [metadata.carto_quadkey_zoom] - The quadkey optimization params ('{"version":1,"partitions":4000,"zmin":0,"zmax":14,"xmin":4634,"xmax":4747,"ymin":6219,"ymax":6322}').
  * @param {string} [metadata.extend_maxzoom_tiles] - A flag to use the max zoom tiles for bigger zoom values. Default is false.
  */
 export default class BigQueryTileset extends Base {

@@ -3,7 +3,8 @@ import GilbertPartition from './BQQuadkey';
 import { decode } from 'base64-arraybuffer';
 import { inflate } from 'pako';
 
-let partitioner = null;
+// Singleton
+let _partitioner = null;
 
 export default class BigQueryTilesetClient {
     constructor (projectId, token) {
@@ -29,13 +30,15 @@ export default class BigQueryTilesetClient {
             }
         }
 
-        const params = JSON.parse(metadata.quadkey_params);
-        partitioner = initializePartitioner(params);
-
         return metadata;
     }
 
     async fetchTiles (tiles, dataset, tileset, tilesetMetadata) {
+        if (!_partitioner) {
+            const params = JSON.parse(tilesetMetadata.carto_quadkey_zoom);
+            _partitioner = initializePartitioner(params);
+        }
+
         const parentQuadkeys = getParentQuadkeysFromTiles(tiles);
         const parentQuadkeysFilter = parentQuadkeys.length ? `carto_quadkey IN (${parentQuadkeys})` : 'TRUE';
         const tilesFilter = tiles.map((tile) => tileFilter(tile)).join(' OR ');
@@ -88,6 +91,9 @@ export default class BigQueryTilesetClient {
 }
 
 function initializePartitioner (parameters) {
+    if (parameters.version !== 1) {
+        throw new Error('Unknown quadkey version');
+    }
     const zRange = {
         zmin: parameters.zmin,
         zmax: parameters.zmax
@@ -105,7 +111,7 @@ function initializePartitioner (parameters) {
 function getParentQuadkeysFromTiles (tiles) {
     let result = new Set();
     for (let tile of tiles) {
-        partitioner.getPartition({ z: tile.z, x: tile.x, y: tile.y });
+        result.add(_partitioner.getPartition({ z: tile.z, x: tile.x, y: tile.y }));
     }
     return [...result].filter(x => x !== null);
 }
