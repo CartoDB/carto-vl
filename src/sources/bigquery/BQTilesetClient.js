@@ -96,7 +96,8 @@ function initializePartitioner (parameters) {
     }
     const zRange = {
         zmin: parameters.zmin,
-        zmax: parameters.zmax
+        zmax: parameters.zmax,
+        zstep: parameters.zstep
     };
     const zmaxBBox = {
         xmin: parameters.xmin,

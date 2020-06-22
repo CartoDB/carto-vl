@@ -19405,6 +19405,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return GilbertPartition; });
 /* eslint-disable */
 
+
 const PARTITION_UNPARTITIONED = 0;
 
 /**
@@ -19416,10 +19417,24 @@ const PARTITION_UNPARTITIONED = 0;
  * of the **remaining** space to the zoom level right below it, 75%(75%(75%)) to the next one, and so on.
  *
  * When (zmin != 0) we divide the "saved" partition space in the same proportion as the full partition table
+ *
+ * When (zstep != 1) we assign those partitions to the next valid zoom level
  */
-function partition_range_by_zoom (partition_count, { z, zmin, zmax }) {
-    if (z < 0 || zmin < 0 || zmax < 0 || z < zmin || z > zmax || partition_count < 1)
+function partition_range_by_zoom(partition_count, param = { z, zmin, zmax, zstep }) {
+
+    if (param.z < 0 || param.zmin < 0 || param.zmax < 0 || param.zstep < 1 ||
+        param.z < param.zmin || param.z > param.zmax || param.partition_count < 1 ||
+        (param.z != param.zmin && ((param.z - param.zmin) % param.zstep) !== 0)) {
         return { min: PARTITION_UNPARTITIONED, max: PARTITION_UNPARTITIONED };
+    }
+
+    /* Adapt levels to always start from 0 */
+    const zstep = param.zstep;
+    const zmin = 0;
+    let zmax = param.zmax - param.zmin;
+    zmax = zmax - (zmax % zstep);
+    let z = param.z - param.zmin;
+    let range_initial_z = z - zstep + 1;
 
     const global_start = 1;
     const global_end = partition_count;
@@ -19428,26 +19443,23 @@ function partition_range_by_zoom (partition_count, { z, zmin, zmax }) {
         return { min: global_start, max: global_end };
     }
 
-    const zoom_divisor = (Math.pow(4, zmax - z + 1));
-    let saved_space = 0;
-    let saved_space_used_by_previous = 0;
-    let saved_space_used_by_z = 0;
-    if (zmin !== 0) {
-        /* We calculate the offsets of the saved space */
-        const zmin_divisor = Math.pow(4, zmax - zmin + 1);
-        saved_space = global_end / zmin_divisor;
-        saved_space_used_by_previous = saved_space * (Math.pow(4, z - zmin) - 1) / zmin_divisor;
-        saved_space_used_by_z = saved_space * 3 / zoom_divisor;
+    /* Note that the z0 level gets special treatment since it gets the whole 100% of its remaining space */
+    let z_partitions = 0;
+    let partition_start;
+    if (z == 0) {
+        z_partitions = 4 * global_end / Math.pow(4, zmax + 1);
+        partition_start = 0;
+    } else {
+        for (let acc = range_initial_z; acc <= z; acc++) {
+            z_partitions += 3 * global_end / Math.pow(4, zmax - acc + 1);
+        }
+        partition_start = global_end / Math.pow(4, zmax - range_initial_z + 1);
     }
-
-    const z_partitions = global_end * 3 / zoom_divisor;
-    let partition_start = global_end / zoom_divisor - (saved_space - saved_space_used_by_previous);
-    const partition_end = z == zmax ? global_end - global_start : partition_start + z_partitions + saved_space_used_by_z;
+    const partition_end = partition_start + z_partitions;
     /* We round the start (instead of using floor) to give the lower zoom levels more partitions as 
      * they tend to be overcrowded, especially in rectangles with a great difference between height and width
      */
     partition_start = Math.round(partition_start);
-
     return {
         min: partition_start + global_start,
         max: Math.min(global_end, Math.max(Math.floor(partition_end), partition_start) + global_start)
@@ -19587,12 +19599,13 @@ class GilbertPartition {
      *            These are tile coordinates (x, y) not geography coordinates
      */
     constructor(partition_count,
-        z_range = { zmin, zmax },
+        z_range = { zmin, zmax, zstep },
         zmax_bbox = { xmin, xmax, ymin, ymax }) {
         this.partition_count = parseInt(partition_count);
         this.z_range = {
             zmin: parseInt(z_range.zmin),
-            zmax: parseInt(z_range.zmax)
+            zmax: parseInt(z_range.zmax),
+            zstep: parseInt(z_range.zstep)
         };
         this.zmax_bbox = {
             xmin: parseInt(zmax_bbox.xmin),
@@ -19605,9 +19618,9 @@ class GilbertPartition {
             throw `Unexpected partition count. Expected a positive integer. Got ${partition_count}`;
         if (!this.z_range)
             throw `Missing z_range`;
-        if (isNaN(this.z_range.zmin) || isNaN(this.z_range.zmax))
-            throw `Invalid z_range. Both zmin and zmax need to be defined. Got ${JSON.stringify(z_range)}`;
-        if (this.z_range.zmin > this.z_range.zmax || this.z_range.zmin < 0)
+        if (isNaN(this.z_range.zmin) || isNaN(this.z_range.zmax) || isNaN(this.z_range.zstep))
+            throw `Invalid z_range. Both zmin, zmax and zstep need to be defined. Got ${JSON.stringify(z_range)}`;
+        if (this.z_range.zmin > this.z_range.zmax || this.z_range.zmin < 0 || this.zstep < 1)
             throw `Invalid z_range received. Got (${JSON.stringify(z_range)})`;
         if (!this.zmax_bbox)
             throw `Missing zmax_bbox`;
@@ -19631,7 +19644,7 @@ class GilbertPartition {
         }
 
         const partition_range = partition_range_by_zoom(this.partition_count,
-            { z: tile.z, zmin: this.z_range.zmin, zmax: this.z_range.zmax });
+            { z: tile.z, zmin: this.z_range.zmin, zmax: this.z_range.zmax, zstep: this.z_range.zstep });
         const usable_partitions = partition_range.max - partition_range.min + 1;
         if (usable_partitions == 1) {
             return partition_range.min;
@@ -19666,6 +19679,7 @@ class GilbertPartition {
         return partition_range.min + Math.floor(usable_partitions * gilbert_position / rectangle_size);
     }
 }
+
 
 /***/ }),
 
@@ -19783,7 +19797,8 @@ function initializePartitioner (parameters) {
     }
     const zRange = {
         zmin: parameters.zmin,
-        zmax: parameters.zmax
+        zmax: parameters.zmax,
+        zstep: parameters.zstep
     };
     const zmaxBBox = {
         xmin: parameters.xmin,
@@ -21343,4 +21358,4 @@ function isTimeRange (t) {
 /***/ })
 
 /******/ });
-//# sourceMappingURL=carto-vl-798e4cb504254db0a1cb.worker.js.map
+//# sourceMappingURL=carto-vl-91ee0cafd1e8f2199af1.worker.js.map
