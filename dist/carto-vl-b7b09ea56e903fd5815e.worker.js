@@ -19714,21 +19714,19 @@ class BigQueryTilesetClient {
 
     async fetchMetadata (dataset, tileset) {
         const sqlQuery = `
-            SELECT name, value
-            FROM \`${dataset}.metadata\`
-            WHERE table_name = '${tileset}'`;
+            SELECT option_value FROM \`${dataset}.INFORMATION_SCHEMA.TABLE_OPTIONS\` 
+            WHERE table_name='${tileset}' AND option_name = 'description'`;
 
         const result = await this._execute(sqlQuery);
 
-        const metadata = {};
+        let metadata = {};
 
-        if (result && result.rows) {
-            for (let i = 0; i < result.rows.length; i++) {
-                const row = result.rows[i];
-                if (row.f && row.f.length === 2) {
-                    metadata[row.f[0].v] = row.f[1].v;
-                }
-            }
+        if (result && result.rows && result.rows.length && result.rows[0] && result.rows[0].f &&
+            result.rows[0].f.length && result.rows[0].f[0] && result.rows[0].f[0].v) {
+            const rawMetadata = result.rows[0].f[0].v;
+            metadata = JSON.parse(JSON.parse(rawMetadata));
+        } else {
+            throw Error('Tileset metadata not available');
         }
 
         return metadata;
@@ -19736,15 +19734,15 @@ class BigQueryTilesetClient {
 
     async fetchTiles (tiles, dataset, tileset, tilesetMetadata) {
         if (!_partitioner) {
-            const params = JSON.parse(tilesetMetadata.carto_quadkey_zoom);
+            const params = tilesetMetadata.carto_partition;
             _partitioner = initializePartitioner(params);
         }
 
         const parentQuadkeys = getParentQuadkeysFromTiles(tiles);
-        const parentQuadkeysFilter = parentQuadkeys.length ? `carto_quadkey IN (${parentQuadkeys})` : 'TRUE';
+        const parentQuadkeysFilter = parentQuadkeys.length ? `carto_partition IN (${parentQuadkeys})` : 'TRUE';
         const tilesFilter = tiles.map((tile) => tileFilter(tile)).join(' OR ');
         const sqlQuery = `
-            SELECT zoom_level, tile_column, tile_row, tile_data
+            SELECT z, x, y, data
             FROM \`${dataset}.${tileset}\`
             WHERE (${parentQuadkeysFilter}) AND (${tilesFilter})`;
 
@@ -19819,7 +19817,7 @@ function getParentQuadkeysFromTiles (tiles) {
 }
 
 function tileFilter (tile) {
-    return `(zoom_level = ${tile.z} AND tile_column = ${tile.x} AND tile_row = ${tile.y})`;
+    return `(z = ${tile.z} AND x = ${tile.x} AND y = ${tile.y})`;
 }
 
 
@@ -19898,7 +19896,7 @@ class BigQueryTilesetWorker {
 
     async _requestDataframes (tiles, tilesetData, tilesetMetadata, metadata) {
         const client = new _BQTilesetClient__WEBPACK_IMPORTED_MODULE_9__["default"](tilesetData.project, tilesetData.token);
-        const responseTiles = await client.fetchTiles(tiles, tilesetData.dataset, tilesetData.tileset, tilesetMetadata);
+        const responseTiles = await client.fetchTiles(tiles, tilesetData.dataset, tilesetData.table, tilesetMetadata);
         const dataframes = await Promise.all(tiles.map((t) => {
             const responseTile = responseTiles && responseTiles.find((rt) => (rt.x === t.x && rt.y === t.y && rt.z === t.z));
             if (responseTile) {
@@ -21358,4 +21356,4 @@ function isTimeRange (t) {
 /***/ })
 
 /******/ });
-//# sourceMappingURL=carto-vl-91ee0cafd1e8f2199af1.worker.js.map
+//# sourceMappingURL=carto-vl-b7b09ea56e903fd5815e.worker.js.map
