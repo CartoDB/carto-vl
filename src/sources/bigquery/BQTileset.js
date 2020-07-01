@@ -14,7 +14,7 @@ const DEFAULT_ID_PROPERTY = '___id';
  * @param {object} data - BigQuery data to reference the tileset:
  * @param {string} data.project - The name of the BigQuery project.
  * @param {string} data.dataset - The name of the BigQuery dataset.
- * @param {string} data.tileset - The name of the BigQuery tileset table.
+ * @param {string} data.table  - The name of the BigQuery table.
  * @param {string} data.token   - The token to authorize requests to the BigQuery project.
  *
  * @param {object} [metadata] - Optional attributes to overwrite tileset metadata:
@@ -99,7 +99,7 @@ export default class BigQueryTileset extends Base {
 
     async initMetadata () {
         const client = new BigQueryTilesetClient(this._tilesetData.project, this._tilesetData.token);
-        const tilesetMetadata = await client.fetchMetadata(this._tilesetData.dataset, this._tilesetData.tileset);
+        const tilesetMetadata = await client.fetchMetadata(this._tilesetData.dataset, this._tilesetData.table);
 
         this._tilesetMetadata = { ...tilesetMetadata, ...this._tilesetMetadata };
 

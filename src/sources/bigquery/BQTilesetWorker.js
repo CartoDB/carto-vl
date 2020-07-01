@@ -49,7 +49,7 @@ export class BigQueryTilesetWorker {
 
     async _requestDataframes (tiles, tilesetData, tilesetMetadata, metadata) {
         const client = new BigQueryTilesetClient(tilesetData.project, tilesetData.token);
-        const responseTiles = await client.fetchTiles(tiles, tilesetData.dataset, tilesetData.tileset, tilesetMetadata);
+        const responseTiles = await client.fetchTiles(tiles, tilesetData.dataset, tilesetData.table, tilesetMetadata);
         const dataframes = await Promise.all(tiles.map((t) => {
             const responseTile = responseTiles && responseTiles.find((rt) => (rt.x === t.x && rt.y === t.y && rt.z === t.z));
             if (responseTile) {

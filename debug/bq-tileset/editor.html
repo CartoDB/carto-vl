@@ -4,7 +4,8 @@
 <head>
     <title>BigQuery Tileset Editor</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://rawcdn.githack.com/CartoDB/carto-vl/bq-poc-0.3/dist/carto-vl.min.js"></script>
+    <!-- <script src="https://rawcdn.githack.com/CartoDB/carto-vl/bq-poc-0.3/dist/carto-vl.min.js"></script> -->
+    <script src="http://localhost:8080/dist/carto-vl.js"></script>
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
     <link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.css">
@@ -49,16 +50,24 @@
             <div class="col-md-2">
                 <form action="javascript:renderLayer()">
                     <div class="form-group">
-                        <label for="tileset">Project</label>
-                        <input type="text" class="form-control" id="project" placeholder="Enter project" value="cartodb-gcp-backend-data-team">
+                        <label for="project">Project</label>
+                        <input type="text" class="form-control" id="project" placeholder="Enter project"
+                            value="cartodb-gcp-backend-data-team">
                     </div>
                     <div class="form-group">
-                        <label for="tileset">Tileset</label>
-                        <input type="text" class="form-control" id="tileset" placeholder="Enter tileset" value="unacast_grouped_21">
+                        <label for="dataset">Dataset</label>
+                        <input type="text" class="form-control" id="dataset" placeholder="Enter dataset"
+                            value="carto_tilesets">
+                    </div>
+                    <div class="form-group">
+                        <label for="table">Table</label>
+                        <input type="text" class="form-control" id="table" placeholder="Enter table"
+                            value="nyc_collisions">
                     </div>
                     <div class="form-group">
                         <label for="token">Token</label>
-                        <input type="text" class="form-control" id="token" placeholder="Enter GCP token" value="">
+                        <input type="text" class="form-control" id="token" placeholder="Enter GCP token"
+                            value="">
                     </div>
                     <button type="submit" class="btn btn-primary">Render layer</button>
                 </form>
@@ -66,7 +75,7 @@
             <div class="col-md-10">
                 <div class="form-group">
                     <label for="style">Style</label>
-                    <textarea class="form-control" id="style" rows="9"></textarea>
+                    <textarea class="form-control" id="style" rows="12"></textarea>
                 </div>
             </div>
 
@@ -87,12 +96,12 @@
             layer && layer.remove();
 
             const project = document.getElementById('project').value;
-            const dataset = 'carto_tilesets'
-            const tileset = document.getElementById('tileset').value;
+            const dataset = document.getElementById('dataset').value;
+            const table = document.getElementById('table').value;
             const token = document.getElementById('token').value;
             const style = document.getElementById('style').value;
 
-            const data = { project, dataset, tileset, token };
+            const data = { project, dataset, table, token };
             const metadata = { extend_maxzoom_tiles: true };
 
             const source = new carto.source.BigQueryTileset(data, metadata);

@@ -29,10 +29,10 @@
 
         const project = 'cartodb-gcp-backend-data-team';
         const dataset = 'carto_tilesets'
-        const tileset = 'unacast_grouped_21';
+        const table = 'unacast_grouped_21';
         const token = '';
 
-        const data = { project, dataset, tileset, token };
+        const data = { project, dataset, table, token };
         const metadata = { extend_maxzoom_tiles: true };
 
         const source = new carto.source.BigQueryTileset(data, metadata);

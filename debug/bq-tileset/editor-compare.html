@@ -4,7 +4,8 @@
 <head>
     <title>BigQuery Tileset Editor Compare</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://rawcdn.githack.com/CartoDB/carto-vl/bq-poc-0.3/dist/carto-vl.min.js"></script>
+    <!-- <script src="https://rawcdn.githack.com/CartoDB/carto-vl/bq-poc-0.3/dist/carto-vl.min.js"></script> -->
+    <script src="http://localhost:8080/dist/carto-vl.js"></script>
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.js"></script>
@@ -27,7 +28,7 @@
         .content .map {
             position: absolute;
             top: 0;
-            bottom: 330px;
+            bottom: 415px;
             width: 100%;
         }
         .content .info {
@@ -45,7 +46,7 @@
             resize: none;
         }
         .compare-swiper-vertical {
-            top: calc(50% - 165px) !important;
+            top: calc(50% - 207px) !important;
         }
     </style>
 </head>
@@ -61,16 +62,24 @@
             <div class="col-md-2">
                 <form action="javascript:renderLayer(0)">
                     <div class="form-group">
-                        <label for="tileset">Project</label>
-                        <input type="text" class="form-control" id="project0" placeholder="Enter project" value="cartodb-gcp-backend-data-team">
+                        <label for="project0">Project</label>
+                        <input type="text" class="form-control" id="project0" placeholder="Enter project"
+                            value="cartodb-gcp-backend-data-team">
                     </div>
                     <div class="form-group">
-                        <label for="tileset">Tileset</label>
-                        <input type="text" class="form-control" id="tileset0" placeholder="Enter tileset" value="unacast_grouped_21">
+                        <label for="dataset0">Dataset</label>
+                        <input type="text" class="form-control" id="dataset0" placeholder="Enter dataset"
+                            value="carto_tilesets">
+                    </div>
+                    <div class="form-group">
+                        <label for="table">Table</label>
+                        <input type="text" class="form-control" id="table0" placeholder="Enter table"
+                            value="nyc_collisions">
                     </div>
                     <div class="form-group">
                         <label for="token">Token</label>
-                        <input type="text" class="form-control" id="token0" placeholder="Enter GCP token" value="">
+                        <input type="text" class="form-control" id="token0" placeholder="Enter GCP token"
+                            value="">
                     </div>
                     <button type="submit" class="btn btn-primary">Render layer</button>
                 </form>
@@ -78,28 +87,36 @@
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="style">Style</label>
-                    <textarea class="form-control" id="style0" rows="9"></textarea>
+                    <textarea class="form-control" id="style0" rows="12"></textarea>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="style">Style</label>
-                    <textarea class="form-control" id="style1" rows="9"></textarea>
+                    <textarea class="form-control" id="style1" rows="12"></textarea>
                 </div>
             </div>
             <div class="col-md-2">
                 <form action="javascript:renderLayer(1)">
                     <div class="form-group">
-                        <label for="tileset">Project</label>
-                        <input type="text" class="form-control" id="project1" placeholder="Enter project" value="cartodb-gcp-backend-data-team">
+                        <label for="project1">Project</label>
+                        <input type="text" class="form-control" id="project1" placeholder="Enter project"
+                            value="cartodb-gcp-backend-data-team">
                     </div>
                     <div class="form-group">
-                        <label for="tileset">Tileset</label>
-                        <input type="text" class="form-control" id="tileset1" placeholder="Enter tileset" value="unacast_grouped_21">
+                        <label for="dataset1">Dataset</label>
+                        <input type="text" class="form-control" id="dataset1" placeholder="Enter dataset"
+                            value="carto_tilesets">
+                    </div>
+                    <div class="form-group">
+                        <label for="table1">Table</label>
+                        <input type="text" class="form-control" id="table1" placeholder="Enter table"
+                            value="nyc_collisions">
                     </div>
                     <div class="form-group">
                         <label for="token">Token</label>
-                        <input type="text" class="form-control" id="token1" placeholder="Enter GCP token" value="">
+                        <input type="text" class="form-control" id="token1" placeholder="Enter GCP token"
+                            value="">
                     </div>
                     <button type="submit" class="btn btn-primary">Render layer</button>
                 </form>
@@ -120,7 +137,7 @@
                 pitchWithRotate: false
             })
         ];
-        const map = new mapboxgl.Compare(maps[0], maps[1], "#content");
+        const map = new mapboxgl.Compare(maps[0], maps[1], '#content');
 
         updateZoom();
         maps[0].on('zoom', updateZoom);
@@ -129,12 +146,12 @@
             layers[index] && layers[index].remove();
 
             const project = document.getElementById('project' + index).value;
-            const dataset = 'carto_tilesets'
-            const tileset = document.getElementById('tileset' + index).value;
+            const dataset = document.getElementById('dataset' + index).value;
+            const table = document.getElementById('table' + index).value;
             const token = document.getElementById('token' + index).value;
             const style = document.getElementById('style' + index).value;
 
-            const data = { project, dataset, tileset, token };
+            const data = { project, dataset, table, token };
             const metadata = { extend_maxzoom_tiles: true };
 
             const source = new carto.source.BigQueryTileset(data, metadata);
