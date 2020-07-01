@@ -13,21 +13,19 @@ export default class BigQueryTilesetClient {
 
     async fetchMetadata (dataset, tileset) {
         const sqlQuery = `
-            SELECT name, value
-            FROM \`${dataset}.metadata\`
-            WHERE table_name = '${tileset}'`;
+            SELECT option_value FROM \`${dataset}.INFORMATION_SCHEMA.TABLE_OPTIONS\` 
+            WHERE table_name='${tileset}' AND option_name = 'description'`;
 
         const result = await this._execute(sqlQuery);
 
-        const metadata = {};
+        let metadata = {};
 
-        if (result && result.rows) {
-            for (let i = 0; i < result.rows.length; i++) {
-                const row = result.rows[i];
-                if (row.f && row.f.length === 2) {
-                    metadata[row.f[0].v] = row.f[1].v;
-                }
-            }
+        if (result && result.rows && result.rows.length && result.rows[0] && result.rows[0].f &&
+            result.rows[0].f.length && result.rows[0].f[0] && result.rows[0].f[0].v) {
+            const rawMetadata = result.rows[0].f[0].v;
+            metadata = JSON.parse(JSON.parse(rawMetadata));
+        } else {
+            throw Error('Tileset metadata not available');
         }
 
         return metadata;
@@ -35,7 +33,7 @@ export default class BigQueryTilesetClient {
 
     async fetchTiles (tiles, dataset, tileset, tilesetMetadata) {
         if (!_partitioner) {
-            const params = JSON.parse(tilesetMetadata.carto_quadkey_zoom);
+            const params = tilesetMetadata.carto_partition;
             _partitioner = initializePartitioner(params);
         }
 
@@ -91,7 +89,7 @@ export default class BigQueryTilesetClient {
 }
 
 function initializePartitioner (parameters) {
-    if (parameters.version !== 1) {
+    if (parameters.version !== 2) {
         throw new Error('Unknown quadkey version');
     }
     const zRange = {

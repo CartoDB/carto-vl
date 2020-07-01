@@ -18,14 +18,14 @@ const DEFAULT_ID_PROPERTY = '___id';
  * @param {string} data.token   - The token to authorize requests to the BigQuery project.
  *
  * @param {object} [metadata] - Optional attributes to overwrite tileset metadata:
- * @param {object} [metadata.properties]  - The information about available columns and types in the MVT ('{"prop": "String", ...').
+ * @param {object} [metadata.vector_layers] - The information about available layers in the vector tiles.
  * @param {string} [metadata.maxzoom]     - The maximum zoom with tiles data ('14').
  * @param {string} [metadata.minzoom]     - The minimum zoom with tiles data ('4').
  * @param {string} [metadata.center]      - The initial position and zoom of the map ('-76.124268,38.933775,14')
  * @param {string} [metadata.bounds]      - The global bounds with tiles data available ('78.178689,0.000000,0.000000,39.719731').
  * @param {string} [metadata.compression] - The type of tile compression ('gzip').
  * @param {string} [metadata.tile_extent] - The size and resolution of the tile ('4096').
- * @param {string} [metadata.carto_quadkey_zoom] - The quadkey optimization params ('{"version":1,"partitions":4000,"zmin":0,"zmax":14,"xmin":4634,"xmax":4747,"ymin":6219,"ymax":6322}').
+ * @param {object} [metadata.carto_partition] - The quadkey optimization params ({"version":1,"partitions":4000,"zmin":0,"zmax":14,"xmin":4634,"xmax":4747,"ymin":6219,"ymax":6322}).
  * @param {string} [metadata.extend_maxzoom_tiles] - A flag to use the max zoom tiles for bigger zoom values. Default is false.
  */
 export default class BigQueryTileset extends Base {
@@ -104,7 +104,7 @@ export default class BigQueryTileset extends Base {
         this._tilesetMetadata = { ...tilesetMetadata, ...this._tilesetMetadata };
 
         const properties = {};
-        const tilesetProps = JSON.parse(this._tilesetMetadata.json).vector_layers[0].fields;
+        const tilesetProps = this._tilesetMetadata.vector_layers[0].fields;
 
         for (let key in tilesetProps) {
             const type = tilesetProps[key] === 'String' ? 'category' : 'number';
