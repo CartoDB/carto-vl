@@ -38,10 +38,10 @@ export default class BigQueryTilesetClient {
         }
 
         const parentQuadkeys = getParentQuadkeysFromTiles(tiles);
-        const parentQuadkeysFilter = parentQuadkeys.length ? `carto_quadkey IN (${parentQuadkeys})` : 'TRUE';
+        const parentQuadkeysFilter = parentQuadkeys.length ? `carto_partition IN (${parentQuadkeys})` : 'TRUE';
         const tilesFilter = tiles.map((tile) => tileFilter(tile)).join(' OR ');
         const sqlQuery = `
-            SELECT zoom_level, tile_column, tile_row, tile_data
+            SELECT z, x, y, data
             FROM \`${dataset}.${tileset}\`
             WHERE (${parentQuadkeysFilter}) AND (${tilesFilter})`;
 
@@ -89,7 +89,7 @@ export default class BigQueryTilesetClient {
 }
 
 function initializePartitioner (parameters) {
-    if (parameters.version !== 2) {
+    if (parameters.version !== 1) {
         throw new Error('Unknown quadkey version');
     }
     const zRange = {
@@ -116,5 +116,5 @@ function getParentQuadkeysFromTiles (tiles) {
 }
 
 function tileFilter (tile) {
-    return `(zoom_level = ${tile.z} AND tile_column = ${tile.x} AND tile_row = ${tile.y})`;
+    return `(z = ${tile.z} AND x = ${tile.x} AND y = ${tile.y})`;
 }
