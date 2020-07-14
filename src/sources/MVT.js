@@ -4,7 +4,7 @@ import Metadata from '../renderer/Metadata';
 import MVTMetadata from './MVTMetadata';
 import Base from './Base';
 import TileClient from './TileClient';
-import Worker from './MVTWorkers.worker';
+import Worker from './Workers.worker';
 
 export default class MVT extends Base {
     /**

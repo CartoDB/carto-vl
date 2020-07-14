@@ -1,5 +1,6 @@
 import { MVTWorker } from './MVTWorker';
 import { WindshaftWorker } from '../client/WindshaftWorker';
+import { BigQueryTilesetWorker } from './bigquery/BQTilesetWorker';
 
 // This file publishes a Web Worker onmessage function that will redirect incoming messages
 // based on an ID (`workerName`) defined by the message sender
@@ -7,7 +8,8 @@ import { WindshaftWorker } from '../client/WindshaftWorker';
 
 const workers = {
     MVT: new MVTWorker(),
-    windshaft: new WindshaftWorker()
+    windshaft: new WindshaftWorker(),
+    BigQueryTileset: new BigQueryTilesetWorker()
 };
 
 onmessage = function (event) {

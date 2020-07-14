@@ -54,6 +54,11 @@ module.exports = {
     plugins: [
         new webpack.BannerPlugin(banner)
     ],
+    node: {
+        child_process: 'empty',
+        net: 'empty',
+        tls: 'empty'
+    },
     performance: {
         maxEntrypointSize: 435200,
         maxAssetSize: 435200

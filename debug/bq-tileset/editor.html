@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>BigQuery Tileset Editor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://rawcdn.githack.com/CartoDB/carto-vl/bq-poc-0.7/dist/carto-vl.min.js"></script>
+    <!-- <script src="http://localhost:8080/dist/carto-vl.js"></script> -->
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
+    <link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <style>
+        html, body {
+            height: 100%;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+        .content {
+            flex: 1 0 auto;
+        }
+        .content .map {
+            height: 100%;
+        }
+        .content .info {
+            position: absolute;
+            margin: 8px;
+            z-index: 1;
+        }
+        .container-fluid {
+            padding: 16px;
+            border-top: 1px solid #CCC;
+            background: #FAFAFA;
+        }
+        textarea {
+            resize: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content">
+        <span class="info" id="info"></span>
+        <div class="map" id="map"></div>
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2">
+                <form action="javascript:renderLayer()">
+                    <div class="form-group">
+                        <label for="project">Project</label>
+                        <input type="text" class="form-control" id="project" placeholder="Enter project"
+                            value="cartodb-gcp-backend-data-team">
+                    </div>
+                    <div class="form-group">
+                        <label for="dataset">Dataset</label>
+                        <input type="text" class="form-control" id="dataset" placeholder="Enter dataset"
+                            value="rmr_tests">
+                    </div>
+                    <div class="form-group">
+                        <label for="table">Table</label>
+                        <input type="text" class="form-control" id="table" placeholder="Enter table"
+                            value="metadata_in_table_0">
+                    </div>
+                    <div class="form-group">
+                        <label for="token">Token</label>
+                        <input type="text" class="form-control" id="token" placeholder="Enter GCP token"
+                            value="">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Render layer</button>
+                </form>
+            </div>
+            <div class="col-md-10">
+                <div class="form-group">
+                    <label for="style">Style</label>
+                    <textarea class="form-control" id="style" rows="12"></textarea>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script>
+        let layer = null;
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.voyager,
+            pitchWithRotate: false
+        });
+
+        updateZoom();
+        map.on('zoom', updateZoom);
+
+        function renderLayer () {
+            layer && layer.remove();
+
+            const project = document.getElementById('project').value;
+            const dataset = document.getElementById('dataset').value;
+            const table = document.getElementById('table').value;
+            const token = document.getElementById('token').value;
+            const style = document.getElementById('style').value;
+
+            const data = { project, dataset, table, token };
+            const metadata = { extend_maxzoom_tiles: true };
+
+            const source = new carto.source.BigQueryTileset(data, metadata);
+            const viz = new carto.Viz(style);
+            layer = new carto.Layer('layer', source, viz);
+            layer.addTo(map, 'watername_ocean');
+
+            const styleElement = document.getElementById('style');
+            styleElement.addEventListener('input', (event) => {
+                try {
+                    styleElement.style.background = '';
+                    layer.blendToViz(new carto.Viz(event.target.value));
+                } catch (error) {
+                    styleElement.style.background = '#FFCDCD';
+                    // console.warn(error.message);
+                }
+            });
+        }
+
+        function updateZoom() {
+            const zoom = map.getZoom().toFixed(4);
+            document.getElementById('info').innerText = `Zoom: ${zoom}`;
+        }
+    </script>
+</body>
+
+</html>

@@ -2,7 +2,7 @@ import { decodeGeom } from '../decoder';
 import { GEOMETRY_TYPE, computeAABB, computeCentroids } from '../../utils/geometry';
 
 export default class DummyDataframe {
-    constructor ({ active, center, properties, propertiesArrayBuffer, scale, type, geom, size, metadata }) {
+    constructor ({ active, center, properties, propertiesArrayBuffer, scale, type, geom, size, metadata, x, y, z }) {
         this.active = active;
         this.center = center;
         this.properties = properties;
@@ -16,6 +16,9 @@ export default class DummyDataframe {
         this.propertyTex = [];
         this.metadata = metadata;
         this.propertyCount = 0;
+        this.x = x;
+        this.y = y;
+        this.z = z;
 
         this._aabb = computeAABB(geom, type);
         this._centroids = computeCentroids(this.decodedGeom, type);

@@ -33,6 +33,10 @@ module.exports = {
     },
     plugins: [
         new webpack.BannerPlugin(banner)
-
-    ]
+    ],
+    node: {
+        child_process: 'empty',
+        net: 'empty',
+        tls: 'empty'
+    }
 };

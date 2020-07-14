@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="http://localhost:8080/dist/carto-vl.js"></script>
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.css" rel="stylesheet" />
+    <link href="https://carto.com/developers/carto-vl/v1.4.4/examples/maps/style.css" rel="stylesheet">
+</head>
+
+<body>
+    <div id="map" style="visibility:hidden;"></div>
+    <span id="info" style="position:absolute;bottom:0;"></span>
+    <div id="loader">
+        <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+            <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+                <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+            </svg>
+        </div>
+    </div>
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.voyager,
+            pitchWithRotate: false
+        });
+
+        const project = 'cartodb-gcp-backend-data-team';
+        const dataset = 'carto_tilesets'
+        const table = 'unacast_grouped_21';
+        const token = '';
+
+        const data = { project, dataset, table, token };
+        const metadata = { extend_maxzoom_tiles: true };
+
+        const source = new carto.source.BigQueryTileset(data, metadata);
+        const viz = new carto.Viz(`
+            width: ramp(buckets($avg_accuracy, [10, 100]), [2, 14])
+        `);
+        const layer = new carto.Layer('layer', source, viz);
+
+        updateZoom();
+        map.on('zoom', updateZoom);
+
+        layer.addTo(map, 'watername_ocean');
+        layer.on('loaded', () => {
+            document.getElementById('map').style.visibility = 'visible';
+            document.getElementById('loader').style.opacity = '0';
+        });
+
+        function updateZoom() {
+            const zoom = map.getZoom().toFixed(4)
+            document.getElementById('info').innerText = `Zoom: ${zoom}`
+        }
+    </script>
+</body>
+
+</html>
