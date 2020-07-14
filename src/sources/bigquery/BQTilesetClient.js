@@ -24,6 +24,7 @@ export default class BigQueryTilesetClient {
             result.rows[0].f.length && result.rows[0].f[0] && result.rows[0].f[0].v) {
             const rawMetadata = result.rows[0].f[0].v;
             metadata = JSON.parse(rawMetadata);
+            console.log('Metadata', metadata);
         } else {
             throw Error('Tileset metadata not available');
         }
