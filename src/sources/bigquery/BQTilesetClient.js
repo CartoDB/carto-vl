@@ -13,8 +13,8 @@ export default class BigQueryTilesetClient {
 
     async fetchMetadata (dataset, tileset) {
         const sqlQuery = `
-            SELECT option_value FROM \`${dataset}.INFORMATION_SCHEMA.TABLE_OPTIONS\` 
-            WHERE table_name='${tileset}' AND option_name = 'description'`;
+            SELECT CAST(data AS STRING) FROM  \`${dataset}.${tileset}\`
+            WHERE carto_partition IS NULL AND z = -1`;
 
         const result = await this._execute(sqlQuery);
 
@@ -23,7 +23,7 @@ export default class BigQueryTilesetClient {
         if (result && result.rows && result.rows.length && result.rows[0] && result.rows[0].f &&
             result.rows[0].f.length && result.rows[0].f[0] && result.rows[0].f[0].v) {
             const rawMetadata = result.rows[0].f[0].v;
-            metadata = JSON.parse(JSON.parse(rawMetadata));
+            metadata = JSON.parse(rawMetadata);
         } else {
             throw Error('Tileset metadata not available');
         }
