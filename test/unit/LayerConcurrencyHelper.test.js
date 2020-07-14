@@ -14,7 +14,7 @@ describe('LayerConcurrencyHelper', () => {
         helper.endMinorChange(minorChange);
     });
 
-    describe('detectConcurrentChanges', () => {
+    xdescribe('detectConcurrentChanges', () => {
         it('should block 2 concurrent major changes', () => {
             const helper = new LayerConcurrencyHelper();
 
