@@ -52,7 +52,7 @@ export default class LayerConcurrencyHelper {
      * @param {Object} changeUID
      */
     endMinorChange (changeUID) {
-        this._detectConcurrentChanges(false, changeUID);
+        // this._detectConcurrentChanges(false, changeUID);
         this._setUID(changeUID);
     }
 

@@ -4,7 +4,7 @@
 <head>
     <title>BigQuery Tileset Editor</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://rawcdn.githack.com/CartoDB/carto-vl/bq-poc-0.6/dist/carto-vl.min.js"></script>
+    <!-- <script src="https://rawcdn.githack.com/CartoDB/carto-vl/bq-poc-0.6/dist/carto-vl.min.js"></script> -->
     <script src="http://localhost:8080/dist/carto-vl.js"></script>
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
@@ -62,7 +62,7 @@
                     <div class="form-group">
                         <label for="table">Table</label>
                         <input type="text" class="form-control" id="table" placeholder="Enter table"
-                            value="new_mode24">
+                            value="metadata_in_table_0">
                     </div>
                     <div class="form-group">
                         <label for="token">Token</label>
@@ -113,10 +113,10 @@
             styleElement.addEventListener('input', (event) => {
                 try {
                     styleElement.style.background = '';
-                    layer.update(source, new carto.Viz(event.target.value));
+                    layer.blendToViz(new carto.Viz(event.target.value));
                 } catch (error) {
                     styleElement.style.background = '#FFCDCD';
-                    console.warn(error.message);
+                    // console.warn(error.message);
                 }
             });
         }

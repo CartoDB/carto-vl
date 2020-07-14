@@ -90,6 +90,10 @@ export default class BigQueryTileset extends Base {
         this._tileClient.bindLayer(addDataframe);
     }
 
+    requiresNewMetadata () {
+        return false;
+    }
+
     async requestMetadata () {
         if (!this._metadata) {
             await this.initMetadata();
