@@ -132,7 +132,7 @@ export default class BigQueryTileset extends Base {
                 if (zoom < minZoom) {
                     return null;
                 }
-                return Math.ceil(zoom);
+                return Math.floor(zoom);
             }
         };
 
